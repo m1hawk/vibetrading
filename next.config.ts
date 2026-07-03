@@ -2,12 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "export",
-  distDir: "dist",
+  distDir: "out",
   images: {
     unoptimized: true,
-  },
-  turbopack: {
-    root: "/Users/yangzhen/Desktop/vibetrading",
   },
 };
 
