@@ -1,0 +1,302 @@
+---
+title: "Build a 24/7 AI Trading Agent with Claude Code and Alpaca"
+description: "Step-by-step tutorial to build an autonomous trading agent using Claude Code Routines and the Alpaca API. Includes complete code, guardrails, and deployment tips."
+date: "2026-07-03"
+category: "Tutorials"
+tags: ["claude code", "alpaca", "ai trading agent", "python", "tutorial"]
+readTime: "18 min read"
+featured: true
+---
+
+<Disclaimer />
+
+One of the most talked-about AI trading trends in 2026 is using Claude Code Routines to build autonomous trading agents. Unlike simple rule-based bots, these agents can research market conditions, form a view, decide whether to trade, execute through a broker API, and journal their reasoning.
+
+In this tutorial, you'll build a Claude Code trading agent that connects to Alpaca's free paper trading API. By the end, you'll have a working system you can run on a schedule with proper risk guardrails.
+
+## What This Agent Does
+
+The agent runs in a loop:
+
+1. **Research** — fetch prices, technical signals, and recent headlines for a watchlist.
+2. **Decide** — Claude analyzes the data and outputs a structured trade decision.
+3. **Execute** — place an order through Alpaca if the decision passes confidence and risk checks.
+4. **Journal** — write a structured log entry explaining every decision.
+
+## Prerequisites
+
+- An [Alpaca](https://alpaca.markets/) account (free)
+- An Anthropic API key with access to Claude
+- Node.js 20+ or Python 3.11+
+- Claude Code installed and authenticated
+- A server or cloud instance for 24/7 operation (local laptop won't work)
+
+## Step 1: Set Up Alpaca Connection
+
+Create `alpaca.js` with helper functions for account info, quotes, and order placement.
+
+```javascript
+const ALPACA_BASE_URL = "https://paper-api.alpaca.markets";
+const ALPACA_KEY = process.env.ALPACA_API_KEY;
+const ALPACA_SECRET = process.env.ALPACA_API_SECRET;
+
+async function alpacaFetch(path, options = {}) {
+  const res = await fetch(`${ALPACA_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      "APCA-API-KEY-ID": ALPACA_KEY,
+      "APCA-API-SECRET-KEY": ALPACA_SECRET,
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+  return res.json();
+}
+
+export async function getAccount() {
+  return alpacaFetch("/v2/account");
+}
+
+export async function getLatestQuote(symbol) {
+  const res = await fetch(
+    `https://data.alpaca.markets/v2/stocks/${symbol}/quotes/latest`,
+    {
+      headers: {
+        "APCA-API-KEY-ID": ALPACA_KEY,
+        "APCA-API-SECRET-KEY": ALPACA_SECRET,
+      },
+    }
+  );
+  return res.json();
+}
+
+export async function placeOrder(order) {
+  return alpacaFetch("/v2/orders", {
+    method: "POST",
+    body: JSON.stringify(order),
+  });
+}
+```
+
+## Step 2: Build the Research Module
+
+The research module gathers clean data for Claude to analyze.
+
+```javascript
+// research.js
+import { getAccount, getLatestQuote } from "./alpaca.js";
+
+function rsi(prices, period = 14) {
+  const gains = [];
+  const losses = [];
+  for (let i = 1; i < prices.length; i++) {
+    const change = prices[i] - prices[i - 1];
+    gains.push(change > 0 ? change : 0);
+    losses.push(change < 0 ? Math.abs(change) : 0);
+  }
+  const avgGain = average(gains.slice(-period));
+  const avgLoss = average(losses.slice(-period));
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return 100 - 100 / (1 + rs);
+}
+
+function average(arr) {
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+
+export async function buildMarketData(watchlist) {
+  const account = await getAccount();
+  const tickers = await Promise.all(
+    watchlist.map(async (symbol) => {
+      const quote = await getLatestQuote(symbol);
+      return {
+        symbol,
+        price: quote.quote.ap,
+        bid: quote.quote.bp,
+        ask: quote.quote.ap,
+      };
+    })
+  );
+
+  return {
+    timestamp: new Date().toISOString(),
+    account: {
+      buying_power: account.buying_power,
+      portfolio_value: account.portfolio_value,
+    },
+    watchlist: tickers,
+  };
+}
+```
+
+<Alert type="warning">
+  This example uses only the latest quote. For a real strategy, you'll want
+  historical bars to compute RSI, moving averages, and other indicators.
+</Alert>
+
+## Step 3: Create the Claude Decision Prompt
+
+The prompt is the most important part of the system. It tells Claude how to behave as a disciplined trader.
+
+```markdown
+# system_prompt.md
+
+You are a disciplined algorithmic trading agent. Analyze market data and decide whether to place a trade.
+
+Rules:
+- Never risk more than 2% of portfolio value on a single trade.
+- Only trade during regular US market hours (9:30 AM - 4:00 PM ET).
+- Do not trade if you are uncertain. The default action is NO_TRADE.
+- Always explain your reasoning in plain language.
+
+Output valid JSON in this exact format:
+
+{
+  "decision": "BUY" | "SELL" | "NO_TRADE",
+  "symbol": "TICKER or null",
+  "qty": number or null,
+  "reasoning": "2-3 sentence explanation",
+  "confidence": "LOW" | "MEDIUM" | "HIGH"
+}
+```
+
+## Step 4: Execute the Decision
+
+```javascript
+// execution.js
+import { placeOrder } from "./alpaca.js";
+
+export async function executeDecision(decision, account) {
+  if (decision.decision === "NO_TRADE") {
+    console.log("No trade:", decision.reasoning);
+    return null;
+  }
+
+  if (decision.confidence === "LOW") {
+    console.log("Skipping low-confidence signal:", decision.reasoning);
+    return null;
+  }
+
+  const portfolioValue = parseFloat(account.portfolio_value);
+  const maxRisk = portfolioValue * 0.02;
+
+  // Validate position size
+  if (decision.qty * decision.estimatedPrice > maxRisk) {
+    throw new Error("Position exceeds 2% risk limit");
+  }
+
+  return placeOrder({
+    symbol: decision.symbol,
+    qty: decision.qty,
+    side: decision.decision.toLowerCase(),
+    type: "market",
+    time_in_force: "day",
+  });
+}
+```
+
+## Step 5: Journal Every Cycle
+
+The journal turns a script into a learning system.
+
+```javascript
+// journal.js
+import fs from "fs";
+import path from "path";
+
+export function writeJournalEntry({ marketData, decision, order, timestamp }) {
+  const entry = {
+    timestamp,
+    market_snapshot: marketData,
+    agent_decision: decision,
+    order_result: order || "NO_ORDER_PLACED",
+  };
+
+  const logPath = path.join("./journal", `${timestamp.split("T")[0]}.jsonl`);
+  fs.mkdirSync("./journal", { recursive: true });
+  fs.appendFileSync(logPath, JSON.stringify(entry) + "\n");
+}
+```
+
+## Step 6: Wire It Into a Claude Code Routine
+
+Create `agent.js` as the main entry point:
+
+```javascript
+// agent.js
+import { buildMarketData } from "./research.js";
+import { getTradeDecision } from "./claude.js";
+import { executeDecision } from "./execution.js";
+import { writeJournalEntry } from "./journal.js";
+
+const WATCHLIST = ["AAPL", "MSFT", "NVDA", "TSLA"];
+
+async function runCycle() {
+  const timestamp = new Date().toISOString();
+  console.log(`Starting cycle: ${timestamp}`);
+
+  const marketData = await buildMarketData(WATCHLIST);
+  const decision = await getTradeDecision(marketData);
+  const order = await executeDecision(decision, marketData.account);
+
+  writeJournalEntry({ marketData, decision, order, timestamp });
+
+  console.log(`Cycle complete: ${decision.decision}`);
+}
+
+runCycle().catch(console.error);
+```
+
+Then define the routine in your `CLAUDE.md`:
+
+```markdown
+## Routines
+
+### trading-cycle
+Schedule: every 15 minutes on weekdays between 9:30 AM and 4:15 PM ET
+Command: node agent.js
+Description: Run one full trading cycle
+```
+
+## Step 7: Add Guardrails
+
+Before touching live capital, add these safety checks:
+
+1. **Daily loss limit:** halt trading if down more than 3% in a session.
+2. **Market hours check:** verify the market is open before trading.
+3. **Position size validation:** enforce the 2% rule in code, not just the prompt.
+4. **Kill switch:** a simple file flag or environment variable to stop the agent instantly.
+
+<Alert type="danger">
+  Always start with Alpaca paper trading. Never deploy real money until you've
+  run the agent for several weeks and reviewed every journal entry.
+</Alert>
+
+## Deployment Options
+
+For 24/7 operation, you have three main options:
+
+| Option | Cost | Best For |
+|--------|------|----------|
+| Cloud VPS (Hetzner, DigitalOcean) | $5-10/month | Full control, easy debugging |
+| AWS Lambda + EventBridge | ~$1-5/month | Low maintenance, pay per execution |
+| Docker on managed container service | Varies | Teams, complex workloads |
+
+## Common Mistakes
+
+- **Overfitting the prompt.** A prompt that works in one market regime may fail in another.
+- **Ignoring fees.** Slippage and commissions eat into returns on frequent trading.
+- **No monitoring.** The agent may run silently for days while losing money.
+- **Too much context.** Feeding Claude noisy data leads to noisy decisions.
+
+## Next Steps
+
+Now that you have the skeleton, you can extend it:
+
+- Add historical bars and technical indicators.
+- Integrate news sentiment via a news API.
+- Build a dashboard to visualize journal entries.
+- Run backtests before deploying any strategy live.
+
+If you want a structured checklist and starter templates, download the [AI Trading Starter Kit](/starter-kit).

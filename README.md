@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Trading Lab
+
+An SEO-driven blog focused on AI trading tools, strategies, and tutorials for retail traders. Built with Next.js, Tailwind CSS, and MDX.
+
+## Project Structure
+
+```
+content/posts/          # MDX blog posts with frontmatter
+src/app/                # Next.js App Router pages
+src/components/         # React components
+src/lib/                # Utilities (posts, date, cn)
+public/                 # Static assets
+```
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Live site: [https://vibetrading.fun](https://vibetrading.fun)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Adding a New Post
 
-## Learn More
+1. Create a new `.mdx` file in `content/posts/`.
+2. Add frontmatter:
 
-To learn more about Next.js, take a look at the following resources:
+```yaml
+---
+title: "Your Post Title"
+description: "A short description for SEO and cards."
+date: "2026-07-03"
+category: "Guides" # Guides | Reviews | Tutorials | Challenges
+tags: ["ai trading", "beginners"]
+readTime: "8 min read"
+featured: false
+---
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Write content using Markdown and MDX components (`<Disclaimer />`, `<Alert type="info">`, etc.).
+4. Run `npm run build` to generate static files in `dist/`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Build for Production
 
-## Deploy on Vercel
+```bash
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Static files are output to `dist/`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Design System
+
+- **Colors:** Dark mode by default (`#0a0a0f` background, `#6366f1` accent).
+- **Typography:** System font stack with Inter and JetBrains Mono.
+- **Layout:** 12-column grid, max content width 720px, sticky TOC on article pages.
+
+## SEO
+
+- Custom metadata per page
+- Open Graph and Twitter card tags
+- XML sitemap at `/sitemap.xml`
+- `robots.txt`
+- JSON-LD schema for organization, website, and articles
