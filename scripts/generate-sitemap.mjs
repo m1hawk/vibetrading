@@ -54,23 +54,20 @@ function buildSitemap() {
     }
   }
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-                            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-${urls
-  .map(
-    (url) => `  <url>
-    <loc>${escapeXml(url.loc)}</loc>
-    <lastmod>${url.lastmod.toISOString()}</lastmod>
-    <changefreq>${url.changefreq}</changefreq>
-    <priority>${url.priority}</priority>
-  </url>`
-  )
-  .join("\n")}
-</urlset>
-`;
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls
+      .map(
+        (url) =>
+          `<url>\n` +
+          `<loc>${escapeXml(url.loc)}</loc>\n` +
+          `<lastmod>${url.lastmod.toISOString().split(".")[0] + "Z"}</lastmod>\n` +
+          `<changefreq>${url.changefreq}</changefreq>\n` +
+          `<priority>${url.priority}</priority>\n` +
+          `</url>`
+      )
+      .join("\n") +
+    `\n</urlset>\n`;
 
   fs.writeFileSync(outPath, xml, "utf8");
   console.log(`Generated sitemap.xml with ${urls.length} URLs`);
