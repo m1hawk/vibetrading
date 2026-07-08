@@ -41,7 +41,7 @@ featured: false
 ```
 
 3. Write content using Markdown and MDX components (`<Disclaimer />`, `<Alert type="info">`, etc.).
-4. Run `npm run build` to generate static files in `dist/`.
+4. Run `npm run build` to generate static files in `out/`.
 
 ## Build for Production
 
@@ -49,7 +49,7 @@ featured: false
 npm run build
 ```
 
-Static files are output to `dist/`.
+Static files are output to `out/`.
 
 ## Design System
 
