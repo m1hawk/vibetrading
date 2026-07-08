@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Calendar, Clock, ArrowRight } from "lucide-react";
+import { Calendar, ArrowRight } from "lucide-react";
 import { formatDate } from "@/lib/date";
 import type { Post } from "@/lib/posts";
 
@@ -19,17 +19,21 @@ export function PostCard({ post, featured = false }: PostCardProps) {
       }`}
     >
       <div className="flex flex-1 flex-col">
-        <div className="mb-3 flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <span className="rounded-full bg-accent/10 px-2.5 py-1 text-accent">
             {post.category}
           </span>
+          {post.tags.slice(0, 2).map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full border border-border bg-background px-2.5 py-1"
+            >
+              {tag}
+            </span>
+          ))}
           <span className="flex items-center gap-1">
             <Calendar className="h-3.5 w-3.5" />
             {formatDate(post.date)}
-          </span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5" />
-            {post.readTime}
           </span>
         </div>
 
