@@ -2,7 +2,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "Privacy policy for AI Trading Lab.",
+  description: "Privacy policy for vibetrading.fun.",
 };
 
 export default function PrivacyPage() {
@@ -13,7 +13,7 @@ export default function PrivacyPage() {
       </h1>
       <div className="prose prose-invert mt-8 max-w-none">
         <p>
-          AI Trading Lab respects your privacy. This policy explains what
+          vibetrading.fun respects your privacy. This policy explains what
           information we collect and how we use it.
         </p>
         <h2>Information We Collect</h2>

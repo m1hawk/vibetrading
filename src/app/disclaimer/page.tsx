@@ -3,7 +3,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Risk Disclaimer",
   description:
-    "Important risk disclaimer for AI Trading Lab. Trading involves substantial risk of loss.",
+    "Important risk disclaimer for vibetrading.fun. Trading involves substantial risk of loss.",
 };
 
 export default function DisclaimerPage() {
@@ -14,7 +14,7 @@ export default function DisclaimerPage() {
       </h1>
       <div className="prose prose-invert mt-8 max-w-none">
         <p>
-          The content on AI Trading Lab is for informational and educational
+          The content on vibetrading.fun is for informational and educational
           purposes only. It is not financial advice, investment advice, or a
           recommendation to buy, sell, or hold any security or financial
           instrument.

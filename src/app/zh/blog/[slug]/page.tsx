@@ -1,20 +1,19 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { getAllPosts, getPostBySlug } from "@/lib/posts";
+import { getAllPosts, getPostBySlug, getAvailableLanguages } from "@/lib/posts";
 import { MDXContent } from "@/components/MDXContent";
 import { formatDate } from "@/lib/date";
 import { Calendar, Clock, Tag, ArrowLeft, Globe } from "lucide-react";
 import Link from "next/link";
 import { TableOfContents } from "@/components/TableOfContents";
 import { JsonLd } from "@/components/JsonLd";
-import { getAvailableLanguages } from "@/lib/posts";
 
-interface BlogPostPageProps {
+interface ZhBlogPostPageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  const posts = getAllPosts("en");
+  const posts = getAllPosts("zh");
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -22,9 +21,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: BlogPostPageProps): Promise<Metadata> {
+}: ZhBlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug, "en");
+  const post = getPostBySlug(slug, "zh");
 
   if (!post) {
     return {};
@@ -44,16 +43,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function ZhBlogPostPage({ params }: ZhBlogPostPageProps) {
   const { slug } = await params;
-  const post = getPostBySlug(slug, "en");
+  const post = getPostBySlug(slug, "zh");
 
   if (!post) {
     notFound();
   }
 
   const availableLanguages = getAvailableLanguages(slug);
-  const hasZh = availableLanguages.includes("zh");
+  const hasEn = availableLanguages.includes("en");
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -77,7 +76,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     dateModified: post.updated || post.date,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://vibetrading.fun/blog/${post.slug}`,
+      "@id": `https://vibetrading.fun/zh/blog/${post.slug}`,
     },
     keywords: post.tags.join(", "),
   };
@@ -89,22 +88,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div className="lg:grid lg:grid-cols-[1fr_280px] lg:gap-12">
           <div>
             <Link
-              href="/blog"
+              href="/zh/blog"
               className="mb-6 inline-flex items-center gap-2 text-sm text-muted hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Blog
+              返回博客
             </Link>
 
-            {hasZh && (
+            {hasEn && (
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-sm text-muted">
                 <Globe className="h-4 w-4" />
                 <span>Also available in</span>
                 <Link
-                  href={`/zh/blog/${post.slug}`}
+                  href={`/blog/${post.slug}`}
                   className="font-medium text-accent hover:text-accent-hover"
                 >
-                  中文
+                  English
                 </Link>
               </div>
             )}

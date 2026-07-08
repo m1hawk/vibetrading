@@ -3,7 +3,7 @@ import { Download, AlertTriangle } from "lucide-react";
 import { StarterKitForm } from "@/components/StarterKitForm";
 
 export const metadata: Metadata = {
-  title: "AI Trading Starter Kit",
+  title: "Starter Kit",
   description:
     "Free starter kit with a checklist, code templates, and a tool comparison sheet for retail traders getting started with AI trading.",
 };
@@ -18,7 +18,7 @@ export default function StarterKitPage() {
           Free Download
         </div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          AI Trading Starter Kit
+          Starter Kit
         </h1>
         <p className="mt-4 text-lg text-muted">
           A free collection of checklists, templates, and frameworks to help you

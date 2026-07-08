@@ -3,20 +3,21 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "AI Trading Lab is an independent publication testing AI trading tools and sharing honest, data-driven insights.",
+    "vibetrading.fun is a blog about AI trading bots, prediction markets, and automated trading strategies.",
 };
 
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
       <h1 className="text-4xl font-bold tracking-tight text-foreground">
-        About AI Trading Lab
+        About vibetrading.fun
       </h1>
 
       <div className="prose prose-invert mt-8 max-w-none">
         <p>
-          AI Trading Lab is an independent publication for retail traders who are
-          tired of AI trading hype and want real, tested information.
+          vibetrading.fun is a blog for retail traders who are tired of AI
+          trading hype and want real, tested information about bots, prediction
+          markets, and automated strategies.
         </p>
 
         <h2>What We Do</h2>
@@ -30,8 +31,8 @@ export default function AboutPage() {
             working code you can adapt for your own strategies.
           </li>
           <li>
-            <strong>Run transparent challenges.</strong> We test strategies with
-            fixed rules and publish every trade.
+            <strong>Research new markets.</strong> We explore prediction markets,
+            crypto automation, and AI agents as they evolve.
           </li>
         </ul>
 

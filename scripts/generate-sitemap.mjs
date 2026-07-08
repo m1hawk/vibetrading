@@ -7,16 +7,14 @@ const postsDir = path.join(process.cwd(), "content", "posts");
 const outPath = path.join(process.cwd(), "public", "sitemap.xml");
 
 const staticRoutes = [
-  "",
-  "/blog",
-  "/reviews",
-  "/tutorials",
-  "/challenges",
-  "/about",
-  "/starter-kit",
-  "/disclaimer",
-  "/privacy",
-  "/affiliate",
+  { route: "", lang: "en" },
+  { route: "/blog", lang: "en" },
+  { route: "/about", lang: "en" },
+  { route: "/disclaimer", lang: "en" },
+  { route: "/privacy", lang: "en" },
+  { route: "/affiliate", lang: "en" },
+  { route: "/zh", lang: "zh" },
+  { route: "/zh/blog", lang: "zh" },
 ];
 
 function escapeXml(str) {
@@ -28,33 +26,54 @@ function escapeXml(str) {
     .replace(/'/g, "&apos;");
 }
 
+function parsePostFile(fileName) {
+  if (fileName.endsWith(".zh.mdx")) {
+    return {
+      slug: fileName.replace(/\.zh\.mdx$/, ""),
+      lang: "zh",
+      prefix: "/zh/blog/",
+    };
+  }
+  return {
+    slug: fileName.replace(/\.mdx$/, ""),
+    lang: "en",
+    prefix: "/blog/",
+  };
+}
+
 function buildSitemap() {
   const now = new Date();
+  const urls = [];
 
-  const urls = staticRoutes.map((route) => ({
-    loc: `${baseUrl}${route}`,
-    lastmod: now,
-    changefreq: "weekly",
-    priority: route === "" ? "1.0" : "0.8",
-  }));
+  for (const { route, lang } of staticRoutes) {
+    urls.push({
+      loc: `${baseUrl}${route}`,
+      lastmod: now,
+      changefreq: "weekly",
+      priority: route === "" || route === "/zh" ? "1.0" : "0.8",
+      lang,
+    });
+  }
 
   if (fs.existsSync(postsDir)) {
     const files = fs.readdirSync(postsDir).filter((f) => f.endsWith(".mdx"));
     for (const file of files) {
-      const slug = file.replace(/\.mdx$/, "");
+      const { slug, prefix } = parsePostFile(file);
       const content = fs.readFileSync(path.join(postsDir, file), "utf8");
       const { data } = matter(content);
       const date = data.updated || data.date;
       urls.push({
-        loc: `${baseUrl}/blog/${slug}`,
+        loc: `${baseUrl}${prefix}${slug}`,
         lastmod: date ? new Date(date) : now,
         changefreq: "weekly",
         priority: "0.9",
+        lang: data.lang || "en",
       });
     }
   }
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     urls
       .map(

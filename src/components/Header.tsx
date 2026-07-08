@@ -3,9 +3,7 @@ import { Menu, X, FlaskConical } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/reviews", label: "Reviews" },
-  { href: "/tutorials", label: "Tutorials" },
-  { href: "/challenges", label: "Challenges" },
+  { href: "/blog", label: "Blog" },
   { href: "/about", label: "About" },
 ];
 
@@ -16,7 +14,7 @@ export function Header() {
         <Link href="/" className="flex items-center gap-2 text-foreground">
           <FlaskConical className="h-6 w-6 text-accent" />
           <span className="text-lg font-semibold tracking-tight">
-            AI Trading Lab
+            vibetrading.fun
           </span>
         </Link>
 
@@ -30,16 +28,24 @@ export function Header() {
               {link.label}
             </Link>
           ))}
+          <div className="flex items-center gap-2 border-l border-border pl-6 text-sm">
+            <Link
+              href="/"
+              className="font-medium text-foreground"
+              aria-label="English"
+            >
+              EN
+            </Link>
+            <span className="text-muted-foreground">/</span>
+            <Link
+              href="/zh"
+              className="text-muted transition-colors hover:text-foreground"
+              aria-label="中文"
+            >
+              中文
+            </Link>
+          </div>
         </nav>
-
-        <div className="hidden md:block">
-          <Link
-            href="/starter-kit"
-            className="inline-flex items-center justify-center rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
-          >
-            Starter Kit
-          </Link>
-        </div>
 
         <button className="md:hidden text-foreground" aria-label="Open menu">
           <Menu className="h-6 w-6" />

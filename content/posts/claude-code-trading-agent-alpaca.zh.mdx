@@ -1,40 +1,40 @@
 ---
-title: "Build a 24/7 AI Trading Agent with Claude Code and Alpaca"
-description: "Step-by-step tutorial to build an autonomous trading agent using Claude Code Routines and the Alpaca API. Includes complete code, guardrails, and deployment tips."
+title: "用 Claude Code 和 Alpaca 构建 24/7 AI 交易 Agent"
+description: "使用 Claude Code Routines 和 Alpaca API 构建自主交易 Agent 的分步教程。包含完整代码、护栏和部署技巧。"
 date: "2026-07-03"
 category: "Tutorials"
 tags: ["claude code", "alpaca", "ai trading agent", "python", "tutorial"]
 readTime: "18 min read"
 featured: true
-lang: "en"
+lang: "zh"
 ---
 
 <Disclaimer />
 
-One of the most talked-about AI trading trends in 2026 is using Claude Code Routines to build autonomous trading agents. Unlike simple rule-based bots, these agents can research market conditions, form a view, decide whether to trade, execute through a broker API, and journal their reasoning.
+2026 年最热门的 AI 交易趋势之一是使用 Claude Code Routines 构建自主交易 Agent。与简单的基于规则的机器人不同，这些 Agent 可以研究市场状况、形成观点、决定是否交易、通过经纪商 API 执行，并记录其推理过程。
 
-In this tutorial, you'll build a Claude Code trading agent that connects to Alpaca's free paper trading API. By the end, you'll have a working system you can run on a schedule with proper risk guardrails.
+在本教程中，你将构建一个连接到 Alpaca 免费模拟交易 API 的 Claude Code 交易 Agent。到最后，你将拥有一个可以按计划运行并带有适当风险护栏的工作系统。
 
-## What This Agent Does
+## 这个 Agent 做什么
 
-The agent runs in a loop:
+Agent 在循环中运行：
 
-1. **Research** — fetch prices, technical signals, and recent headlines for a watchlist.
-2. **Decide** — Claude analyzes the data and outputs a structured trade decision.
-3. **Execute** — place an order through Alpaca if the decision passes confidence and risk checks.
-4. **Journal** — write a structured log entry explaining every decision.
+1. **研究** — 获取观察列表的价格、技术信号和最近头条。
+2. **决策** — Claude 分析数据并输出结构化的交易决策。
+3. **执行** — 如果决策通过信心和风险检查，通过 Alpaca 下单。
+4. **记录** — 写入结构化日志条目，解释每个决策。
 
-## Prerequisites
+## 先决条件
 
-- An [Alpaca](https://alpaca.markets/) account (free)
-- An Anthropic API key with access to Claude
-- Node.js 20+ or Python 3.11+
-- Claude Code installed and authenticated
-- A server or cloud instance for 24/7 operation (local laptop won't work)
+- 一个 [Alpaca](https://alpaca.markets/) 账户（免费）
+- 一个 Anthropic API key，可访问 Claude
+- Node.js 20+ 或 Python 3.11+
+- 安装并认证的 Claude Code
+- 用于 24/7 运行的服务器或云实例（本地笔记本不行）
 
-## Step 1: Set Up Alpaca Connection
+## 第 1 步：设置 Alpaca 连接
 
-Create `alpaca.js` with helper functions for account info, quotes, and order placement.
+创建 `alpaca.js`，包含账户信息、报价和订单放置的辅助函数。
 
 ```javascript
 const ALPACA_BASE_URL = "https://paper-api.alpaca.markets";
@@ -79,9 +79,9 @@ export async function placeOrder(order) {
 }
 ```
 
-## Step 2: Build the Research Module
+## 第 2 步：构建研究模块
 
-The research module gathers clean data for Claude to analyze.
+研究模块为 Claude 收集干净的数据。
 
 ```javascript
 // research.js
@@ -132,26 +132,25 @@ export async function buildMarketData(watchlist) {
 ```
 
 <Alert type="warning">
-  This example uses only the latest quote. For a real strategy, you'll want
-  historical bars to compute RSI, moving averages, and other indicators.
+  本示例仅使用最新报价。对于真实策略，你需要历史 K 线来计算 RSI、移动平均线和其他指标。
 </Alert>
 
-## Step 3: Create the Claude Decision Prompt
+## 第 3 步：创建 Claude 决策 Prompt
 
-The prompt is the most important part of the system. It tells Claude how to behave as a disciplined trader.
+Prompt 是系统中最重要的部分。它告诉 Claude 如何作为一个有纪律的交易者行事。
 
 ```markdown
 # system_prompt.md
 
-You are a disciplined algorithmic trading agent. Analyze market data and decide whether to place a trade.
+你是一个有纪律的算法交易 Agent。分析市场数据并决定是否下单。
 
-Rules:
-- Never risk more than 2% of portfolio value on a single trade.
-- Only trade during regular US market hours (9:30 AM - 4:00 PM ET).
-- Do not trade if you are uncertain. The default action is NO_TRADE.
-- Always explain your reasoning in plain language.
+规则：
+- 单笔交易的风险 Never 超过投资组合价值的 2%。
+- 只在美国常规市场时间（东部时间 9:30 AM - 4:00 PM）交易。
+- 如果不确定，不要交易。默认动作是 NO_TRADE。
+- 始终用 plain language 解释你的推理。
 
-Output valid JSON in this exact format:
+以这种 exact 格式输出有效 JSON：
 
 {
   "decision": "BUY" | "SELL" | "NO_TRADE",
@@ -162,7 +161,7 @@ Output valid JSON in this exact format:
 }
 ```
 
-## Step 4: Execute the Decision
+## 第 4 步：执行决策
 
 ```javascript
 // execution.js
@@ -182,7 +181,7 @@ export async function executeDecision(decision, account) {
   const portfolioValue = parseFloat(account.portfolio_value);
   const maxRisk = portfolioValue * 0.02;
 
-  // Validate position size
+  // 验证仓位大小
   if (decision.qty * decision.estimatedPrice > maxRisk) {
     throw new Error("Position exceeds 2% risk limit");
   }
@@ -197,9 +196,9 @@ export async function executeDecision(decision, account) {
 }
 ```
 
-## Step 5: Journal Every Cycle
+## 第 5 步：记录每个周期
 
-The journal turns a script into a learning system.
+日志将脚本变成学习系统。
 
 ```javascript
 // journal.js
@@ -220,9 +219,9 @@ export function writeJournalEntry({ marketData, decision, order, timestamp }) {
 }
 ```
 
-## Step 6: Wire It Into a Claude Code Routine
+## 第 6 步：接入 Claude Code Routine
 
-Create `agent.js` as the main entry point:
+创建 `agent.js` 作为主入口：
 
 ```javascript
 // agent.js
@@ -249,7 +248,7 @@ async function runCycle() {
 runCycle().catch(console.error);
 ```
 
-Then define the routine in your `CLAUDE.md`:
+然后在你的 `CLAUDE.md` 中定义 routine：
 
 ```markdown
 ## Routines
@@ -260,44 +259,43 @@ Command: node agent.js
 Description: Run one full trading cycle
 ```
 
-## Step 7: Add Guardrails
+## 第 7 步：添加护栏
 
-Before touching live capital, add these safety checks:
+在接触真实资本之前，添加这些安全检查：
 
-1. **Daily loss limit:** halt trading if down more than 3% in a session.
-2. **Market hours check:** verify the market is open before trading.
-3. **Position size validation:** enforce the 2% rule in code, not just the prompt.
-4. **Kill switch:** a simple file flag or environment variable to stop the agent instantly.
+1. **每日亏损限制：** 如果一天内下跌超过 3%，停止交易。
+2. **市场时间检查：** 在交易前验证市场是否开放。
+3. **仓位大小验证：** 在代码中而不仅仅是在 prompt 中执行 2% 规则。
+4. **紧急停止开关：** 一个简单的文件标志或环境变量，可以立即停止 Agent。
 
 <Alert type="danger">
-  Always start with Alpaca paper trading. Never deploy real money until you've
-  run the agent for several weeks and reviewed every journal entry.
+  始终从 Alpaca 模拟交易开始。在运行数周并审查每个日志条目之前，Never 部署真实资金。
 </Alert>
 
-## Deployment Options
+## 部署选项
 
-For 24/7 operation, you have three main options:
+对于 24/7 运行，你有三个主要选择：
 
-| Option | Cost | Best For |
-|--------|------|----------|
-| Cloud VPS (Hetzner, DigitalOcean) | $5-10/month | Full control, easy debugging |
-| AWS Lambda + EventBridge | ~$1-5/month | Low maintenance, pay per execution |
-| Docker on managed container service | Varies | Teams, complex workloads |
+| 选项 | 成本 | 最适合 |
+|------|------|--------|
+| Cloud VPS (Hetzner, DigitalOcean) | $5-10/月 | 完全控制，易于调试 |
+| AWS Lambda + EventBridge | ~$1-5/月 | 低维护，按执行付费 |
+| Docker on managed container service | 不一 | 团队，复杂工作负载 |
 
-## Common Mistakes
+## 常见错误
 
-- **Overfitting the prompt.** A prompt that works in one market regime may fail in another.
-- **Ignoring fees.** Slippage and commissions eat into returns on frequent trading.
-- **No monitoring.** The agent may run silently for days while losing money.
-- **Too much context.** Feeding Claude noisy data leads to noisy decisions.
+- **过度拟合 prompt。** 在一个市场机制有效的 prompt 可能在另一个机制中失败。
+- **忽略费用。** 滑点和佣金会侵蚀频繁交易的回报。
+- **没有监控。** Agent 可能在悄无声息地亏钱数天。
+- **太多上下文。** 给 Claude 喂噪音数据会导致噪音决策。
 
-## Next Steps
+## 下一步
 
-Now that you have the skeleton, you can extend it:
+现在你已经有了骨架，可以扩展它：
 
-- Add historical bars and technical indicators.
-- Integrate news sentiment via a news API.
-- Build a dashboard to visualize journal entries.
-- Run backtests before deploying any strategy live.
+- 添加历史 K 线和技术指标。
+- 通过新闻 API 整合新闻情绪。
+- 构建一个仪表板来可视化日志条目。
+- 在实盘部署任何策略之前运行回测。
 
-If you want a structured checklist and starter templates, download the [AI Trading Starter Kit](/starter-kit).
+如果你想要结构化清单和入门模板，下载 [AI 交易入门套件](/starter-kit)。

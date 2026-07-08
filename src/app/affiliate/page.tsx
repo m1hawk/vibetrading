@@ -3,7 +3,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Affiliate Disclosure",
   description:
-    "Affiliate disclosure for AI Trading Lab. We only recommend tools we have tested or researched.",
+    "Affiliate disclosure for vibetrading.fun. We only recommend tools we have tested or researched.",
 };
 
 export default function AffiliatePage() {
@@ -14,7 +14,7 @@ export default function AffiliatePage() {
       </h1>
       <div className="prose prose-invert mt-8 max-w-none">
         <p>
-          AI Trading Lab participates in affiliate programs for some of the
+          vibetrading.fun participates in affiliate programs for some of the
           products and services we review. This means we may earn a commission if
           you click on a link and make a purchase or sign up for a service.
         </p>

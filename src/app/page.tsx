@@ -11,10 +11,10 @@ export default function Home() {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "AI Trading Lab",
+    name: "vibetrading.fun",
     url: "https://vibetrading.fun",
     description:
-      "Honest reviews, real performance tests, and step-by-step tutorials for AI trading bots, strategies, and tools.",
+      "A blog about AI trading bots, prediction markets, and automated trading strategies.",
     potentialAction: {
       "@type": "SearchAction",
       target: "https://vibetrading.fun/blog?q={search_term_string}",
@@ -25,7 +25,7 @@ export default function Home() {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "AI Trading Lab",
+    name: "vibetrading.fun",
     url: "https://vibetrading.fun",
     logo: "https://vibetrading.fun/logo.png",
     sameAs: [
@@ -47,26 +47,26 @@ export default function Home() {
             Real tests. No hype.
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Tested. Transparent. Buildable.
+            AI Trading. Prediction Markets. Automated Strategies.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted">
-            Honest reviews, real performance tests, and step-by-step tutorials
-            for AI trading bots, strategies, and tools. Built for retail traders
-            who want facts, not fairy tales.
+            A blog about building and testing AI trading bots, Polymarket
+            agents, crypto automation, and rule-based strategies. No hype, no
+            guaranteed returns.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              href="/reviews"
+              href="/blog"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-base font-medium text-accent-foreground transition-colors hover:bg-accent-hover"
             >
-              Browse Reviews
+              Read the Blog
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              href="/tutorials"
+              href="/about"
               className="inline-flex items-center justify-center rounded-full border border-border bg-surface px-6 py-3 text-base font-medium text-foreground transition-colors hover:bg-surface-elevated"
             >
-              Build Your First Bot
+              About
             </Link>
           </div>
         </div>
@@ -81,8 +81,8 @@ export default function Home() {
               Honest Reviews
             </h3>
             <p className="mt-2 text-sm text-muted">
-              We test AI trading tools with real accounts and publish the actual
-              results — wins, losses, and everything in between.
+              We test AI trading tools and prediction market bots with real
+              accounts, then publish the actual results.
             </p>
           </div>
           <div className="rounded-xl border border-border bg-background p-6">
@@ -91,18 +91,18 @@ export default function Home() {
               Buildable Tutorials
             </h3>
             <p className="mt-2 text-sm text-muted">
-              Copy-paste code for bots using Claude Code, Alpaca, Python, and
-              TradingView. Designed for traders who want to own their edge.
+              Copy-paste code for bots using Claude Code, Polymarket, Alpaca,
+              Python, and TradingView.
             </p>
           </div>
           <div className="rounded-xl border border-border bg-background p-6">
             <TrendingUp className="mb-4 h-8 w-8 text-accent" />
             <h3 className="text-lg font-semibold text-foreground">
-              Strategy Challenges
+              Strategy Research
             </h3>
             <p className="mt-2 text-sm text-muted">
-              Follow 30-day challenges where we test AI strategies with fixed
-              rules and fixed capital. Transparent, trackable, no cherry-picking.
+              Deep dives into prediction markets, crypto automation, and
+              rule-based trading systems.
             </p>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default function Home() {
                 Featured
               </h2>
               <Link
-                href="/reviews"
+                href="/blog"
                 className="text-sm font-medium text-accent hover:text-accent-hover"
               >
                 View all →

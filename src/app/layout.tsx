@@ -5,33 +5,33 @@ import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: {
-    default: "AI Trading Lab — Tested. Transparent. Buildable.",
-    template: "%s | AI Trading Lab",
+    default: "vibetrading.fun — AI Trading Bots & Prediction Markets",
+    template: "%s | vibetrading.fun",
   },
   description:
-    "Honest reviews, real performance tests, and step-by-step tutorials for AI trading bots, strategies, and tools. Built for retail traders who want facts, not hype.",
+    "A blog about AI trading bots, prediction markets, and automated trading strategies. No hype, no guaranteed returns.",
   keywords: [
     "AI trading",
     "AI trading bot",
+    "prediction market",
+    "Polymarket bot",
+    "crypto trading bot",
     "algorithmic trading",
-    "trading automation",
-    "Claude Code trading",
-    "Alpaca API",
   ],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://vibetrading.fun",
-    siteName: "AI Trading Lab",
-    title: "AI Trading Lab — Tested. Transparent. Buildable.",
+    siteName: "vibetrading.fun",
+    title: "vibetrading.fun — AI Trading Bots & Prediction Markets",
     description:
-      "Honest reviews, real performance tests, and step-by-step tutorials for AI trading bots, strategies, and tools.",
+      "A blog about AI trading bots, prediction markets, and automated trading strategies.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI Trading Lab — Tested. Transparent. Buildable.",
+    title: "vibetrading.fun — AI Trading Bots & Prediction Markets",
     description:
-      "Honest reviews, real performance tests, and step-by-step tutorials for AI trading bots, strategies, and tools.",
+      "A blog about AI trading bots, prediction markets, and automated trading strategies.",
   },
   metadataBase: new URL("https://vibetrading.fun"),
   robots: {

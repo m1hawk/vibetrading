@@ -9,6 +9,9 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, featured = false }: PostCardProps) {
+  const postHref = post.lang === "zh" ? `/zh/blog/${post.slug}` : `/blog/${post.slug}`;
+  const ctaText = post.lang === "zh" ? "阅读文章" : "Read article";
+
   return (
     <article
       className={`group relative flex flex-col rounded-2xl border border-border bg-surface p-6 transition-all hover:border-border-soft hover:bg-surface-elevated ${
@@ -35,7 +38,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
             featured ? "text-2xl lg:text-3xl" : "text-lg"
           }`}
         >
-          <Link href={`/blog/${post.slug}`} className="focus:outline-none">
+          <Link href={postHref} className="focus:outline-none">
             <span className="absolute inset-0" aria-hidden="true" />
             {post.title}
           </Link>
@@ -46,7 +49,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
         </p>
 
         <div className="mt-4 flex items-center gap-2 text-sm font-medium text-accent">
-          Read article
+          {ctaText}
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
         </div>
       </div>

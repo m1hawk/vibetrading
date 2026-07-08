@@ -12,12 +12,12 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2 text-foreground">
               <FlaskConical className="h-6 w-6 text-accent" />
               <span className="text-lg font-semibold tracking-tight">
-                AI Trading Lab
+                vibetrading.fun
               </span>
             </Link>
             <p className="mt-4 max-w-sm text-sm text-muted">
-              Real tests, honest reviews, and buildable tutorials for AI trading
-              tools and strategies. No hype, no guaranteed returns.
+              A blog about AI trading bots, prediction markets, and automated
+              strategies. No hype, no guaranteed returns.
             </p>
           </div>
 
@@ -25,18 +25,13 @@ export function Footer() {
             <h3 className="text-sm font-semibold text-foreground">Content</h3>
             <ul className="mt-4 space-y-2 text-sm text-muted">
               <li>
-                <Link href="/reviews" className="hover:text-foreground">
-                  Reviews
+                <Link href="/blog" className="hover:text-foreground">
+                  Blog
                 </Link>
               </li>
               <li>
-                <Link href="/tutorials" className="hover:text-foreground">
-                  Tutorials
-                </Link>
-              </li>
-              <li>
-                <Link href="/challenges" className="hover:text-foreground">
-                  Challenges
+                <Link href="/about" className="hover:text-foreground">
+                  About
                 </Link>
               </li>
             </ul>
@@ -66,7 +61,7 @@ export function Footer() {
 
         <div className="mt-12 border-t border-border pt-8 text-center text-sm text-muted-foreground">
           <p>
-            © {currentYear} AI Trading Lab. All rights reserved. Not financial
+            © {currentYear} vibetrading.fun. All rights reserved. Not financial
             advice.
           </p>
         </div>
