@@ -5,6 +5,7 @@ import matter from "gray-matter";
 const baseUrl = "https://vibetrading.fun";
 const postsDir = path.join(process.cwd(), "content", "posts");
 const outPath = path.join(process.cwd(), "public", "sitemap.xml");
+const googleSitemapPath = path.join(process.cwd(), "public", "google-sitemap.xml");
 const sitemapIndexPath = path.join(process.cwd(), "public", "sitemap_index.xml");
 
 const staticRoutes = [
@@ -90,6 +91,7 @@ function buildSitemap() {
     `\n</urlset>\n`;
 
   fs.writeFileSync(outPath, xml, "utf8");
+  fs.writeFileSync(googleSitemapPath, xml, "utf8");
   fs.writeFileSync(
     sitemapIndexPath,
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
