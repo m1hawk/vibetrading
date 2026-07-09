@@ -7,6 +7,7 @@ const postsDir = path.join(process.cwd(), "content", "posts");
 const outPath = path.join(process.cwd(), "public", "sitemap.xml");
 const googleSitemapPath = path.join(process.cwd(), "public", "google-sitemap.xml");
 const sitemapIndexPath = path.join(process.cwd(), "public", "sitemap_index.xml");
+const textSitemapPath = path.join(process.cwd(), "public", "sitemap.txt");
 
 const staticRoutes = [
   { route: "", lang: "en" },
@@ -92,6 +93,7 @@ function buildSitemap() {
 
   fs.writeFileSync(outPath, xml, "utf8");
   fs.writeFileSync(googleSitemapPath, xml, "utf8");
+  fs.writeFileSync(textSitemapPath, `${urls.map((url) => url.loc).join("\n")}\n`, "utf8");
   fs.writeFileSync(
     sitemapIndexPath,
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
