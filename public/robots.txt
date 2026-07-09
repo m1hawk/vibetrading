@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://vibetrading.fun/sitemap.xml
+Sitemap: https://vibetrading.fun/sitemap_index.xml
