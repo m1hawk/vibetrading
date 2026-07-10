@@ -3,9 +3,9 @@ import { getAllPosts, getAllCategories } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Vibe Trading Guides",
   description:
-    "Tutorials, tools, and guides for AI trading, Polymarket, crypto bots, and automated strategies.",
+    "Practical field guides for understanding, building, testing, and improving AI-powered trading workflows.",
 };
 
 export default function BlogPage() {
@@ -20,14 +20,15 @@ export default function BlogPage() {
   }));
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="mb-12">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground">
-          All Articles
+        <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">Guides</p>
+        <h1 className="mt-5 text-5xl font-semibold tracking-[-0.045em] text-foreground sm:text-6xl">
+          The Vibe Trading field guide
         </h1>
-        <p className="mt-4 max-w-2xl text-lg text-muted">
-          Browse by topic. Each category covers one area of AI trading and
-          automation.
+        <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
+          Learn the concepts, inspect the tools, reproduce the builds, and test
+          every idea before capital is involved.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-2">

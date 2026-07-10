@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import { Download, AlertTriangle } from "lucide-react";
 import { StarterKitForm } from "@/components/StarterKitForm";
 
@@ -168,14 +169,14 @@ export default function StarterKitPage() {
             Ready to Start Testing?
           </h2>
           <p className="mt-2 text-accent-foreground/90">
-            Begin with our honest guide to what AI trading can and can't do.
+            Begin with our honest guide to what AI trading can and can&apos;t do.
           </p>
-          <a
+          <Link
             href="/blog/does-ai-trading-really-work"
             className="mt-6 inline-flex items-center justify-center rounded-full bg-background px-6 py-3 text-base font-medium text-foreground transition-colors hover:bg-accent-foreground"
           >
             Read the Guide
-          </a>
+          </Link>
         </div>
       </div>
     </div>

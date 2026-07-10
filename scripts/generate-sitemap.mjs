@@ -11,13 +11,21 @@ const textSitemapPath = path.join(process.cwd(), "public", "sitemap.txt");
 
 const staticRoutes = [
   { route: "", lang: "en" },
+  { route: "/vibe-trading", lang: "en" },
   { route: "/blog", lang: "en" },
+  { route: "/tools", lang: "en" },
+  { route: "/build", lang: "en" },
+  { route: "/lab", lang: "en" },
   { route: "/about", lang: "en" },
   { route: "/disclaimer", lang: "en" },
   { route: "/privacy", lang: "en" },
   { route: "/affiliate", lang: "en" },
   { route: "/zh", lang: "zh" },
+  { route: "/zh/vibe-trading", lang: "zh" },
   { route: "/zh/blog", lang: "zh" },
+  { route: "/zh/tools", lang: "zh" },
+  { route: "/zh/build", lang: "zh" },
+  { route: "/zh/lab", lang: "zh" },
 ];
 
 function escapeXml(str) {

@@ -1,64 +1,29 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About",
-  description:
-    "vibetrading.fun is a blog about AI trading bots, prediction markets, and automated trading strategies.",
+  description: "Why VibeTrading.fun exists, how we build and test, and what we will never sell.",
 };
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-      <h1 className="text-4xl font-bold tracking-tight text-foreground">
-        About vibetrading.fun
-      </h1>
-
-      <div className="prose prose-invert mt-8 max-w-none">
-        <p>
-          vibetrading.fun is a blog for retail traders who are tired of AI
-          trading hype and want real, tested information about bots, prediction
-          markets, and automated strategies.
-        </p>
-
-        <h2>What We Do</h2>
-        <ul>
-          <li>
-            <strong>Test tools honestly.</strong> We open accounts, use the
-            software, and report what actually happens.
-          </li>
-          <li>
-            <strong>Publish buildable tutorials.</strong> Every tutorial includes
-            working code you can adapt for your own strategies.
-          </li>
-          <li>
-            <strong>Research new markets.</strong> We explore prediction markets,
-            crypto automation, and AI agents as they evolve.
-          </li>
-        </ul>
-
-        <h2>What We Don't Do</h2>
-        <ul>
-          <li>Promise guaranteed returns</li>
-          <li>Sell "secret" trading signals</li>
-          <li>Promote scams or unregulated platforms</li>
-          <li>Hide affiliate relationships</li>
-        </ul>
-
-        <h2>Our Methodology</h2>
-        <p>
-          Every review and challenge follows a consistent process: define the
-          strategy, run it in paper or small live mode, record every trade,
-          measure risk-adjusted returns, and publish the raw data.
-        </p>
-
-        <h2>Disclosures</h2>
-        <p>
-          Some links on this site are affiliate links. We only recommend tools we
-          have personally tested or researched deeply. Our opinions are our own.
-          This site is for educational purposes only and does not constitute
-          financial advice.
-        </p>
+    <div className="mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8">
+      <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">About</p>
+      <h1 className="mt-5 text-5xl font-semibold tracking-[-0.045em] sm:text-6xl">Market ideas should be testable.</h1>
+      <div className="prose mt-10 max-w-3xl">
+        <p>VibeTrading.fun is a practical field guide for people using AI to research markets, formalize strategies, build tools, and test trading workflows.</p>
+        <p>We believe the most useful part of AI is not a confident prediction. It is the ability to move faster from a vague idea to explicit assumptions, inspectable rules, working code, and evidence that can prove the idea wrong.</p>
+        <h2>What we publish</h2>
+        <ul><li>Beginner-friendly explanations of AI and algorithmic trading</li><li>No-code, low-code, and developer build guides</li><li>Tool comparisons with research status and limitations</li><li>Backtests, paper-trading experiments, and failed ideas</li><li>Reusable prompts, checklists, code, and evaluation frameworks</li></ul>
+        <h2>What we do not sell</h2>
+        <ul><li>Guaranteed returns</li><li>Secret signals or copy-trading promises</li><li>Rankings influenced by undisclosed compensation</li><li>Results without the assumptions and risks needed to interpret them</li></ul>
+        <h2>Our method</h2>
+        <p>Describe → Build → Backtest → Paper trade → Iterate. Rules are stated before results. Costs and limitations are included. A failed experiment is still publishable evidence.</p>
+        <h2>Responsibility</h2>
+        <p>Everything on this site is educational. AI can help write research and code, but it cannot take responsibility for capital. Every tool, assumption, and output must be independently checked.</p>
       </div>
+      <Link href="/vibe-trading" className="mt-10 inline-flex rounded-full bg-accent px-6 py-3 font-medium text-white hover:bg-accent-hover">Read the Vibe Trading guide</Link>
     </div>
   );
 }

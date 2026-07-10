@@ -5,11 +5,11 @@ import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: {
-    default: "vibetrading.fun — AI Trading Bots & Prediction Markets",
-    template: "%s | vibetrading.fun",
+    default: "VibeTrading.fun — Vibe Trading for Everyone",
+    template: "%s | VibeTrading.fun",
   },
   description:
-    "A blog about AI trading bots, prediction markets, and automated trading strategies. No hype, no guaranteed returns.",
+    "Turn market ideas into research, strategies, backtests, and automated workflows with AI. No quant background required.",
   keywords: [
     "AI trading",
     "AI trading bot",
@@ -23,15 +23,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://vibetrading.fun",
     siteName: "vibetrading.fun",
-    title: "vibetrading.fun — AI Trading Bots & Prediction Markets",
+    title: "VibeTrading.fun — Vibe Trading for Everyone",
     description:
-      "A blog about AI trading bots, prediction markets, and automated trading strategies.",
+      "Turn market ideas into testable trading workflows with AI. No quant background required.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "vibetrading.fun — AI Trading Bots & Prediction Markets",
+    title: "VibeTrading.fun — Vibe Trading for Everyone",
     description:
-      "A blog about AI trading bots, prediction markets, and automated trading strategies.",
+      "Turn market ideas into testable trading workflows with AI. No quant background required.",
   },
   metadataBase: new URL("https://vibetrading.fun"),
   robots: {
