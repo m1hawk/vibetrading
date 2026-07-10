@@ -3,9 +3,9 @@ import { getAllPosts, getAllCategories } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
 
 export const metadata: Metadata = {
-  title: "博客",
+  title: "Vibe Trading 实践指南",
   description:
-    "关于 AI 交易、Polymarket、加密货币机器人和自动化策略的教程、工具与指南。",
+    "关于理解、构建、验证和改进 AI 交易工作流的实践指南。",
 };
 
 export default function ZhBlogPage() {
@@ -20,13 +20,14 @@ export default function ZhBlogPage() {
   }));
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="mb-12">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground">
-          全部文章
+        <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">指南</p>
+        <h1 className="mt-5 text-5xl font-semibold tracking-[-0.045em] text-foreground sm:text-6xl">
+          Vibe Trading 实践指南
         </h1>
-        <p className="mt-4 max-w-2xl text-lg text-muted">
-          按主题浏览。每个分类覆盖 AI 交易和自动化的一个领域。
+        <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
+          理解概念、检查工具、复现构建，并在投入真实资金前验证每一个想法。
         </p>
 
         <div className="mt-6 flex flex-wrap gap-2">

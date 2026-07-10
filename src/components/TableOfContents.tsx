@@ -1,27 +1,16 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 export function TableOfContents({ content }: { content: string }) {
-  const [headings, setHeadings] = useState<
-    { text: string; id: string; level: number }[]
-  >([]);
-
-  useEffect(() => {
-    const extracted = content
-      .split("\n")
-      .filter((line) => line.startsWith("#"))
-      .map((line) => {
-        const level = line.match(/^#+/)?.[0].length || 1;
-        const text = line.replace(/^#+\s*/, "").trim();
-        const id = text
-          .toLowerCase()
-          .replace(/[^a-z0-9\s-]/g, "")
-          .replace(/\s+/g, "-");
-        return { text, id, level };
-      });
-    setHeadings(extracted);
-  }, [content]);
+  const headings = content
+    .split("\n")
+    .filter((line) => line.startsWith("#"))
+    .map((line) => {
+      const level = line.match(/^#+/)?.[0].length || 1;
+      const text = line.replace(/^#+\s*/, "").trim();
+      const id = text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-");
+      return { text, id, level };
+    });
 
   if (headings.length === 0) return null;
 
