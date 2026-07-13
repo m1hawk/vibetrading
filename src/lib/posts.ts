@@ -4,6 +4,11 @@ import matter from "gray-matter";
 
 export type Lang = "en" | "zh";
 
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
 export interface Post {
   slug: string;
   title: string;
@@ -16,6 +21,7 @@ export interface Post {
   featured?: boolean;
   content: string;
   lang: Lang;
+  faq?: FaqItem[];
 }
 
 const postsDirectory = path.join(process.cwd(), "content", "posts");
@@ -53,6 +59,7 @@ export function getAllPosts(lang: Lang = "en"): Post[] {
         featured: data.featured || false,
         content,
         lang: fileLang,
+        faq: data.faq || [],
       } as Post;
     })
     .filter((post) => post.lang === lang);
