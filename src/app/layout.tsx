@@ -1,29 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
-  display: "swap",
-  style: ["normal", "italic"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const plex = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-plex",
-  display: "swap",
-  weight: ["400", "500", "600"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -60,6 +38,12 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  alternates: {
+    // Helps crawlers discover the canonical sitemap
+    types: {
+      "application/xml": "https://vibetrading.fun/sitemap.xml",
+    },
+  },
 };
 
 export default function RootLayout({
@@ -68,10 +52,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`h-full antialiased ${inter.variable} ${playfair.variable} ${plex.variable}`}
-    >
+    <html lang="en" className="h-full antialiased">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,500;1,600&display=swap"
+          rel="stylesheet"
+        />
+        <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+      </head>
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
         <Header />
         <main className="flex-1">{children}</main>
