@@ -1,0 +1,350 @@
+---
+title: "Inside ai-hedge-fund: How Multi-Agent LLMs Make Investment Decisions"
+description: "A hands-on walkthrough of the ai-hedge-fund open-source project. Learn how multi-agent LLMs mimic Buffett, Graham, Lynch, and Wood to generate investment signals."
+date: "2026-07-13"
+category: "Tutorials"
+tags: ["ai hedge fund", "multi-agent", "llm", "walkthrough"]
+readTime: "16 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is ai-hedge-fund and who built it?"
+    answer: "ai-hedge-fund is an open-source educational project that simulates a hedge fund using multiple LLM-powered agents. Each agent models a famous investor style—Warren Buffett, Benjamin Graham, Cathie Wood, or Peter Lynch—and debates a final buy, hold, or sell decision. It is not a live trading system and should be treated as a research sandbox."
+  - question: "Do I need a real brokerage account to use ai-hedge-fund?"
+    answer: "No. The project runs in backtest mode against historical price data by default. You can run it entirely on your local machine with a Python environment, Poetry, and an API key from an LLM provider such as OpenAI or Anthropic."
+  - question: "Which LLM provider works best with ai-hedge-fund?"
+    answer: "The codebase supports OpenAI, Anthropic, Groq, and local models via Ollama. For reliable JSON output and reasoning, GPT-4o or Claude 3.5 Sonnet are the most common choices. Local models work for experimentation but may struggle with structured schema adherence."
+  - question: "How do the agents make a final decision?"
+    answer: "Each agent receives the same ticker and fundamental data, reasons through its own investment philosophy, and returns a bullish, bearish, or neutral signal with confidence and rationale. A risk-management layer then aggregates the signals, checks portfolio constraints, and outputs a final action."
+  - question: "Can I change how much weight each agent has?"
+    answer: "Yes. The agent weights are configurable in the orchestrator code. You can emphasize deep-value agents like Graham or growth-oriented agents like Wood depending on the market regime you want to simulate. We cover the exact file and lines in the 'Modify Agent Weights' section."
+  - question: "Is ai-hedge-fund profitable out of the box?"
+    answer: "Not reliably. The project is designed for education and experimentation. Past backtests are not a guarantee of future returns, and the default agents may overfit to well-known market narratives. Always validate signals with your own research and risk controls."
+  - question: "What data sources does ai-hedge-fund use?"
+    answer: "The default implementation pulls financial data from public APIs such as Yahoo Finance and Financial Modeling Prep. You will need valid API keys for some data providers, and you should review their terms of service before running large backtests."
+---
+
+<Disclaimer />
+
+If you have spent any time in algorithmic trading circles lately, you have probably seen screenshots of an LLM declaring that Apple is a "wonderful business at a fair price" or that Tesla is a "disruptive growth story." Those screenshots usually come from `ai-hedge-fund`, an open-source project that turns a single ticker into a boardroom debate between AI agents trained to think like history's most famous investors.
+
+This is not a live trading robot promising passive income. It is a research sandbox: a way to see how different investment philosophies collide when every participant is a large language model. In this walkthrough we will install the project with Poetry, run a backtest, look at the code that assigns Buffett, Graham, Lynch, and Wood personas, and adjust agent weights so you can reason about regime-specific behavior. By the end you will know exactly how multi-agent LLMs can be used to explore investment decisions—and where their limits are.
+
+## What Is ai-hedge-fund?
+
+`ai-hedge-fund` is a Python-based simulation of a hedge fund research desk. The architecture is intentionally simple: a set of analyst agents, each powered by an LLM, evaluates a stock through the lens of a specific investing legend. The agents do not just summarize a report; they return structured signals with confidence scores and written rationales. A risk-management agent then reviews the collective output and decides whether to buy, hold, sell, or pass.
+
+The educational value is that it makes investment philosophy explicit. Instead of a black-box neural network predicting returns, you can read the reasoning of a "Warren Buffett" agent and see why it liked or disliked a company. When multiple agents disagree, the final decision becomes a transparent trade-off between value, growth, quality, and momentum rather than a mysterious score.
+
+That transparency is also the source of most criticism. The agents are role-playing. They are not the real investors, and they do not have access to private meetings, management temperament, or real-time channel checks. What they do have is a consistent style encoded in system prompts and a shared set of financial metrics. Used correctly, the project is a brainstorming partner. Used incorrectly, it becomes a convincing way to rationalize whatever position you already wanted to take.
+
+<Alert type="info">
+  Treat ai-hedge-fund as an idea generator, not a portfolio manager. Every signal
+  it produces should be cross-checked against your own fundamentals, technicals,
+  and risk-management rules.
+</Alert>
+
+## Why Multi-Agent Architecture Matters
+
+Single-agent LLM systems are prone to a subtle failure mode: the model averages every conflicting fact into a bland middle-ground answer. Ask one model whether a richly valued tech stock is a buy and you may get a five-paragraph essay that concludes "it depends." That is not wrong, but it is not actionable either.
+
+Multi-agent systems solve part of this problem by assigning strong, conflicting viewpoints to different agents. A Graham agent is forced to argue from deep-value criteria. A Wood agent is forced to argue from disruption and exponential growth. The debate format surfaces tensions that a single model might smooth over. The final decision is then made by a separate agent or weighted aggregation function that is explicitly designed to resolve conflict.
+
+Another benefit is interpretability. When the system recommends buying NVIDIA, you can open the logs and see that the Buffett agent was neutral because of valuation, the Lynch agent was bullish because of understandable business drivers, and the Wood agent was strongly bullish because of AI tailwinds. The combination tells you more than a simple "buy" rating would.
+
+The architecture also makes backtesting cleaner. Because each agent produces structured output, you can record exactly which philosophy drove each decision and measure whether certain agents perform better in bull markets, bear markets, or specific sectors. That feedback loop is hard to replicate with a single monolithic prompt.
+
+## Agent Roles: The Styles Inside the System
+
+The default `ai-hedge-fund` distribution ships with agents modeled on four well-known investors. Understanding each style is essential before you change weights or interpret signals. Here is how the personas break down.
+
+| Agent | Inspiration | Core Philosophy | Key Metrics | Typical Bias |
+|-------|-------------|-----------------|-------------|--------------|
+| Value Agent | Warren Buffett | Buy wonderful companies at fair prices | ROE, margin of safety, free cash flow, moat quality | Avoids overpaying; may miss momentum rallies |
+| Deep Value Agent | Benjamin Graham | Buy below intrinsic value with a margin of safety | P/E, P/B, net nets, debt ratios, dividend record | Skeptical of growth stories; early exits in euphoria |
+| Growth Agent | Cathie Wood | Invest in disruptive innovation with exponential upside | Total addressable market, revenue growth, R&D intensity, platform potential | High conviction; can ignore near-term valuation |
+| Quality Growth Agent | Peter Lynch | Buy what you understand; growth at a reasonable price | PEG ratio, earnings growth, insider ownership, understandable business | Balances growth and valuation; avoids hype |
+
+These personas are implemented as system prompts plus, in some forks, tool access to fundamental data. The prompt engineering is the most important part. A weak prompt produces generic answers regardless of the investor label. A strong prompt forces the model to cite specific ratios, explain the margin of safety, or articulate why a moat is durable.
+
+### The Warren Buffett-Style Agent
+
+The Buffett agent is usually configured as a quality-at-reasonable-price investor. It wants wide moats, consistent returns on equity, manageable debt, and owner-oriented management. In practice this means the agent will often pass on fast-growing tech companies if their free-cash-flow conversion is weak or their competitive position looks fragile.
+
+A typical Buffett-agent rationale might read: "The business generates strong free cash flow, has pricing power in its core segment, and trades at a modest premium to historical multiples. I am cautiously bullish but would prefer a larger margin of safety." That kind of nuanced signal is useful because it tells you the model is reasoning from durability rather than price action.
+
+### The Benjamin Graham-Style Agent
+
+The Graham agent is stricter. It looks for statistically cheap securities: low price-to-earnings, low price-to-book, solid balance sheets, and a long record of dividends or earnings stability. In the original `Security Analysis` framework, a stock was only attractive if it could be purchased at a significant discount to conservatively estimated intrinsic value.
+
+In modern markets, a pure Graham screen can leave an agent perpetually bearish on anything outside banks, industrials, and consumer staples. That is not a bug; it is a faithful representation of deep value. If you run a backtest through the 2020-2021 growth rally, expect this agent to generate many "hold" or "sell" signals while the Wood agent cheers from the sidelines.
+
+### The Cathie Wood-Style Agent
+
+The Wood agent models disruptive innovation investing. It cares about total addressable market, technology adoption curves, platform potential, and management's willingness to reinvest heavily in research and development. Valuation multiples are considered, but they are secondary to the magnitude of the opportunity.
+
+This agent will often be the most bullish in bull markets and the most wrong in drawdowns. That is exactly the behavior you want to study if you are building a multi-agent system. The goal is not to make every agent right; the goal is to understand how conviction, volatility, and drawdown tolerance interact when they are combined.
+
+### The Peter Lynch-Style Agent
+
+The Lynch agent sits somewhere between Buffett and Wood. It likes growth, but it wants growth at a reasonable price and in businesses the model can explain simply. The "buy what you understand" rule means the agent is encouraged to reject complicated financial engineering or speculative pre-revenue companies.
+
+A Lynch-style signal often includes a PEG ratio discussion: "Earnings are growing at 18 percent annually, the P/E is 22, and the PEG ratio is slightly above 1.2. The business is understandable, but the valuation leaves little room for error." That structured reasoning makes it easier to trust or challenge the output.
+
+## Installation with Poetry
+
+Before you can run backtests, you need a working Python environment and the project dependencies. The repository recommends Poetry, which keeps the dependency graph reproducible and avoids polluting your global Python installation.
+
+### Step 1: Clone the Repository
+
+Open a terminal and clone the project. If you prefer, you can fork it first so you can track your own modifications.
+
+```bash
+git clone https://github.com/virattt/ai-hedge-fund.git
+cd ai-hedge-fund
+```
+
+### Step 2: Install Poetry
+
+If you do not already have Poetry installed, the official installer is the safest route. On macOS and Linux you can run:
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+Then add Poetry to your path and verify the version:
+
+```bash
+poetry --version
+```
+
+### Step 3: Install Dependencies
+
+Inside the project directory, install the dependencies. This will create a virtual environment automatically.
+
+```bash
+poetry install
+```
+
+If the project includes optional data-provider packages, you may need to install them explicitly. Check `pyproject.toml` for extras such as `yfinance` or `financial-modeling-prep`.
+
+### Step 4: Configure API Keys
+
+The agents need an LLM provider, and the data fetchers need market data. Copy the example environment file and fill in your keys:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your preferred editor. A minimal configuration looks like this:
+
+```bash
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+FINANCIAL_MODELING_PREP_API_KEY=your_key_here
+```
+
+<Alert type="warning">
+  Never commit your `.env` file to version control. It contains paid API keys
+  and could expose your accounts. The repository should already list `.env` in
+  `.gitignore`, but double-check before pushing.
+</Alert>
+
+### Step 5: Activate the Shell
+
+To run commands inside the Poetry environment, use:
+
+```bash
+poetry shell
+```
+
+You are now ready to run your first backtest.
+
+## Running Your First Backtest
+
+The simplest way to see the system in action is to run a single-ticker backtest over a historical window. This lets you observe the agent debate and the final decision without risking capital.
+
+### Basic Backtest Command
+
+Most forks expose a CLI entrypoint. The exact command varies, but a common pattern is:
+
+```bash
+python src/main.py --ticker AAPL --start-date 2024-01-01 --end-date 2024-12-31
+```
+
+When you run this, the system will:
+
+1. Fetch historical price data and fundamental metrics for Apple.
+2. Send formatted prompts to each analyst agent.
+3. Collect structured signals from every agent.
+4. Run the risk-management agent to produce a final action.
+5. Print or save a summary of decisions and simulated performance.
+
+### Reading the Output
+
+A typical output block looks like this:
+
+```text
+Ticker: AAPL
+Date: 2024-03-15
+Buffett Agent: NEUTRAL (confidence 0.55) — valuation full, moat intact
+Graham Agent: NEUTRAL (confidence 0.50) — P/E above historical median
+Wood Agent: BULLISH (confidence 0.75) — ecosystem and AI integration
+Lynch Agent: BULLISH (confidence 0.65) — understandable growth, PEG near 1.3
+Risk Manager: BUY (position size 3%)
+Rationale: Two of four agents are bullish; valuation concerns are offset by quality and growth visibility.
+```
+
+Notice that the final action is not a simple vote. The risk manager considers confidence, conflicting signals, and concentration. A unanimous bullish panel might still receive a smaller position size if volatility is high.
+
+### Comparing Multiple Tickers
+
+You can also run a basket backtest to compare how the same panel of agents behaves across different sectors. For example:
+
+```bash
+python src/main.py --ticker AAPL,MSFT,JPM,XOM --start-date 2024-01-01 --end-date 2024-12-31
+```
+
+This is useful for spotting style drift. A portfolio that is heavy in the names the Wood agent loves may behave like a growth fund, while a portfolio dominated by Graham signals may behave like a deep-value fund. The multi-agent format makes that drift visible in the logs instead of hiding it inside a single model.
+
+## Where Agent Weights Live in the Code
+
+One of the most powerful experiments you can run is changing how much influence each agent has. The default configuration usually gives equal weight to every analyst, but that may not match the market regime you want to study.
+
+### Finding the Orchestrator
+
+The aggregation logic typically lives in an orchestrator or portfolio manager module. Search the repository for files that mention agent weights or signal aggregation:
+
+```bash
+grep -r "weight" src/
+grep -r "aggregate" src/
+```
+
+You are looking for a function that receives a list of agent signals and returns a final score. It may look something like this:
+
+```python
+def aggregate_signals(signals: list[Signal]) -> Action:
+    weights = {
+        "buffett": 0.25,
+        "graham": 0.25,
+        "wood": 0.25,
+        "lynch": 0.25,
+    }
+    ...
+```
+
+### Adjusting Weights by Regime
+
+Suppose you believe the current environment favors quality compounders over speculative growth. You could raise the Buffett weight and lower the Wood weight:
+
+```python
+weights = {
+    "buffett": 0.35,
+    "graham": 0.30,
+    "wood": 0.15,
+    "lynch": 0.20,
+}
+```
+
+If you are studying the 2020-2021 period, you might flip that allocation to see whether the Wood agent's signals would have dominated the portfolio. The point of the exercise is not to find the one true weight; it is to understand how sensitive the final decisions are to each philosophy.
+
+<Alert type="danger">
+  Overfitting weights to a single backtest is easy. If you optimize the agent
+  weights until the equity curve looks perfect, you are fitting to noise. Always
+  test modified weights on an out-of-sample period before drawing conclusions.
+</Alert>
+
+### Adding a Confidence Threshold
+
+Another useful modification is a minimum confidence threshold. A weakly bullish signal from an agent should probably count for less than a strongly bullish one. A simple implementation:
+
+```python
+weighted_score = sum(
+    weights[s.agent] * s.confidence * (1 if s.signal == "BULLISH" else -1)
+    for s in signals
+    if s.confidence >= 0.60
+)
+```
+
+This filter forces agents to have conviction before they can move the final score. It tends to reduce the number of trades and can improve the signal-to-noise ratio in sideways markets.
+
+## Practical Experiment: Value vs. Growth in 2024
+
+To make the tutorial concrete, here is a sample experiment you can run. The goal is to compare two agent-weight configurations over the same period.
+
+| Configuration | Buffett | Graham | Wood | Lynch | Expected Behavior |
+|---------------|---------|--------|------|-------|-------------------|
+| Balanced | 25% | 25% | 25% | 25% | Moderate exposure across styles |
+| Quality Value | 35% | 35% | 10% | 20% | Favors profitable, cash-generative businesses |
+| Disruption Growth | 10% | 10% | 50% | 30% | Favors high-growth, high-volatility names |
+
+Run each configuration against the same ticker list and record the final portfolio. You will likely find that the quality-value configuration underperforms in strong rallies and outperforms in corrections, while the disruption-growth configuration does the opposite. Documenting those trade-offs is more valuable than finding the configuration with the highest Sharpe ratio.
+
+### Questions to Ask During the Experiment
+
+- Which agent was the swing vote in the most decisions?
+- Did any agent consistently produce low-confidence signals? That may indicate a mismatch between its style and the current market.
+- How did the risk manager adjust position sizes when agents disagreed?
+- Did the final portfolio ever take a large position in a name that three of four agents disliked? If so, why?
+
+Answering these questions turns the backtest from a scoreboard into a learning exercise.
+
+## Common Failure Modes to Watch For
+
+Multi-agent LLM systems are not magic. They inherit the failure modes of both LLMs and committee-based decision making. Here are the most common problems you will encounter.
+
+### Hallucinated Fundamentals
+
+An LLM can cite a price-to-earnings ratio that does not match the data you provided. This usually happens when the model's training knowledge conflicts with the retrieved numbers. The safest fix is to force the model to reference only the data supplied in the prompt and to verify that output against your data source.
+
+### Prompt Leakage Between Agents
+
+If the system prompt is too vague, every agent may converge on the same middle-of-the-road opinion. You can test for this by giving the agents contradictory data and checking whether they still agree. Strong personas should disagree when the facts are ambiguous.
+
+### Overconfidence in Bull Markets
+
+During strong rallies, every agent may become bullish because the recent price trend colors the LLM's reasoning. This is the multi-agent version of recency bias. A well-designed risk manager should reduce position sizes when signals are highly correlated.
+
+### Expensive API Bills
+
+Running hundreds of backtest iterations with GPT-4o or Claude can add up quickly. Use cheaper models for exploration, limit the number of tickers in your first tests, and cache data aggressively. Local models via Ollama are a good option once the prompts are stable.
+
+## FAQ
+
+Here are answers to the most common questions about `ai-hedge-fund`.
+
+### What is ai-hedge-fund and who built it?
+
+ai-hedge-fund is an open-source educational project that simulates a hedge fund using multiple LLM-powered agents. Each agent models a famous investor style—Warren Buffett, Benjamin Graham, Cathie Wood, or Peter Lynch—and debates a final buy, hold, or sell decision. It is not a live trading system and should be treated as a research sandbox.
+
+### Do I need a real brokerage account to use ai-hedge-fund?
+
+No. The project runs in backtest mode against historical price data by default. You can run it entirely on your local machine with a Python environment, Poetry, and an API key from an LLM provider such as OpenAI or Anthropic.
+
+### Which LLM provider works best with ai-hedge-fund?
+
+The codebase supports OpenAI, Anthropic, Groq, and local models via Ollama. For reliable JSON output and reasoning, GPT-4o or Claude 3.5 Sonnet are the most common choices. Local models work for experimentation but may struggle with structured schema adherence.
+
+### How do the agents make a final decision?
+
+Each agent receives the same ticker and fundamental data, reasons through its own investment philosophy, and returns a bullish, bearish, or neutral signal with confidence and rationale. A risk-management layer then aggregates the signals, checks portfolio constraints, and outputs a final action.
+
+### Can I change how much weight each agent has?
+
+Yes. The agent weights are configurable in the orchestrator code. You can emphasize deep-value agents like Graham or growth-oriented agents like Wood depending on the market regime you want to simulate. We cover the exact approach in the "Modify Agent Weights" section.
+
+### Is ai-hedge-fund profitable out of the box?
+
+Not reliably. The project is designed for education and experimentation. Past backtests are not a guarantee of future returns, and the default agents may overfit to well-known market narratives. Always validate signals with your own research and risk controls.
+
+### What data sources does ai-hedge-fund use?
+
+The default implementation pulls financial data from public APIs such as Yahoo Finance and Financial Modeling Prep. You will need valid API keys for some data providers, and you should review their terms of service before running large backtests.
+
+## Bottom Line
+
+`ai-hedge-fund` is one of the clearest demonstrations of how multi-agent LLMs can be applied to investment research. By giving each agent a distinct, historically grounded philosophy, the project turns a single ticker into a structured debate about value, growth, quality, and risk. The transparency is its biggest strength: you can read exactly why the system made a decision, which agents agreed, and where the disagreements were.
+
+That transparency also sets the ceiling. The agents are role-playing with public data and language models. They do not have access to management teams, proprietary datasets, or the emotional discipline required to stick with a strategy through a drawdown. Use the project to sharpen your own reasoning, test how different philosophies weight the same facts, and generate questions you would not have asked alone. Do not use it to allocate real capital without independent due diligence.
+
+The most valuable outcome of this walkthrough is not a profitable backtest. It is the habit of asking: which agent is speaking right now, how confident is it, and what would make it change its mind? That is the question every investor, human or machine, should be able to answer.

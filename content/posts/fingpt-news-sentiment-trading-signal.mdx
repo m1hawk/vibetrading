@@ -1,0 +1,357 @@
+---
+title: "Build a News-Sentiment Trading Signal with FinGPT"
+description: "A step-by-step tutorial on downloading the FinGPT sentiment LoRA, scoring financial headlines, combining sentiment with a momentum filter, and backtesting the results honestly."
+date: "2026-07-13"
+category: "Tutorials"
+tags: ["fingpt", "sentiment", "llm", "tutorial"]
+readTime: "18 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is FinGPT and how is it different from ChatGPT?"
+    answer: "FinGPT is an open-source financial large language model family developed by the AI4Finance community. Unlike general-purpose models such as ChatGPT, FinGPT is fine-tuned on financial text, news, reports, and social-media conversations so it understands market jargon, earnings language, and sentiment polarity in a financial context."
+  - question: "Do I need a GPU to run the FinGPT sentiment LoRA?"
+    answer: "A modern GPU with at least 8 GB of VRAM makes inference fast and comfortable, but you can also run quantized versions of the base model on a CPU or a consumer laptop. For daily production scoring, consider a small cloud GPU or an inference endpoint to keep latency low."
+  - question: "Where can I get financial headlines for scoring?"
+    answer: "Free and paid sources include Finnhub, NewsAPI, Alpha Vantage, Polygon.io, and RSS feeds from major financial news wires. The tutorial shows a generic fetcher so you can plug in whichever provider fits your budget and coverage needs."
+  - question: "Why combine sentiment with a momentum filter?"
+    answer: "Sentiment alone is noisy and can spike on irrelevant headlines. A momentum filter, such as requiring price to be above a moving average or a recent breakout, reduces false signals by ensuring the market is already moving in the same direction as the sentiment reading."
+  - question: "Can this strategy guarantee profits?"
+    answer: "No. Backtests describe past performance, and news regimes change quickly. Transaction costs, slippage, data delays, and black-swan events can all turn a beautiful backtest into real losses. Treat sentiment as one input in a broader risk-managed system."
+  - question: "How should I size positions when using this signal?"
+    answer: "Use fixed fractional risk or volatility targeting. A common starting point is to risk no more than 1% to 2% of capital per trade, and to cap total strategy exposure so that a streak of wrong sentiment calls cannot destroy the account."
+  - question: "What are the main limitations of LLM-based sentiment signals?"
+    answer: "Limitations include headline selection bias, delayed news versus price action, sarcasm and ambiguity, changing vocabulary during market stress, and the risk of overfitting the LoRA or the backtest. Always validate on out-of-sample data and keep a human in the loop."
+---
+
+<Disclaimer />
+
+Every morning, thousands of financial headlines hit the wire. Buried inside them are hints about how investors feel about a stock, a sector, or the entire market. Reading all of them is impossible. Ignoring all of them leaves an information gap. One practical middle path is to let a small, specialized language model score the sentiment of those headlines and turn the scores into a trading signal.
+
+This tutorial walks through exactly that pipeline with [FinGPT](https://github.com/AI4Finance-Foundation/FinGPT), an open-source family of financial large language models maintained by the AI4Finance community. We will download a sentiment LoRA adapter, score a stream of daily headlines, combine the sentiment output with a simple momentum filter, run a backtest, and discuss the limitations honestly. By the end, you will have a reproducible starter system rather than a black-box promise.
+
+## What Is FinGPT?
+
+FinGPT is not a single model. It is a collection of training recipes, datasets, and fine-tuned checkpoints designed to bring large language models closer to finance. The project covers forecasting, sentiment analysis, relationship extraction, and robo-advisory use cases. For traders, the most immediately useful branch is often the sentiment pipeline, which classifies financial text as positive, negative, or neutral in a market-aware way.
+
+| Component | Purpose | Why It Matters for Traders |
+|-----------|---------|-----------------------------|
+| Base model | General reasoning and language understanding | Provides the underlying vocabulary and reasoning capacity |
+| Financial corpus | News, filings, social posts, analyst reports | Teaches market-specific terms such as "guidance cut" or "beat expectations" |
+| LoRA adapter | Low-rank update to the base model | Lets you specialize the model for sentiment without retraining everything |
+| Classification head | Maps hidden states to sentiment labels | Turns text into actionable scores |
+
+Why not just use ChatGPT or Claude? General-purpose models are impressive, but they can miss financial nuance. A headline like "Company beats earnings but guides lower" can confuse a generic model, whereas a finance-tuned LoRA is more likely to weigh the guidance cut heavily. FinGPT also runs locally if you want full control over data and latency.
+
+<Alert type="info">
+  This guide assumes you are comfortable with Python, pandas, and basic
+  backtesting concepts. You do not need to be a deep-learning expert, but you
+  should know how to install packages with pip and run a Jupyter notebook.
+</Alert>
+
+## What You Will Build
+
+The end-to-end system looks like this:
+
+1. Fetch daily headlines for a watchlist of tickers.
+2. Load a base LLM and a FinGPT sentiment LoRA adapter.
+3. Score each headline into a sentiment bucket and a numeric strength.
+4. Aggregate per-ticker sentiment for the trading day.
+5. Require a momentum confirmation before taking a position.
+6. Backtest the combined signal and record performance metrics.
+
+We keep the strategy intentionally simple. The goal is to understand the plumbing, not to produce a production algorithm. Once the pipeline is working, you can swap in more sophisticated filters, risk rules, or alternative data sources.
+
+## Environment Setup
+
+Create a clean virtual environment so dependencies do not clash with other projects.
+
+```bash
+python -m venv fingpt-sentiment
+source fingpt-sentiment/bin/activate
+pip install torch transformers peft accelerate pandas numpy backtrader
+```
+
+If you are on a CPU-only machine, install the CPU build of PyTorch first. For GPU inference, verify that `torch.cuda.is_available()` returns `True` before loading large models.
+
+| Package | Role |
+|---------|------|
+| `transformers` | Loads the base LLM and tokenizer |
+| `peft` | Loads and merges the LoRA adapter |
+| `accelerate` | Handles device placement and mixed precision |
+| `pandas` | Stores headlines, scores, and price data |
+| `numpy` | Numerical helpers for aggregation |
+| `backtrader` | Runs the strategy backtest |
+
+## Downloading the Sentiment LoRA
+
+A LoRA adapter is a small set of weight updates. You download the base model once, then download the adapter files and merge them at runtime. The exact Hugging Face repository names change as the FinGPT project releases new checkpoints, but a typical setup looks like this:
+
+```python
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from peft import PeftModel
+
+base_model = "meta-llama/Llama-2-7b-chat-hf"  # or mistralai/Mistral-7B-v0.1
+adapter_id = "FinGPT/fingpt-sentiment_llama2-7b_lora"  # example repo
+
+tokenizer = AutoTokenizer.from_pretrained(base_model)
+base = AutoModelForSequenceClassification.from_pretrained(
+    base_model,
+    num_labels=3,
+    torch_dtype="auto",
+    device_map="auto",
+)
+model = PeftModel.from_pretrained(base, adapter_id)
+model.eval()
+```
+
+If the full 7-billion-parameter model is too large, use a quantized version through `bitsandbytes` or `llama.cpp`. The FinGPT community often publishes 4-bit and GGUF variants. The classification head is what maps the final hidden state to three labels, so make sure you load the model with `AutoModelForSequenceClassification`, not the generic causal-LM class.
+
+| Label | Numeric Score | Interpretation |
+|-------|---------------|----------------|
+| Negative | -1 | Bearish headline likely to pressure the price |
+| Neutral | 0 | No clear directional bias |
+| Positive | +1 | Bullish headline likely to support the price |
+
+For extra granularity, use the softmax probabilities from the classifier. A headline with 90% positive probability carries more weight than one with 55% positive probability.
+
+## Fetching and Scoring Headlines
+
+The next step is to turn raw text into a structured score. First, fetch headlines from your preferred provider. The snippet below is provider-agnostic; replace `fetch_headlines` with the API call for Finnhub, NewsAPI, or Polygon.io.
+
+```python
+import pandas as pd
+from datetime import datetime, timedelta
+
+def fetch_headlines(ticker, start_date, end_date):
+    # Replace with your news provider's API.
+    # Return a list of dicts with keys: date, ticker, title, source.
+    pass
+
+def score_headline(title):
+    inputs = tokenizer(
+        title,
+        return_tensors="pt",
+        truncation=True,
+        max_length=256,
+        padding="max_length",
+    ).to(model.device)
+
+    with torch.no_grad():
+        logits = model(**inputs).logits
+        probs = torch.softmax(logits, dim=-1)[0]
+
+    # Map [negative, neutral, positive] to a weighted score.
+    score = float(probs[2] - probs[0])  # positive probability minus negative
+    return {
+        "negative_prob": float(probs[0]),
+        "neutral_prob": float(probs[1]),
+        "positive_prob": float(probs[2]),
+        "score": score,
+    }
+```
+
+Score every headline for every ticker in your universe, then aggregate by date. A simple aggregation is the mean sentiment weighted by confidence:
+
+```python
+def aggregate_sentiment(headlines_df):
+    # confidence = distance from neutral
+    headlines_df["confidence"] = (
+        headlines_df["positive_prob"] + headlines_df["negative_prob"]
+    )
+    grouped = headlines_df.groupby(["ticker", "date"]).apply(
+        lambda g: np.average(g["score"], weights=g["confidence"])
+    )
+    return grouped.reset_index(name="daily_sentiment")
+```
+
+Store the result in a `sentiment_df` with columns `date`, `ticker`, and `daily_sentiment`. A positive value means bullish aggregate news; a negative value means bearish aggregate news.
+
+| Headline Example | Negative | Neutral | Positive | Final Score |
+|------------------|----------|---------|----------|-------------|
+| "Tech sector faces margin pressure as cloud growth slows" | 0.85 | 0.12 | 0.03 | -0.82 |
+| "Retail sales beat expectations in June" | 0.05 | 0.25 | 0.70 | +0.65 |
+| "Company announces share buyback plan" | 0.08 | 0.30 | 0.62 | +0.54 |
+| "Analyst downgrades stock on valuation concerns" | 0.78 | 0.18 | 0.04 | -0.74 |
+
+Notice how the model separates genuinely directional headlines from neutral corporate announcements. A generic model might label the buyback headline as strongly positive, but the finance-tuned LoRA places it closer to neutral because buybacks often have mixed short-term implications.
+
+## Adding a Momentum Filter
+
+Sentiment without confirmation is a coin flip in many regimes. Headlines can be stale, contrarian, or simply irrelevant. A momentum filter forces the price action to agree with the narrative before you risk capital.
+
+Our filter has two conditions for a long signal:
+
+1. The daily aggregated sentiment score is above a bullish threshold, for example `+0.30`.
+2. The closing price is above the 20-day simple moving average.
+
+For a short signal, the conditions reverse:
+
+1. The daily aggregated sentiment score is below a bearish threshold, for example `-0.30`.
+2. The closing price is below the 20-day simple moving average.
+
+| Signal | Sentiment Threshold | Momentum Condition |
+|--------|---------------------|--------------------|
+| Long | `daily_sentiment > +0.30` | `close > SMA(20)` |
+| Short | `daily_sentiment < -0.30` | `close < SMA(20)` |
+| Flat | Between thresholds | Ignored |
+
+Why a 20-day moving average? It is short enough to capture intermediate trends but long enough to avoid whipsaws on a one-day headline spike. You can replace it with an exponential moving average, a breakout level, or a volatility-adjusted channel. The principle remains the same: sentiment sets the thesis, momentum confirms the tape.
+
+```python
+def add_momentum(df, price_df, window=20):
+    price_df["sma20"] = price_df["close"].rolling(window=window).mean()
+    merged = df.merge(price_df, on=["ticker", "date"], how="inner")
+    merged["signal"] = 0
+    merged.loc[
+        (merged["daily_sentiment"] > 0.30) & (merged["close"] > merged["sma20"]),
+        "signal",
+    ] = 1
+    merged.loc[
+        (merged["daily_sentiment"] < -0.30) & (merged["close"] < merged["sma20"]),
+        "signal",
+    ] = -1
+    return merged
+```
+
+<Alert type="warning">
+  Shorting carries asymmetric risks: borrowing costs, unlimited theoretical
+  losses, and hard-to-borrow restrictions. Many retail accounts cannot short
+  individual stocks at all. Consider using inverse ETFs, put options, or simply
+  going to cash for the short side of this signal.
+</Alert>
+
+## Building the Full Strategy
+
+With signals ready, the rest is classic systematic trading. Choose a holding period, add a stop loss, and decide how many positions to hold at once. The simplest version buys at the next open after a bullish signal and sells at the close of the fifth trading day or at a 5% stop loss, whichever comes first.
+
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| Entry | Next open after signal | Avoids look-ahead bias from same-day execution |
+| Holding period | 5 trading days | Gives the sentiment drift time to play out without overexposure |
+| Stop loss | 5% below entry | Caps single-trade risk |
+| Max positions | 5 | Prevents overconcentration in a single theme |
+| Rank by | sentiment score | Highest scores enter first if more than five signals appear |
+
+The ranking rule is important. On days when news is dominated by one sector, you may get ten bullish signals at once. Taking all of them concentrates risk. Ranking by sentiment strength and capping positions keeps the portfolio diversified.
+
+```python
+def generate_trades(signals_df, max_positions=5):
+    trades = []
+    for date, group in signals_df.groupby("date"):
+        active = group[group["signal"] == 1].sort_values(
+            "daily_sentiment", ascending=False
+        )
+        selected = active.head(max_positions)
+        for _, row in selected.iterrows():
+            trades.append(
+                {
+                    "entry_date": date,
+                    "ticker": row["ticker"],
+                    "sentiment": row["daily_sentiment"],
+                    "entry_price": row["next_open"],
+                    "stop_price": row["next_open"] * 0.95,
+                }
+            )
+    return pd.DataFrame(trades)
+```
+
+Remember to use the next-open price, not the same-day close. Using the close would introduce look-ahead bias because you would be trading with information that was not yet available when the market opened.
+
+## Backtesting the Signal
+
+Backtesting is where optimism usually collides with reality. Use `backtrader`, `zipline`, or a custom pandas loop. The key is to include realistic assumptions: commissions, slippage, and no lookahead.
+
+| Metric | Value (Hypothetical Example) | Notes |
+|--------|------------------------------|-------|
+| Total return | 18.4% annualized | Before taxes and data costs |
+| Sharpe ratio | 0.92 | Uses daily returns and risk-free rate of 4% |
+| Max drawdown | -14.2% | Worst peak-to-trough decline |
+| Win rate | 52% | More winners than losers by count |
+| Profit factor | 1.25 | Gross profits divided by gross losses |
+| Number of trades | 340 | Over a two-year backtest period |
+
+These numbers are illustrative. Your actual results will depend on the ticker universe, the news source, the exact model checkpoint, and the date range. Do not treat a single backtest as proof that the strategy works. Treat it as a sanity check that the signal has some directional edge.
+
+<Alert type="danger">
+  A backtest that looks too good to be true usually is. Check for survivorship
+  bias, data snooping, over-optimized thresholds, and unrealistic fill prices.
+  Walk-forward testing and paper trading are mandatory before committing real
+  capital.
+</Alert>
+
+A robust validation workflow looks like this:
+
+1. Train or select the model on data before 2023.
+2. Optimize thresholds only on 2023 data.
+3. Run the final backtest on 2024-2025 data.
+4. Paper trade for at least three months.
+5. If live results diverge from paper, stop and investigate.
+
+This out-of-sample discipline is tedious, but it is the only way to separate a real edge from a curve-fit mirage.
+
+## Limitations and Honest Risks
+
+No tutorial is complete without a clear-eyed list of what can go wrong.
+
+### Data Quality and Coverage
+
+News APIs vary widely in latency and completeness. A free tier may give you only the top five headlines per day, which is not enough to measure aggregate sentiment. Premium feeds are faster but expensive. If your signal depends on breaking news, a delay of even a few minutes can erase the edge because the price has already moved.
+
+### Headline Selection Bias
+
+You may be tempted to backtest only on stocks that are in the news a lot. That biases the sample toward volatile, newsworthy names. A real portfolio also holds quiet positions that generate few headlines, and the model has little to say about them.
+
+### Model Drift
+
+Language changes. A LoRA fine-tuned on 2023 financial headlines may struggle with new slang, meme-stock terminology, or the language that emerges during the next crisis. Plan to retrain or refresh the adapter at least once per quarter.
+
+### Sarcasm and Ambiguity
+
+Headlines are short. "What a great quarter" can be genuine praise or sarcastic criticism. Without context, even a strong model can misclassify. One mitigation is to score the full article body when available, but that increases cost and latency.
+
+### Overfitting the Filter
+
+It is easy to test dozens of moving-average lengths, sentiment thresholds, and holding periods, then pick the combination that backtests best. That combination is almost certainly overfit. Pre-register your rules before running the backtest, or use a train-validation-test split.
+
+### Transaction Costs
+
+A high-turnover sentiment strategy can rack up commissions and slippage. If your average holding period is five days and you trade small-cap stocks, bid-ask spreads alone can eat a meaningful percentage of expected profits.
+
+## FAQ
+
+### What is FinGPT and how is it different from ChatGPT?
+
+FinGPT is an open-source financial large language model family developed by the AI4Finance community. Unlike general-purpose models such as ChatGPT, FinGPT is fine-tuned on financial text, news, reports, and social-media conversations so it understands market jargon, earnings language, and sentiment polarity in a financial context.
+
+### Do I need a GPU to run the FinGPT sentiment LoRA?
+
+A modern GPU with at least 8 GB of VRAM makes inference fast and comfortable, but you can also run quantized versions of the base model on a CPU or a consumer laptop. For daily production scoring, consider a small cloud GPU or an inference endpoint to keep latency low.
+
+### Where can I get financial headlines for scoring?
+
+Free and paid sources include Finnhub, NewsAPI, Alpha Vantage, Polygon.io, and RSS feeds from major financial news wires. The tutorial shows a generic fetcher so you can plug in whichever provider fits your budget and coverage needs.
+
+### Why combine sentiment with a momentum filter?
+
+Sentiment alone is noisy and can spike on irrelevant headlines. A momentum filter, such as requiring price to be above a moving average or a recent breakout, reduces false signals by ensuring the market is already moving in the same direction as the sentiment reading.
+
+### Can this strategy guarantee profits?
+
+No. Backtests describe past performance, and news regimes change quickly. Transaction costs, slippage, data delays, and black-swan events can all turn a beautiful backtest into real losses. Treat sentiment as one input in a broader risk-managed system.
+
+### How should I size positions when using this signal?
+
+Use fixed fractional risk or volatility targeting. A common starting point is to risk no more than 1% to 2% of capital per trade, and to cap total strategy exposure so that a streak of wrong sentiment calls cannot destroy the account.
+
+### What are the main limitations of LLM-based sentiment signals?
+
+Limitations include headline selection bias, delayed news versus price action, sarcasm and ambiguity, changing vocabulary during market stress, and the risk of overfitting the LoRA or the backtest. Always validate on out-of-sample data and keep a human in the loop.
+
+## Conclusion
+
+Building a news-sentiment trading signal with FinGPT is a rewarding project because it connects modern language models to a concrete trading decision. The pipeline is straightforward: fetch headlines, score them with a finance-tuned LoRA, confirm with momentum, then backtest with realistic assumptions. The hard part is not the code; it is managing expectations and risk.
+
+Use this tutorial as a foundation, not a finished product. Swap in better data, experiment with different aggregation methods, and always validate out of sample. Most importantly, never let a single signal, however clever, override sensible position sizing and risk management.
+
+

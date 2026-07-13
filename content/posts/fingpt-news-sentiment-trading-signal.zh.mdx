@@ -1,0 +1,353 @@
+---
+title: "用 FinGPT 构建新闻情感交易信号"
+description: "一篇手把手教程：下载 FinGPT 情感 LoRA、为财经标题打分、结合动量过滤，并诚实地回测结果。"
+date: "2026-07-13"
+category: "Tutorials"
+tags: ["fingpt", "sentiment", "llm", "tutorial"]
+readTime: "18 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "什么是 FinGPT？它和 ChatGPT 有什么区别？"
+    answer: "FinGPT 是由 AI4Finance 社区维护的开源金融大语言模型家族。与 ChatGPT 等通用模型不同，FinGPT 在金融文本、新闻、财报和社交媒体对话上进行微调，因此更理解市场术语、财报语言和金融市场中的情感极性。"
+  - question: "运行 FinGPT 情感 LoRA 是否需要 GPU？"
+    answer: "拥有一块至少 8 GB 显存的现代 GPU 会让推理又快又稳，但你也可以在 CPU 或普通笔记本上运行量化版本的基础模型。若用于每日生产级打分，建议考虑小型云 GPU 或推理端点，以降低延迟。"
+  - question: "从哪里获取用于打分的财经标题？"
+    answer: "免费和付费来源包括 Finnhub、NewsAPI、Alpha Vantage、Polygon.io，以及主要财经通讯社的 RSS 订阅。本教程展示了一个通用获取器，你可以根据自身预算和覆盖范围接入任意提供商。"
+  - question: "为什么要把情感信号与动量过滤结合？"
+    answer: "单独的噪音很大，可能在无关标题上出现异常峰值。动量过滤（例如要求价格位于均线之上或出现突破）可以减少错误信号，确保市场已经朝着情感读数相同的方向运动。"
+  - question: "这个策略能保证盈利吗？"
+    answer: "不能。回测只描述过去的表现，而新闻环境变化很快。交易成本、滑点、数据延迟和黑天鹅事件都可能让漂亮的回测变成真实亏损。应把情感信号视为更大风险管理体系中的一个输入。"
+  - question: "使用该信号时应如何控制仓位？"
+    answer: "采用固定分数风险或波动率目标法。常见的起点是每笔交易只承担账户资金的 1% 到 2% 风险，并限制策略总敞口，以免连续错误的情感判断摧毁账户。"
+  - question: "基于 LLM 的情感信号主要有哪些局限？"
+    answer: "局限包括标题选择偏差、新闻滞后于价格走势、讽刺与歧义、市场压力期间词汇变化，以及对 LoRA 或回测过度拟合的风险。务必在样本外数据上验证，并保留人工把关。"
+---
+
+<Disclaimer />
+
+每天早晨，成千上万条财经标题涌入信息流。它们之中隐藏着投资者对某只股票、某个板块甚至整个市场的情绪线索。逐条阅读是不可能的，完全忽视又会留下信息缺口。一条务实的折中之路，是让一个经过专门训练的小型语言模型为这些标题打分，并把分数转化为交易信号。
+
+本教程将使用由 AI4Finance 社区维护的开源金融大语言模型家族 [FinGPT](https://github.com/AI4Finance-Foundation/FinGPT)，完整演示这一流程。我们会下载一个情感 LoRA 适配器、为每日标题打分、结合简单的动量过滤、运行回测，并诚实地讨论局限。读完之后，你将得到一个可复现的入门系统，而不是一个黑盒式的盈利承诺。
+
+## 什么是 FinGPT？
+
+FinGPT 并不是单一模型，而是一套训练方案、数据集和微调检查点的集合，旨在让大语言模型更贴近金融领域。该项目覆盖预测、情感分析、关系抽取和智能投顾等应用场景。对交易者来说，最直接有用的分支通常是情感分析流程，它能把金融文本分类为正面、负面或中性，并且具备一定的市场语境理解。
+
+| 组件 | 作用 | 对交易者的重要性 |
+|------|------|------------------|
+| 基础模型 | 通用推理和语言理解 | 提供底层词汇量和推理能力 |
+| 金融语料 | 新闻、财报、社交帖子、研报 | 学习市场专属术语，如 "业绩指引下调" 或 "超预期" |
+| LoRA 适配器 | 对基础模型的低秩更新 | 无需重训整个模型即可实现情感特化 |
+| 分类头 | 将隐藏状态映射到情感标签 | 把文本转化为可操作的分数 |
+
+为什么不直接用 ChatGPT 或 Claude？通用模型令人惊叹，但可能遗漏金融领域的细微差别。例如标题 "公司盈利超预期但指引下调" 就可能让通用模型困惑，而经过金融微调的 LoRA 更有可能重视指引下调这一利空。此外，如果你希望对数据和延迟有完全掌控，FinGPT 可以本地运行。
+
+<Alert type="info">
+  本指南假设你熟悉 Python、pandas 和基础回测概念。你不必是深度学习专家，
+  但应掌握如何用 pip 安装包并运行 Jupyter notebook。
+</Alert>
+
+## 你将构建什么
+
+端到端系统如下：
+
+1. 为观察名单中的股票获取每日标题。
+2. 加载基础大语言模型和 FinGPT 情感 LoRA 适配器。
+3. 把每条标题打分为情感桶并给出数值强度。
+4. 汇总每个股票在交易日内的情感分数。
+5. 在建立仓位前要求动量确认。
+6. 回测组合信号并记录绩效指标。
+
+我们刻意保持策略简单。目标是理解整个流程的管道，而不是生成一个生产级算法。管道跑通后，你可以替换更复杂的过滤条件、风控规则或另类数据源。
+
+## 环境准备
+
+创建干净的虚拟环境，避免与其他项目的依赖冲突。
+
+```bash
+python -m venv fingpt-sentiment
+source fingpt-sentiment/bin/activate
+pip install torch transformers peft accelerate pandas numpy backtrader
+```
+
+如果你只在 CPU 上运行，请先安装 PyTorch 的 CPU 版本。若使用 GPU 推理，请在加载大模型前确认 `torch.cuda.is_available()` 返回 `True`。
+
+| 包 | 作用 |
+|----|------|
+| `transformers` | 加载基础大语言模型和分词器 |
+| `peft` | 加载并合并 LoRA 适配器 |
+| `accelerate` | 处理设备放置和混合精度 |
+| `pandas` | 存储标题、分数和价格数据 |
+| `numpy` | 用于聚合的数值计算辅助 |
+| `backtrader` | 运行策略回测 |
+
+## 下载情感 LoRA
+
+LoRA 适配器是一小组权重更新。你只需下载一次基础模型，然后下载适配器文件并在运行时合并。随着 FinGPT 项目不断发布新检查点，具体的 Hugging Face 仓库名会有所变化，但典型配置如下：
+
+```python
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from peft import PeftModel
+
+base_model = "meta-llama/Llama-2-7b-chat-hf"  # 或 mistralai/Mistral-7B-v0.1
+adapter_id = "FinGPT/fingpt-sentiment_llama2-7b_lora"  # 示例仓库
+
+tokenizer = AutoTokenizer.from_pretrained(base_model)
+base = AutoModelForSequenceClassification.from_pretrained(
+    base_model,
+    num_labels=3,
+    torch_dtype="auto",
+    device_map="auto",
+)
+model = PeftModel.from_pretrained(base, adapter_id)
+model.eval()
+```
+
+如果完整的 70 亿参数模型过大，可以通过 `bitsandbytes` 或 `llama.cpp` 使用量化版本。FinGPT 社区通常会发布 4-bit 和 GGUF 变体。由于分类头负责把最终隐藏状态映射为三个标签，请务必使用 `AutoModelForSequenceClassification` 加载模型，而不是通用的因果语言模型类。
+
+| 标签 | 数值分数 | 解读 |
+|------|----------|------|
+| 负面 | -1 | 利空标题，可能压制股价 |
+| 中性 | 0 | 没有明确方向性偏向 |
+| 正面 | +1 | 利多标题，可能支撑股价 |
+
+如果需要更细的粒度，可以使用分类器的 softmax 概率。一条正面概率 90% 的标题，显然比正面概率 55% 的标题权重更高。
+
+## 获取并打分时事标题
+
+下一步是把原始文本转化为结构化分数。首先从所选数据源获取标题。下面的代码片段是通用骨架，请把 `fetch_headlines` 替换为 Finnhub、NewsAPI 或 Polygon.io 的实际 API 调用。
+
+```python
+import pandas as pd
+from datetime import datetime, timedelta
+
+def fetch_headlines(ticker, start_date, end_date):
+    # 替换为你的新闻提供商 API。
+    # 返回包含 date、ticker、title、source 键的字典列表。
+    pass
+
+def score_headline(title):
+    inputs = tokenizer(
+        title,
+        return_tensors="pt",
+        truncation=True,
+        max_length=256,
+        padding="max_length",
+    ).to(model.device)
+
+    with torch.no_grad():
+        logits = model(**inputs).logits
+        probs = torch.softmax(logits, dim=-1)[0]
+
+    # 将 [负面, 中性, 正面] 映射为加权分数。
+    score = float(probs[2] - probs[0])  # 正面概率减去负面概率
+    return {
+        "negative_prob": float(probs[0]),
+        "neutral_prob": float(probs[1]),
+        "positive_prob": float(probs[2]),
+        "score": score,
+    }
+```
+
+为观察名单中的每只股票、每条标题打分，然后按日期汇总。简单的汇总方式是按置信度加权的平均情感：
+
+```python
+def aggregate_sentiment(headlines_df):
+    # 置信度 = 与中性之间的距离
+    headlines_df["confidence"] = (
+        headlines_df["positive_prob"] + headlines_df["negative_prob"]
+    )
+    grouped = headlines_df.groupby(["ticker", "date"]).apply(
+        lambda g: np.average(g["score"], weights=g["confidence"])
+    )
+    return grouped.reset_index(name="daily_sentiment")
+```
+
+把结果存入 `sentiment_df`，列包括 `date`、`ticker` 和 `daily_sentiment`。正值代表新闻整体偏多，负值代表整体偏空。
+
+| 标题示例 | 负面概率 | 中性概率 | 正面概率 | 最终分数 |
+|----------|----------|----------|----------|----------|
+| "科技股因云业务增速放缓面临利润率压力" | 0.85 | 0.12 | 0.03 | -0.82 |
+| "六月零售销售超预期" | 0.05 | 0.25 | 0.70 | +0.65 |
+| "公司宣布股票回购计划" | 0.08 | 0.30 | 0.62 | +0.54 |
+| "分析师因估值担忧下调股票评级" | 0.78 | 0.18 | 0.04 | -0.74 |
+
+注意模型如何把真正具有方向性的标题与中性的公司公告区分开。通用模型可能会把回购标题标为强烈利好，但经金融微调的 LoRA 更倾向于将其判为接近中性，因为回购的短期影响往往喜忧参半。
+
+## 加入动量过滤
+
+在许多市场环境中，缺乏确认的不可谓不差。标题可能是滞后的、逆向的，或干脆无关。动量过滤要求价格走势与叙事方向一致，然后才投入本金。
+
+我们的多头信号有两个条件：
+
+1. 当日汇总情感分数高于多头阈值，例如 `+0.30`。
+2. 收盘价高于 20 日简单移动平均线。
+
+空头信号则相反：
+
+1. 当日汇总情感分数低于空头阈值，例如 `-0.30`。
+2. 收盘价低于 20 日简单移动平均线。
+
+| 信号 | 情感阈值 | 动量条件 |
+|------|----------|----------|
+| 多头 | `daily_sentiment > +0.30` | `close > SMA(20)` |
+| 空头 | `daily_sentiment < -0.30` | `close < SMA(20)` |
+| 空仓 | 阈值之间 | 忽略 |
+
+为什么选择 20 日移动平均线？它足够短以捕捉中期趋势，又足够长以避免被单日标题尖峰反复打脸。你可以用指数移动平均线、突破位或波动率调整通道替代。原则不变：建立假设， tape 确认。
+
+```python
+def add_momentum(df, price_df, window=20):
+    price_df["sma20"] = price_df["close"].rolling(window=window).mean()
+    merged = df.merge(price_df, on=["ticker", "date"], how="inner")
+    merged["signal"] = 0
+    merged.loc[
+        (merged["daily_sentiment"] > 0.30) & (merged["close"] > merged["sma20"]),
+        "signal",
+    ] = 1
+    merged.loc[
+        (merged["daily_sentiment"] < -0.30) & (merged["close"] < merged["sma20"]),
+        "signal",
+    ] = -1
+    return merged
+```
+
+<Alert type="warning">
+  空头交易存在非对称风险：借券成本、理论上无限亏损，以及难以借券的限制。
+  许多散户账户根本无法做空个股。可以考虑用反向 ETF、看跌期权，或干脆在空头信号出现时转为现金。
+</Alert>
+
+## 构建完整策略
+
+信号准备就绪后，剩下的就是经典系统化交易。选择持有期、设置止损，并决定同时最多持有多少仓位。最简单版本在多头信号出现后的次日开盘买入，持有 5 个交易日或在触及 5% 止损时平仓，以先到者为准。
+
+| 参数 | 取值 | 理由 |
+|------|------|------|
+| 入场 | 信号出现后的次日开盘 | 避免同日执行的 lookahead 偏差 |
+| 持有期 | 5 个交易日 | 给情感漂移留出时间，同时避免过度暴露 |
+| 止损 | 入场价下方 5% | 限制单笔交易风险 |
+| 最大仓位数 | 5 | 防止在单一主题上过度集中 |
+| 排序依据 | 情感分数 | 若信号过多，优先选择分数最高的 |
+
+排序规则很重要。当新闻被某个行业主导时，一天可能出现十个多头信号。全部买入会集中风险。按情感强度排序并限制仓位数，可以保持组合分散。
+
+```python
+def generate_trades(signals_df, max_positions=5):
+    trades = []
+    for date, group in signals_df.groupby("date"):
+        active = group[group["signal"] == 1].sort_values(
+            "daily_sentiment", ascending=False
+        )
+        selected = active.head(max_positions)
+        for _, row in selected.iterrows():
+            trades.append(
+                {
+                    "entry_date": date,
+                    "ticker": row["ticker"],
+                    "sentiment": row["daily_sentiment"],
+                    "entry_price": row["next_open"],
+                    "stop_price": row["next_open"] * 0.95,
+                }
+            )
+    return pd.DataFrame(trades)
+```
+
+记住使用次日开盘价，而不是当日收盘价。使用收盘价会引入 lookahead 偏差，因为你将用开盘时尚未获得的信息进行交易。
+
+## 回测信号
+
+回测是乐观与现实碰撞的地方。可以使用 `backtrader`、`zipline` 或自定义 pandas 循环。关键是纳入现实假设：佣金、滑点、无 lookahead。
+
+| 指标 | 数值（假设示例） | 说明 |
+|------|------------------|------|
+| 总收益 | 年化 18.4% | 税前、扣数据费前 |
+| 夏普比率 | 0.92 | 使用日收益和 4% 无风险利率 |
+| 最大回撤 | -14.2% | 最坏峰谷跌幅 |
+| 胜率 | 52% | 按交易次数计算盈利占比 |
+| 盈亏比 | 1.25 | 总盈利除以总亏损 |
+| 交易次数 | 340 | 两年回测期内 |
+
+这些数字仅为示意。实际结果取决于股票池、新闻来源、具体模型检查点和日期范围。不要把单次回测当作策略有效的证明，把它当作信号具有一定方向性优势的合理性检查。
+
+<Alert type="danger">
+  看起来好得不像真的回测，通常确实不是真的。检查幸存者偏差、数据窥探、
+  过度优化的阈值，以及不切实际的成交价格。在投入真金白银前，
+  前向测试和模拟交易是 mandatory。
+</Alert>
+
+一套稳健的验证流程如下：
+
+1. 在 2023 年之前的数据上训练或选择模型。
+2. 仅在 2023 年数据上优化阈值。
+3. 在 2024-2025 年数据上运行最终回测。
+4. 至少进行三个月模拟交易。
+5. 如果实盘与模拟结果背离，停止并调查。
+
+这种样本外纪律很枯燥，但它是区分真实优势和曲线拟合幻觉的唯一方法。
+
+## 局限与诚实风险
+
+任何教程如果不列出可能出错的地方，都是不完整的。
+
+### 数据质量与覆盖度
+
+新闻 API 的延迟和覆盖度差异很大。免费套餐可能每天只返回前五条标题，不足以衡量聚合。付费流更快但更贵。如果你的信号依赖突发新闻，即使几分钟的延迟也可能抹掉优势，因为价格已经动了。
+
+### 标题选择偏差
+
+回测时你可能只选新闻很多的股票。这会偏向波动大、受关注的标的。真实组合还会持有产生少量标题的安静标的，而模型对它们无话可说。
+
+### 模型漂移
+
+语言会变化。在 2023 年财经标题上微调的 LoRA，可能难以理解新俚语、meme 股术语或下次危机中出现的新表达。计划至少每季度重训或刷新一次适配器。
+
+### 讽刺与歧义
+
+标题很短。"多么棒的季度" 可能是真诚赞扬，也可能是讽刺批评。没有上下文时，即使很强的模型也可能误判。一种缓解办法是在可获取时对完整正文打分，但会提高成本和延迟。
+
+### 过滤条件过度拟合
+
+很容易测试几十组均线长度、情感阈值和持有期，然后挑选回测最好的组合。这个组合几乎肯定过拟合。在运行回测前预先登记规则，或使用训练-验证-测试分割。
+
+### 交易成本
+
+高换手率的策略会累积佣金和滑点。如果平均持有期为 5 天且交易小盘股，仅买卖价差就可能吃掉预期利润的相当一部分。
+
+## 常见问题
+
+### 什么是 FinGPT？它和 ChatGPT 有什么区别？
+
+FinGPT 是由 AI4Finance 社区维护的开源金融大语言模型家族。与 ChatGPT 等通用模型不同，FinGPT 在金融文本、新闻、财报和社交媒体对话上进行微调，因此更理解市场术语、财报语言和金融市场中的情感极性。
+
+### 运行 FinGPT 情感 LoRA 是否需要 GPU？
+
+拥有一块至少 8 GB 显存的现代 GPU 会让推理又快又稳，但你也可以在 CPU 或普通笔记本上运行量化版本的基础模型。若用于每日生产级打分，建议考虑小型云 GPU 或推理端点，以降低延迟。
+
+### 从哪里获取用于打分的财经标题？
+
+免费和付费来源包括 Finnhub、NewsAPI、Alpha Vantage、Polygon.io，以及主要财经通讯社的 RSS 订阅。本教程展示了一个通用获取器，你可以根据自身预算和覆盖范围接入任意提供商。
+
+### 为什么要把情感信号与动量过滤结合？
+
+单独的噪音很大，可能在无关标题上出现异常峰值。动量过滤（例如要求价格位于均线之上或出现突破）可以减少错误信号，确保市场已经朝着情感读数相同的方向运动。
+
+### 这个策略能保证盈利吗？
+
+不能。回测只描述过去的表现，而新闻环境变化很快。交易成本、滑点、数据延迟和黑天鹅事件都可能让漂亮的回测变成真实亏损。应把情感信号视为更大风险管理体系中的一个输入。
+
+### 使用该信号时应如何控制仓位？
+
+采用固定分数风险或波动率目标法。常见的起点是每笔交易只承担账户资金的 1% 到 2% 风险，并限制策略总敞口，以免连续错误的情感判断摧毁账户。
+
+### 基于 LLM 的情感信号主要有哪些局限？
+
+局限包括标题选择偏差、新闻滞后于价格走势、讽刺与歧义、市场压力期间词汇变化，以及对 LoRA 或回测过度拟合的风险。务必在样本外数据上验证，并保留人工把关。
+
+## 结论
+
+用 FinGPT 构建新闻情感交易信号是一个值得投入的项目，因为它把现代语言模型与具体的交易决策连接起来。整个流程很直接：获取标题、用金融微调的 LoRA 打分、用动量确认、再用现实假设回测。困难的不是代码，而是管理预期和风险。
+
+把本教程当作基础，而不是成品。接入更好的数据，尝试不同的聚合方法，并始终在样本外验证。最重要的是，不要让任何单一信号，无论多么巧妙，凌驾于合理的仓位管理和风险控制之上。
+
+

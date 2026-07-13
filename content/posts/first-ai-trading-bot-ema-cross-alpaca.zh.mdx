@@ -1,0 +1,426 @@
+---
+title: "你的第一个 AI 交易机器人：EMA 交叉 + Alpaca 模拟交易"
+description: "用 Python、EMA 交叉信号和 Alpaca 免费模拟交易 API，从零构建你的第一个算法交易机器人。没有炒作，没有付费工具，只有诚实的逐步代码。"
+date: "2026-07-13"
+category: "Tutorials"
+tags: ["alpaca", "first bot", "ema", "paper trading"]
+readTime: "16 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "构建这个交易机器人需要会 Python 吗？"
+    answer: "掌握基础 Python 就够了。如果你能读懂循环、函数，并会用 pip 安装包，就能跟着本教程完成。我们会解释每一行代码。"
+  - question: "Alpaca 模拟交易真的免费吗？"
+    answer: "是的。Alpaca 的模拟交易账户完全免费，并提供与真实交易相同的 API，让你用虚拟资金测试策略。"
+  - question: "这个 EMA 交叉机器人能让我赚钱吗？"
+    answer: "仅靠它本身大概率不能。EMA 交叉是一个经典但脆弱的策略。本教程教你构建、回测和迭代，而不是快速致富。"
+  - question: "运行交易机器人需要什么硬件？"
+    answer: "普通笔记本即可。树莓派或云服务器也可以。本指南中的代码消耗的算力甚至比不上一场视频通话。"
+  - question: "如何保证 Alpaca API 密钥的安全？"
+    answer: "将密钥存放在环境变量或 .env 文件中，永远不要提交到 Git，把 API 权限限制为仅交易，并定期轮换密钥。"
+  - question: "这个机器人能用来交易加密货币吗？"
+    answer: "不能直接在 Alpaca 上交易加密货币，它主要面向美股和 ETF。不过同样的 EMA 逻辑可以迁移到加密货币交易所 API。"
+  - question: "学完本教程后下一步该做什么？"
+    answer: "在模拟盘上运行数周，用表格记录每笔交易，添加风控规则，然后决定是否用极小的实盘账户继续，或继续优化策略。"
+---
+
+<Disclaimer />
+
+每个交易者迟早都会想：能不能让机器来做那些枯燥的事——盯盘、按信号入场、管理止损、收盘前平仓？这种好奇心是健康的。问题在于大多数"AI 交易机器人"教程直接跳到精心挑选的回测曲线和被动收入承诺。本文不会这样。
+
+在本教程中，你将从零构建一个虽小但完整的算法交易机器人。它会使用 EMA 交叉策略，从 Alpaca 获取数据，进行贴近现实的回测，然后在 Alpaca 的免费模拟账户上交易。到最后，你将拥有一套可用的代码库，对机器人能做什么、不能做什么有现实的认识，以及一条安全持续实验的路径。
+
+<Alert type="info">
+  本指南仅供教育目的。我们不卖策略、信号服务或"秘密算法"。目标是教你如何安全地测试想法，而不是说服你机器人能印钞。
+</Alert>
+
+## 为什么从 EMA 交叉开始？
+
+交易机器人不过是根据规则做决策的程序。规则越简单，越容易理解它为什么赢、为什么输。指数移动平均线交叉是技术分析中最简单的系统化规则之一：
+
+- 短期 EMA 紧跟近期价格。
+- 长期 EMA 反映更大级别的趋势。
+- 当短期 EMA 上穿长期 EMA 时，机器人考虑买入。
+- 当短期 EMA 下穿长期 EMA 时，机器人考虑卖出或做空。
+
+这个逻辑容易解释、容易编码、也容易调试。它同样容易暴露缺陷：在震荡市中会来回打脸，在强趋势中可能入场偏晚。这种诚实正是关键。如果你能构建、回测并改进一个简单的 EMA 机器人，以后就能替换成更复杂的信号。
+
+## 开始之前你需要什么
+
+你不需要高性能电脑，也不需要付费数据订阅。最低配置如下：
+
+| 需求 | 推荐选项 | 原因 |
+|------|----------|------|
+| Python | 3.10 或更新版本 | 我们使用现代语法，类型提示很少。 |
+| 代码编辑器 | VS Code、Cursor 或 PyCharm | 任何能编辑文本的编辑器都可以。 |
+| Alpaca 账户 | 免费模拟交易账户 | 提供行情数据和模拟执行。 |
+| 网络 | 稳定连接 | 机器人需要轮询数据或监听 websocket。 |
+| 耐心 | 几个小时 | 大部分时间花在理解上，而不是打字。 |
+
+你不必是专业开发者。如果你写过导入包并读取 CSV 的 Python 脚本，就已经有足够的背景知识。
+
+## 设置 Alpaca 模拟交易
+
+Alpaca 是一家提供免佣金 API 和模拟交易环境的美国券商。模拟账户的行为与真实账户几乎一致，只是资金是假的。这正是学习时最需要的。
+
+首先在 Alpaca 注册账户并选择模拟交易。登录后进入 API 密钥页面，生成新密钥。你会看到两个值：API Key ID 和 Secret Key。
+
+| 密钥类型 | 示例格式 | 存放位置 |
+|----------|----------|----------|
+| API Key ID | PKABCDEF1234567890 | 环境变量 `ALPACA_API_KEY` |
+| Secret Key | A1b2C3d4... | 环境变量 `ALPACA_SECRET_KEY` |
+
+永远不要把这些密钥直接粘贴到可能上传到 GitHub 的代码里。最快捷安全的方法是在项目文件夹中创建 `.env` 文件，并用 `python-dotenv` 这类包加载。
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows 用：venv\Scripts\activate
+pip install alpaca-py pandas numpy python-dotenv yfinance
+```
+
+创建 `.env` 文件：
+
+```
+ALPACA_API_KEY=你的密钥
+ALPACA_SECRET_KEY=你的密钥
+```
+
+并把 `.env` 加入 `.gitignore`，确保它永远不会被提交。
+
+## 用 Python 获取历史 K 线
+
+在机器人交易之前，它需要先拿到数据。Alpaca 的 Python SDK 让这变得简单。创建 `data.py`：
+
+```python
+import os
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+from alpaca.data.historical import StockHistoricalDataClient
+from alpaca.data.requests import StockBarsRequest
+from alpaca.data.timeframe import TimeFrame
+import pandas as pd
+
+load_dotenv()
+
+client = StockHistoricalDataClient(
+    api_key=os.getenv("ALPACA_API_KEY"),
+    secret_key=os.getenv("ALPACA_SECRET_KEY"),
+    raw_data=False,
+)
+
+request = StockBarsRequest(
+    symbol_or_symbols="SPY",
+    timeframe=TimeFrame.Hour,
+    start=datetime.now() - timedelta(days=90),
+    end=datetime.now(),
+    feed="iex",
+)
+
+bars = client.get_stock_bars(request)
+df = bars.df.reset_index()
+df = df.rename(columns={"timestamp": "timestamp", "open": "open", "high": "high", "low": "low", "close": "close", "volume": "volume"})
+print(df.tail())
+```
+
+运行脚本。如果你能看到 SPY 的最新小时 K 线，说明密钥和环境都配置正确。`feed="iex"` 告诉 Alpaca 使用免费的 IEX 数据，对学习来说已经足够。延迟的 SIP 数据也可用，但不是必需的。
+
+<Alert type="warning">
+  免费数据流可能比付费 SIP 数据略有延迟，tick 也更少。对学习机器人来说可以接受，但不要假设模拟盘中的成交价会在真实交易中完全复现。
+</Alert>
+
+## 编写 EMA 交叉策略
+
+数据通了之后，加入交易逻辑。创建 `strategy.py`：
+
+```python
+import pandas as pd
+
+def add_ema_signals(df: pd.DataFrame, fast: int = 12, slow: int = 26) -> pd.DataFrame:
+    df = df.copy()
+    df["ema_fast"] = df["close"].ewm(span=fast, adjust=False).mean()
+    df["ema_slow"] = df["close"].ewm(span=slow, adjust=False).mean()
+    df["signal"] = 0
+    df.loc[df["ema_fast"] > df["ema_slow"], "signal"] = 1
+    df.loc[df["ema_fast"] < df["ema_slow"], "signal"] = -1
+    df["crossover"] = df["signal"].diff()
+    return df
+```
+
+这个函数做三件事。首先计算两条指数移动平均线。然后根据哪条 EMA 在上方，把每根 K 线标记为看多、看空或中性。最后计算相邻信号值的差，所以 `2` 表示金叉，`-2` 表示死叉。
+
+你可以稍后修改 `fast` 和 `slow` 的周期。常见组合有 12 和 26、9 和 21、或 50 和 200。没有哪一组是神圣的。不同市场和周期反应不同，这就是回测的意义。
+
+## 回测策略
+
+回测模拟策略在历史数据上的表现。它不能保证未来盈利，但能告诉你规则本身是否成立。创建 `backtest.py`：
+
+```python
+import pandas as pd
+from data import get_bars
+from strategy import add_ema_signals
+
+INITIAL_CAPITAL = 10000
+COMMISSION_PER_TRADE = 1.0
+
+def backtest(df: pd.DataFrame, fast: int = 12, slow: int = 26):
+    df = add_ema_signals(df, fast, slow)
+    position = 0
+    cash = INITIAL_CAPITAL
+    shares = 0
+    trades = []
+
+    for _, row in df.iterrows():
+        price = row["close"]
+        crossover = row["crossover"]
+
+        if crossover == 2 and position <= 0:
+            # 金叉：买入
+            shares = (cash - COMMISSION_PER_TRADE) // price
+            if shares > 0:
+                cash -= shares * price + COMMISSION_PER_TRADE
+                position = 1
+                trades.append({"type": "buy", "price": price, "timestamp": row["timestamp"]})
+        elif crossover == -2 and position >= 0:
+            # 死叉：卖出
+            if shares > 0:
+                cash += shares * price - COMMISSION_PER_TRADE
+                trades.append({"type": "sell", "price": price, "timestamp": row["timestamp"]})
+            shares = 0
+            position = -1
+
+    final_value = cash + shares * df.iloc[-1]["close"]
+    return {
+        "final_value": final_value,
+        "return_pct": (final_value - INITIAL_CAPITAL) / INITIAL_CAPITAL * 100,
+        "trades": len(trades),
+        "trade_list": trades,
+    }
+
+if __name__ == "__main__":
+    df = get_bars("SPY", days=180)
+    result = backtest(df, fast=12, slow=26)
+    print(f"最终价值: ${result['final_value']:.2f}")
+    print(f"收益率: {result['return_pct']:.2f}%")
+    print(f"交易次数: {result['trades']}")
+```
+
+这个回测故意保持简单。它假设市价单按收盘价成交，收取固定佣金，忽略滑点和部分成交。这些简化对第一个机器人来说没问题，但意味着真实结果会有差异。
+
+以下是你在 SPY 180 天小时数据上可能看到的示例输出：
+
+| 指标 | 示例值 | 解读 |
+|------|--------|------|
+| 初始资金 | $10,000 | 起始组合价值。 |
+| 最终价值 | $10,430 | 最后一根 K 线后的模拟价值。 |
+| 收益率 | 4.30% | 税前和数据费前。 |
+| 交易次数 | 14 | 七次交叉带来的往返交易。 |
+| 最大回撤 | 未知 | 我们还没计算。 |
+
+4.3% 的收益听起来 modest，但真正的问题是机器人是否跑赢了同期简单的买入并持有 SPY。如果 SPY 涨了 8% 而机器人只赚 4%，那策略跑输；如果 SPY 走平而机器人赚了 4%，那策略还是加了点价值。语境很重要。
+
+<Alert type="danger">
+  永远不要只看总收益来评判策略。总要与基准比较，衡量回撤，并检查交易频率。缓慢赚钱但大跌的策略不是好策略。
+</Alert>
+
+## 用风险指标改进回测
+
+真正的回测报告不应只有利润。加入以下指标才能理解策略的风险：
+
+| 指标 | 通俗解释 | 为什么重要 |
+|------|----------|------------|
+| 夏普比率 | 每单位波动率的收益 | 越高越好；说明收益是否对得起波动。 |
+| 最大回撤 | 从高点到低点的最大跌幅 | 告诉你最糟糕的连亏期有多痛苦。 |
+| 胜率 | 盈利交易 / 总交易 | 有用，但没有盈亏比会误导。 |
+| 盈利因子 | 总盈利 / 总亏损 | 大于 1 说明策略赚的多于亏的。 |
+| 基准收益 | 同期买入并持有收益 | 说明机器人是创造了价值还是只是跟随市场。 |
+
+计算最大回撤的方法是跟踪权益曲线的高点，并衡量从高点 worst 下跌的幅度。曲线平稳、回撤 modest 的策略通常比大起大落更容易实盘执行。
+
+在 `backtest.py` 中加入辅助函数：
+
+```python
+def max_drawdown(equity_curve: pd.Series) -> float:
+    rolling_max = equity_curve.cummax()
+    drawdown = (equity_curve - rolling_max) / rolling_max
+    return drawdown.min()
+```
+
+然后用交易记录构建权益曲线并传给该函数。结果会是一个负百分比，例如 `-0.08` 表示 8% 的回撤。
+
+## 上模拟盘交易
+
+回测看起来合理后，下一步就是模拟交易。模拟交易迫使你面对真实的 API 调用、订单状态和运行时错误，却不用冒真金白银的风险。创建 `bot.py`：
+
+```python
+import os
+import time
+from datetime import datetime
+from dotenv import load_dotenv
+from alpaca.trading.client import TradingClient
+from alpaca.trading.requests import MarketOrderRequest
+from alpaca.trading.enums import OrderSide, TimeInForce
+from data import get_bars
+from strategy import add_ema_signals
+
+load_dotenv()
+
+SYMBOL = "SPY"
+QTY = 10
+FAST = 12
+SLOW = 26
+
+trading_client = TradingClient(
+    api_key=os.getenv("ALPACA_API_KEY"),
+    secret_key=os.getenv("ALPACA_SECRET_KEY"),
+    paper=True,
+)
+
+def get_latest_signal():
+    df = get_bars(SYMBOL, days=5)
+    df = add_ema_signals(df, fast=FAST, slow=SLOW)
+    return df.iloc[-1]["signal"], df.iloc[-2]["signal"]
+
+def place_order(side: OrderSide, qty: int):
+    order = MarketOrderRequest(
+        symbol=SYMBOL,
+        qty=qty,
+        side=side,
+        time_in_force=TimeInForce.DAY,
+    )
+    return trading_client.submit_order(order)
+
+if __name__ == "__main__":
+    current, previous = get_latest_signal()
+    if current == 1 and previous != 1:
+        print(f"{datetime.now()}: 金叉。买入 {QTY} 股 {SYMBOL}。")
+        place_order(OrderSide.BUY, QTY)
+    elif current == -1 and previous != -1:
+        print(f"{datetime.now()}: 死叉。卖出 {QTY} 股 {SYMBOL}。")
+        place_order(OrderSide.SELL, QTY)
+    else:
+        print(f"{datetime.now()}: 无交叉。不操作。")
+```
+
+这个机器人只检查一次最新信号然后退出。生产风格的机器人会把逻辑包在带睡眠的循环里，或设为每小时运行的 cron 任务。学习阶段单次运行更安全，因为你可以逐笔检查订单。
+
+| 组件 | 文件 | 用途 |
+|------|------|------|
+| 数据获取 | `data.py` | 从 Alpaca 下载历史 K 线。 |
+| 策略 | `strategy.py` | 计算 EMA 和交叉信号。 |
+| 回测 | `backtest.py` | 模拟历史表现。 |
+| 实盘机器人 | `bot.py` | 根据信号下模拟单。 |
+| 环境配置 | `.env` | 把 API 密钥放在源码控制之外。 |
+
+## 常见错误及修复
+
+每个初学者都会遇到同一组问题。以下是最常见的几种及处理方法。
+
+### API 密钥被拒绝
+
+检查密钥是否复制正确，以及是否用 `paper=True` 搭配模拟密钥。模拟密钥和实盘密钥不同。另外确认 `python-dotenv` 确实加载了文件：打印 `os.getenv("ALPACA_API_KEY")` 看看是否为 `None`。
+
+### 没有返回数据
+
+确保标的在 Alpaca 可交易，并且请求的时间范围覆盖对应周期的交易时段。小时线至少要请求最近几个交易日。如果刚过完节假日，自然没有最新数据。
+
+### 每根 K 线都触发交叉
+
+通常是因为你把当前信号和当前信号自身比较，而不是和前一根比较。`crossover` 列应该用 `.diff()`，即比较每行与上一行。如果信号连续 10 根 K 线都是 1，只有第一根应该触发交易。
+
+### 因购买力不足被拒单
+
+模拟账户也会强制执行购买力。10 万美元模拟账户不能买 20 万美元股票。减少 `QTY`，或在运行机器人前在 Alpaca 后台查看账户余额。
+
+### 机器人在震荡市过度交易
+
+EMA 交叉在震荡市中 notoriously 会来回打脸。可以添加过滤条件，比如最小价格变动、用 200 EMA 做趋势过滤，或交易冷却时间。例如，可以规定除非距离上次交易至少过了 5 根 K 线，否则忽略新信号。
+
+## 运行机器人的最佳实践
+
+一个能运行的机器人只是开始。以下习惯区分了爱好者和严肃的系统化交易者。
+
+### 记录一切
+
+每个信号、订单、错误和运行时状态都应写入日志文件。当交易出错时，你需要准确知道机器人当时看到了什么。简单的 Python `logging` 配置就够了：
+
+```python
+import logging
+logging.basicConfig(
+    filename="bot.log",
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+)
+```
+
+### 从小开始，留在模拟盘
+
+即使回测盈利，也要在模拟盘上待几周甚至几个月。市场会变化，过去有效的策略可能在波动率转变时失效。模拟交易会暴露回测隐藏的执行问题和滑点。
+
+### 把信号生成与执行分离
+
+示例代码中，信号逻辑和下单放在不同文件。保持这种分离。如果一个文件有 bug，另一个可能还能保护你。更好的做法是先单独运行信号生成，检查输出，再允许执行脚本交易。
+
+### 注意 API 速率限制
+
+Alpaca 对行情数据和交易接口都有速率限制。每秒轮询一次的循环可能让你被限流。对于小时或日线策略，每根 K 线轮询一次就够了。更快策略应使用 websocket 而非反复调用 REST。
+
+### 设置熔断开关
+
+每个机器人都应能立即停下。可以是键盘中断、标记文件，或最大日亏损规则。如果市场跳空对你不利，或代码行为异常，你必须能在不修改脚本的情况下停止交易。
+
+## 从 EMA 交叉到更好的策略
+
+理解了完整流程后，你可以尝试更高级的想法：
+
+| 下一步 | 添加什么 | 复杂度 |
+|--------|----------|--------|
+| 趋势过滤 | 只在价格高于 200 EMA 时交易 | 低 |
+| 多时间框架 | 在小时图上用日线图确认信号 | 中 |
+| 单笔风险 | 每笔风险 1% 资金，而非固定股数 | 中 |
+| 止损和目标 | 按 ATR 倍数或支撑位出场 | 中 |
+| 均值回归 | 交易 RSI 或布林带反弹 | 中 |
+| 机器学习 | 用特征训练分类器 | 高 |
+
+不要为了复杂而复杂。一个你完全理解的简单策略，通常比从网上抄来的花哨模型表现更好。
+
+## 常见问题
+
+<Alert type="info">
+  以下问题也嵌入到了页面结构化数据中，搜索引擎可以直接展示。答案与 frontmatter 中的值一致。
+</Alert>
+
+**构建这个交易机器人需要会 Python 吗？**
+
+掌握基础 Python 就够了。如果你能读懂循环、函数，并会用 pip 安装包，就能跟着本教程完成。我们会解释每一行代码。
+
+**Alpaca 模拟交易真的免费吗？**
+
+是的。Alpaca 的模拟交易账户完全免费，并提供与真实交易相同的 API，让你用虚拟资金测试策略。
+
+**这个 EMA 交叉机器人能让我赚钱吗？**
+
+仅靠它本身大概率不能。EMA 交叉是一个经典但脆弱的策略。本教程教你构建、回测和迭代，而不是快速致富。
+
+**运行交易机器人需要什么硬件？**
+
+普通笔记本即可。树莓派或云服务器也可以。本指南中的代码消耗的算力甚至比不上一场视频通话。
+
+**如何保证 Alpaca API 密钥的安全？**
+
+将密钥存放在环境变量或 `.env` 文件中，永远不要提交到 Git，把 API 权限限制为仅交易，并定期轮换密钥。
+
+**这个机器人能用来交易加密货币吗？**
+
+不能直接在 Alpaca 上交易加密货币，它主要面向美股和 ETF。不过同样的 EMA 逻辑可以迁移到加密货币交易所 API。
+
+**学完本教程后下一步该做什么？**
+
+在模拟盘上运行数周，用表格记录每笔交易，添加风控规则，然后决定是否用极小的实盘账户继续，或继续优化策略。
+
+## 总结
+
+构建你的第一个 AI 交易机器人，与其说是发现秘密策略，不如说是学习系统化交易的全流程。EMA 交叉只是一个 modest 的起点，但它逼你解决真正的问题：数据获取、信号生成、回测、风险度量和安全执行。
+
+慢慢来。一切都在模拟盘上测试。诚实地记录结果。记住，最好的机器人是你足够了解、能在出问题时停下的那个。
+
+

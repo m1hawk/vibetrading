@@ -1,0 +1,458 @@
+---
+title: "Freqtrade 新手指南：回测并模拟交易你的第一个加密货币机器人"
+description: "面向新手的 Freqtrade 分步教程。学习如何安装、配置 config.json、编写 Python 策略、回测并以模拟模式安全运行你的第一个加密货币交易机器人。"
+date: "2026-07-13"
+category: "Tutorials"
+tags: ["freqtrade", "crypto", "bot", "tutorial"]
+readTime: "18 min read"
+featured: false
+lang: "zh"
+faq:
+  - q: 什么是 Freqtrade，它适合谁？
+    a: Freqtrade 是一个用 Python 编写的开源加密货币交易机器人。它适合希望自动化策略、执行回测并在交易所进行模拟交易，而无需编写交易所相关底层代码的交易者。
+  - q: 使用 Freqtrade 需要会 Python 吗？
+    a: 具备基础 Python 会更有帮助，因为策略是用 Python 编写的。不过，你可以从内置的示例策略开始，边用边学地修改它们。
+  - q: Freqtrade 是免费的吗？
+    a: 是的，Freqtrade 本身基于 MIT 协议开源免费。你只需支付交易所的交易手续费以及可选的云服务器托管费用。
+  - q: Freqtrade 可以用真实资金交易吗？
+    a: 可以，但新手应始终先使用 dry-run（模拟交易）模式。真实交易需要交易所 API 密钥，并存在亏损风险。
+  - q: Freqtrade 支持哪些交易所？
+    a: Freqtrade 通过 CCXT 库支持许多主流交易所，包括 Binance、Bybit、OKX、Kraken、KuCoin 和 Gate.io 等。请始终以官方文档中的最新支持列表为准。
+  - q: 如何判断我的策略是否有盈利能力？
+    a: 在历史数据上运行回测，然后在 dry-run 模式下进行数周的前向测试。永远不要假设回测结果能保证未来盈利。
+  - q: 运行加密货币交易机器人有哪些主要风险？
+    a: 风险包括市场回撤、过拟合策略、交易所宕机、API 密钥泄露、滑点，以及在连续亏损期间关闭风控等行为错误。
+---
+
+<Disclaimer />
+
+如果你曾经想过是否可以自动化加密货币交易，又不愿意为昂贵的订阅机器人付费，那么 Freqtrade 可能是你第一个应该尝试的项目。它是免费的、开源的、活跃维护的，并且让你对策略拥有完全控制权。你可以用 Python 编写规则，用多年历史数据进行测试，并在冒一分钱风险之前先用模拟交易模式运行。
+
+本指南面向完全的新手。我们将介绍 Freqtrade 是什么、如何安装、如何配置 `config.json`、如何编写简单策略、如何回测，以及如何安全地运行你的第一个 dry-run 机器人。我们也会诚实地讨论风险，因为没有任何机器人是印钞机。
+
+## 什么是 Freqtrade？
+
+Freqtrade 是一个用 Python 编写的开源加密货币交易机器人框架。它通过流行的 CCXT 库连接交易所，下载市场数据，根据你定义的策略执行交易，并通过内置网页界面或 Telegram 机器人报告结果。
+
+与黑盒 SaaS 机器人不同，Freqtrade 把所有逻辑都暴露给你。这意味着你可以：
+
+- 定义精确的入场和出场规则。
+- 组合多个技术指标。
+- 使用对机器学习友好的工具优化超参数。
+- 对多年历史数据进行回测。
+- 在 dry-run 模式下交易，模拟真实交易所行为。
+- 在笔记本电脑、树莓派或云服务器上部署同一个机器人。
+
+代价是你需要熟悉命令行和基础 Python。如果这听起来令人生畏，别担心。到本文结束时，你将拥有一个可用的机器人配置，并可以按自己的节奏扩展它。
+
+### Freqtrade 核心概念
+
+在安装任何东西之前，先了解 Freqtrade 使用的术语会很有帮助。
+
+| 术语 | 含义 |
+|------|------|
+| Strategy（策略） | 一个 Python 类，定义买入、卖出、止损和风险管理规则。 |
+| Pair（交易对） | 例如 `BTC/USDT` 或 `ETH/USDT` 的交易对。 |
+| Timeframe（时间周期） | 策略使用的 K 线周期，例如 `5m`、`1h` 或 `1d`。 |
+| Dry-run（模拟运行） | 模拟交易模式。机器人使用实时订单簿数据模拟下单。 |
+| Backtest（回测） | 在历史数据上重演策略的历史模拟。 |
+| Edge | 基于历史胜率和期望值来估计仓位大小的模块。 |
+| Hyperopt | Freqtrade 内置的参数优化工具。 |
+| Pairlist（交易对列表） | 机器人允许交易的币种列表，可通过过滤器或静态设置生成。 |
+
+理解这些术语会让接下来的指南更容易跟上。
+
+## 安装
+
+Freqtrade 可以在 Linux、macOS 以及通过 Docker 或 WSL 在 Windows 上运行。对于新手，推荐的路径是 Docker，因为它能避免 Python 环境配置带来的麻烦。如果你已经安装 Python 3.10 或更高版本，并且熟悉 `pip`，原生安装也可以。
+
+### 方案 A：Docker 安装
+
+确保已安装 Docker 和 Docker Compose。然后创建一个目录存放机器人，并运行官方安装脚本。
+
+```bash
+mkdir ~/freqtrade-bot && cd ~/freqtrade-bot
+curl https://raw.githubusercontent.com/freqtrade/freqtrade/stable/docker-compose.yml -o docker-compose.yml
+docker compose pull
+docker compose run --rm freqtrade create-userdir --userdir user_data
+```
+
+最后一条命令会创建一个 `user_data` 文件夹，用于存放配置、策略和历史数据。
+
+### 方案 B：原生安装
+
+在 Ubuntu 或带有 Homebrew Python 的 macOS 上，运行：
+
+```bash
+git clone https://github.com/freqtrade/freqtrade.git
+cd freqtrade
+git checkout stable
+./setup.sh -i
+```
+
+安装脚本会创建虚拟环境并安装所有依赖。激活环境：
+
+```bash
+source .venv/bin/activate
+```
+
+### 验证安装
+
+安装完成后，检查版本：
+
+```bash
+docker compose run --rm freqtrade --version
+# 原生安装：
+freqtrade --version
+```
+
+如果显示了版本号，你就可以开始配置机器人了。
+
+<Alert type="info">
+  Docker 是保持环境一致性的最简单方式。如果你计划全天候在服务器上运行机器人，Docker 也能简化重启和日志管理。
+</Alert>
+
+## 配置 config.json
+
+Freqtrade 将主要设置存放在 `config.json` 中。你可以用以下命令生成一个初始模板。
+
+```bash
+docker compose run --rm freqtrade new-config --config user_data/config.json
+```
+
+交互式向导会询问你交易所、API 密钥和默认策略名称。在本教程中，请选择 **Binance** 或 **Bybit**，并在提示时启用 **dry-run** 模式。
+
+### 最小可用配置
+
+下面是一个简化版的新手应了解的设置。你不需要记住每个字段，重点关注这张表中的内容即可。
+
+| 设置 | 典型值 | 重要性 |
+|------|--------|--------|
+| `dry_run` | `true` | 在你有信心之前保持模拟交易模式。 |
+| `dry_run_wallet` | `1000` | 模拟的 USDT 起始资金。 |
+| `stake_currency` | `"USDT"` | 用于仓位计价的货币。 |
+| `stake_amount` | `"unlimited"` 或固定数值 | 每笔交易投入多少资金。 |
+| `max_open_trades` | `3` | 同时最多允许持仓数量。 |
+| `timeframe` | `"5m"` | 策略未覆盖时使用的默认 K 线周期。 |
+| `exchange.name` | `"binance"` | 连接哪个交易所。 |
+| `exchange.key` / `secret` | 你的 API 凭证 | 真实交易需要；dry-run 模式下可使用只读密钥。 |
+
+一个最小的 `config.json` 看起来像这样：
+
+```json
+{
+  "max_open_trades": 3,
+  "stake_currency": "USDT",
+  "stake_amount": "unlimited",
+  "dry_run": true,
+  "dry_run_wallet": 1000,
+  "timeframe": "5m",
+  "cancel_open_orders_on_exit": false,
+  "trading_mode": "spot",
+  "exchange": {
+    "name": "binance",
+    "key": "",
+    "secret": "",
+    "ccxt_config": {},
+    "ccxt_async_config": {},
+    "pair_whitelist": [
+      "BTC/USDT",
+      "ETH/USDT",
+      "SOL/USDT",
+      "ADA/USDT"
+    ]
+  },
+  "pairlists": [
+    { "method": "StaticPairList" }
+  ],
+  "bot_name": "freqtrade-beginner",
+  "initial_state": "running",
+  "force_entry_enable": false,
+  "internals": {
+    "process_throttle_secs": 5
+  }
+}
+```
+
+### API 密钥安全
+
+即使在 dry-run 模式下，也建议创建一个不能提现的 API 密钥。在你的交易所中，关闭提现权限，并将密钥限制为机器人运行所在 IP。将密钥保存在版本控制之外；永远不要提交包含真实凭证的 `config.json`。
+
+<Alert type="warning">
+  把你的交易所 API 密钥当作银行密码。如果泄露，他人可能交易或提现你的资金。在真实交易时，请使用环境变量或密钥管理工具。
+</Alert>
+
+## 编写你的第一个 Python 策略
+
+策略存放在 `user_data/strategies/` 目录下。每个策略都是一个继承自 `IStrategy` 的 Python 类，并实现几个关键方法。机器人每根 K 线调用策略，以决定是否入场、出场或调整仓位。
+
+### 创建策略文件
+
+创建 `user_data/strategies/FirstStrategy.py` 并添加以下入门代码。
+
+```python
+from freqtrade.strategy import IStrategy
+from pandas import DataFrame
+import talib.abstract as ta
+import freqtrade.vendor.qtpylib.indicators as qtpylib
+
+class FirstStrategy(IStrategy):
+    INTERFACE_VERSION = 3
+
+    timeframe = "5m"
+    stoploss = -0.10
+    trailing_stop = True
+    trailing_stop_positive = 0.05
+    trailing_only_offset_is_reached = False
+
+    minimal_roi = {
+        "0": 0.15,
+        "120": 0.05,
+        "240": 0.025,
+        "360": 0
+    }
+
+    def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe["ema9"] = ta.EMA(dataframe, timeperiod=9)
+        dataframe["ema21"] = ta.EMA(dataframe, timeperiod=21)
+        dataframe["rsi"] = ta.RSI(dataframe, timeperiod=14)
+        dataframe["volume_mean"] = dataframe["volume"].rolling(window=20).mean()
+        return dataframe
+
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe.loc[
+            (
+                (dataframe["ema9"] > dataframe["ema21"]) &
+                (dataframe["ema9"].shift(1) <= dataframe["ema21"].shift(1)) &
+                (dataframe["rsi"] > 50) &
+                (dataframe["rsi"] < 70) &
+                (dataframe["volume"] > dataframe["volume_mean"])
+            ),
+            "enter_long"
+        ] = 1
+        return dataframe
+
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe.loc[
+            (
+                (dataframe["ema9"] < dataframe["ema21"]) &
+                (dataframe["ema9"].shift(1) >= dataframe["ema21"].shift(1))
+            ),
+            "exit_long"
+        ] = 1
+        return dataframe
+```
+
+### 策略如何工作
+
+该策略使用两条指数移动平均线和 RSI 来寻找上升趋势中的做多入场点。
+
+| 组件 | 用途 |
+|------|------|
+| `ema9` / `ema21` | 识别短期与中期趋势方向。 |
+| `rsi` | 过滤超买情况。 |
+| `volume_mean` | 确认突破发生在高于平均成交量时。 |
+| `stoploss` | 任何交易逆势下跌 10% 时止损。 |
+| `trailing_stop` | 达到 5% 的尾随盈利后锁定利润。 |
+| `minimal_roi` | 在特定持仓时间后按固定目标止盈。 |
+
+当快线 EMA 上穿慢线 EMA、RSI 介于 50 到 70 之间、且成交量高于 20 根 K 线平均值时，入场规则触发。反向交叉时触发出场规则。
+
+这不是圣杯，而是一个教学示例。真实策略通常需要更多过滤器、市场状态识别以及稳健的风险管理。
+
+### 策略文件检查清单
+
+在回测之前，请确保你的策略文件满足以下要求。
+
+| 检查 | 重要性 |
+|------|--------|
+| 类继承自 `IStrategy` | 机器人所需的基础类与钩子。 |
+| `INTERFACE_VERSION = 3` | 与当前 Freqtrade API 匹配。 |
+| 定义 `timeframe` | 告诉机器人下载哪种 K 线。 |
+| 定义 `stoploss` | 强制性的风险管理字段。 |
+| 设置 `populate_indicators` | 准备入场和出场逻辑使用的列。 |
+| 设置 `populate_entry_trend` | 创建 `enter_long` 信号列。 |
+| 设置 `populate_exit_trend` | 创建 `exit_long` 信号列。 |
+
+如果缺少任何一项，Freqtrade 将拒绝加载策略并打印有用的错误信息。
+
+## 下载历史数据
+
+回测需要历史 K 线。Freqtrade 提供数据下载命令，可从你的交易所获取数据。
+
+```bash
+docker compose run --rm freqtrade download-data \
+  --config user_data/config.json \
+  --timeframes 5m 1h \
+  --days 365 \
+  --pairs BTC/USDT ETH/USDT SOL/USDT ADA/USDT
+```
+
+如果需要更长时间的回测，可以增加 `--days` 或使用 `--timerange`。首次下载可能需要几分钟。数据存储在 `user_data/data/<exchange>/` 目录下。
+
+<Alert type="info">
+  每次重要回测前都下载最新数据，以确保模拟使用真实的价差、缺口和下架情况。陈旧数据会导致过于乐观的结果。
+</Alert>
+
+## 回测你的策略
+
+回测是许多初学者爱上自动化交易的地方。它展示策略在过去表现如何。请记住：过去的表现不代表未来的结果。
+
+运行回测的命令如下：
+
+```bash
+docker compose run --rm freqtrade backtesting \
+  --config user_data/config.json \
+  --strategy FirstStrategy \
+  --timeframe 5m \
+  --timerange 20250101-20260701
+```
+
+运行结束后，Freqtrade 会打印汇总表格。请关注以下指标。
+
+| 指标 | 含义 |
+|------|------|
+| Total profit % | 回测期间总收益率。 |
+| Profit factor | 总盈利除以总亏损。大于 1.0 表示策略赚多亏少。 |
+| Max drawdown | 权益曲线最大峰值到谷值的回撤。越小越有利于安心睡眠。 |
+| Win rate | 盈利交易占比。 |
+| Avg profit % | 扣除手续费后每笔交易平均利润。 |
+| Sharpe ratio | 风险调整收益；越高越好。 |
+| Trade count | 交易数量越多统计意义越强，但过多可能意味着过拟合。 |
+
+### 解读结果
+
+假设你的回测显示总收益率 42%、盈亏比 1.3、最大回撤 18%。表面上看不错，但要问自己：
+
+- 策略是否依赖一两笔巨大盈利？
+- 策略在熊市中表现如何，还是只在强牛市中有效？
+- 手续费和滑点是否对你的账户规模现实？
+- 你是否在用同一批数据训练和测试参数？
+
+如果策略在训练数据上表现完美，但在新数据上失败，就叫做过拟合。减少过拟合最简单的方法是保持参数数量少，并在策略未见过的数据上验证结果。
+
+<Alert type="warning">
+  永远不要跳过前向测试。漂亮的回测可能在真实资金入场后瞬间蒸发。
+</Alert>
+
+### 滚动前向测试
+
+验证策略的一种简单方法是滚动前向分析。将历史分为多个阶段，在一个阶段优化，在下一阶段测试。如果策略在多个未见过的阶段都保持盈利，它更可能是稳健的。
+
+| 阶段 | 用途 |
+|------|------|
+| 样本内数据 | 优化参数并发现规则。 |
+| 样本外数据 | 验证规则在未见历史上的表现。 |
+| Dry-run 前向测试 | 在真实市场微观结构下验证行为。 |
+
+只有在这三个阶段看起来都合理后，你才应该考虑小额真实交易。
+
+## 在 Dry-Run 模式下运行机器人
+
+Dry-run 是 Freqtrade 的模拟交易模式。它根据实时订单簿模拟订单执行，因此你可以观察机器人在真实市场条件下的行为，而无需承担资金风险。
+
+启动机器人的命令：
+
+```bash
+docker compose run --rm freqtrade trade \
+  --config user_data/config.json \
+  --strategy FirstStrategy
+```
+
+如果你的配置中 `"dry_run": true`，机器人会记录它正在 dry-run 模式下运行，并且不会下真实订单。它仍会获取实时价格、开设模拟仓位并报告模拟利润。
+
+### 监控机器人
+
+Freqtrade 默认在 8080 端口提供网页界面。在 `config.json` 中添加以下内容启用：
+
+```json
+"api_server": {
+  "enabled": true,
+  "listen_ip_address": "0.0.0.0",
+  "listen_port": 8080,
+  "username": "admin",
+  "password": "change-me-please"
+}
+```
+
+在浏览器中打开 `http://localhost:8080`。你可以看到当前持仓、每日利润、总利润和交易历史表格。你还可以执行强制操作、暂停机器人以及查看日志。
+
+### Dry-Run 最佳实践
+
+在考虑真实交易之前，至少运行几周 dry-run。在此期间，观察：
+
+- 高波动事件期间是否出现意外入场。
+- 止损触发频率是否高于回测显示。
+- 是否出现 API 错误或交易所速率限制。
+- 模拟成交价与交易所图表上的实际价格是否存在差距。
+
+记录机器人行为的交易日志。例如「机器人在闪崩期间三次入场」这样的笔记有助于你以后改进过滤器。
+
+## 风险与合理预期
+
+<Alert type="danger">
+  加密货币交易机器人可能会亏钱。自动化并不能消除风险；它往往通过比人类更快的执行速度放大风险。
+</Alert>
+
+每个新手都应了解最常见的失败模式。
+
+| 风险 | 描述 | 缓解方法 |
+|------|------|----------|
+| 过拟合 | 策略在历史数据上表现出色，但实盘失败。 | 使用样本外测试、减少参数、延长 dry-run 时间。 |
+| 市场状态变化 | 趋势跟踪机器人在震荡市中受损。 | 添加市场过滤器，或在不确定条件下减小仓位。 |
+| 交易所风险 | 延迟、宕机或下架可能导致仓位被困。 | 选择信誉良好的交易所并监控 API 健康状态。 |
+| API 密钥泄露 | 泄露的密钥可能导致未经授权的交易或提现。 | 使用 IP 白名单、关闭提现权限、使用密钥管理工具。 |
+| 滑点与手续费 | 实际成交价可能差于回测假设。 | 准确建模手续费，并对小市值币种考虑价差。 |
+| 行为风险 | 在连续亏损后关闭止损或加大仓位。 | 将规则写进代码，避免在回撤期间手动干预。 |
+
+一个有用的心态是：把机器人当成洗碗机，而不是老虎机。它自动化的是你已理解的过程。如果你的手动策略本身不盈利，自动化只会更快地亏钱。
+
+## 下一步可以去哪里
+
+完成第一次回测和 dry-run 后，你可以从几个方向深入 Freqtrade 技能。
+
+- **Hyperopt：** 使用 Freqtrade 内置优化器搜索更优参数值，但要注意过拟合。
+- **Pairlist 过滤器：** 用成交量、波动率或表现过滤器替代静态白名单，让机器人适应市场变化。
+- **Protections：** 添加冷静期、止损保护和最大回撤保护，以限制糟糕时期的损失。
+- **自定义指标：** 将 TA-Lib 指标与自定义 pandas 逻辑结合。
+- **Telegram 提醒：** 配置 Telegram 机器人，接收入场、出场和错误通知。
+
+这些主题每一项都可以单独成文。一次只深入一个方向，而不是在第一天就试图打造完美机器人。
+
+## 常见问题
+
+以下是初学者关于 Freqtrade 最常问的问题及解答。
+
+### 什么是 Freqtrade，它适合谁？
+
+Freqtrade 是一个用 Python 编写的开源加密货币交易机器人。它适合希望自动化策略、执行回测并在交易所进行模拟交易，而无需编写交易所相关底层代码的交易者。
+
+### 使用 Freqtrade 需要会 Python 吗？
+
+具备基础 Python 会更有帮助，因为策略是用 Python 编写的。不过，你可以从内置的示例策略开始，边用边学地修改它们。
+
+### Freqtrade 是免费的吗？
+
+是的，Freqtrade 本身基于 MIT 协议开源免费。你只需支付交易所的交易手续费以及可选的云服务器托管费用。
+
+### Freqtrade 可以用真实资金交易吗？
+
+可以，但新手应始终先使用 dry-run（模拟交易）模式。真实交易需要交易所 API 密钥，并存在亏损风险。
+
+### Freqtrade 支持哪些交易所？
+
+Freqtrade 通过 CCXT 库支持许多主流交易所，包括 Binance、Bybit、OKX、Kraken、KuCoin 和 Gate.io 等。请始终以官方文档中的最新支持列表为准。
+
+### 如何判断我的策略是否有盈利能力？
+
+在历史数据上运行回测，然后在 dry-run 模式下进行数周的前向测试。永远不要假设回测结果能保证未来盈利。
+
+### 运行加密货币交易机器人有哪些主要风险？
+
+风险包括市场回撤、过拟合策略、交易所宕机、API 密钥泄露、滑点，以及在连续亏损期间关闭风控等行为错误。
+
+## 结语
+
+Freqtrade 是学习算法化加密货币交易最好的免费工具之一。它迫使你从规则、风险和证据的角度思考，而不是凭直觉。从 dry-run 开始，保持首个策略简单，并把每一次回测都视为需要前向验证的假设。构建一个可靠的交易机器人需要时间，但你在过程中学到的技能将比任何单一策略更持久。
+
+准备好深入了吗？今天就下载 Freqtrade，复制本文的策略，运行你的第一次回测。

@@ -22,6 +22,32 @@ const nav = {
   ],
 } as const;
 
+const translatedRoutes = new Set([
+  "/",
+  "/vibe-trading",
+  "/tools",
+  "/build",
+  "/lab",
+  "/about",
+  "/disclaimer",
+  "/privacy",
+  "/affiliate",
+]);
+
+function getToggleHref(pathname: string, targetLang: "en" | "zh") {
+  const isZh = pathname.startsWith("/zh");
+  const enPath = isZh ? pathname.slice(3) || "/" : pathname;
+
+  if (targetLang === "en") {
+    return enPath;
+  }
+
+  if (enPath === "/") return "/zh";
+  if (translatedRoutes.has(enPath)) return `/zh${enPath}`;
+  if (enPath.startsWith("/blog")) return `/zh${enPath}`;
+  return "/zh";
+}
+
 export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -81,7 +107,7 @@ export function Header() {
 
           <div className="flex overflow-hidden border border-border font-mono text-[11px] tracking-wider">
             <Link
-              href="/"
+              href={getToggleHref(pathname, "en")}
               className={`px-2.5 py-1.5 transition-colors ${
                 lang === "en"
                   ? "bg-ink text-on-ink"
@@ -91,7 +117,7 @@ export function Header() {
               EN
             </Link>
             <Link
-              href="/zh"
+              href={getToggleHref(pathname, "zh")}
               className={`px-2.5 py-1.5 transition-colors ${
                 lang === "zh"
                   ? "bg-ink text-on-ink"
@@ -132,10 +158,10 @@ export function Header() {
               </Link>
             ))}
             <div className="mt-3 flex gap-3 border-t border-border px-3 pt-4 font-mono text-xs tracking-wider">
-              <Link href="/" onClick={() => setOpen(false)} className="text-muted hover:text-foreground">
+              <Link href={getToggleHref(pathname, "en")} onClick={() => setOpen(false)} className="text-muted hover:text-foreground">
                 EN
               </Link>
-              <Link href="/zh" onClick={() => setOpen(false)} className="text-muted hover:text-foreground">
+              <Link href={getToggleHref(pathname, "zh")} onClick={() => setOpen(false)} className="text-muted hover:text-foreground">
                 中文
               </Link>
             </div>

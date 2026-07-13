@@ -1,0 +1,269 @@
+---
+title: "The 60-Day Paper-to-Live Checklist for Algo Traders"
+description: "A practical 60-day checklist that helps algorithmic traders move from paper trading to live capital safely, with readiness checks, sizing rules, and kill switches."
+date: "2026-07-13"
+category: "Guides"
+tags: ["paper trading", "live trading", "checklist", "risk"]
+readTime: "18 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "How long should I paper trade before going live?"
+    answer: "Most successful algo traders paper trade for at least 60 days of out-of-sample results, including a mix of market regimes. Two months gives you roughly 40 trading days, enough to observe variance, slippage assumptions, and emotional discipline without risking capital."
+  - question: "What is the minimum capital needed to start live algo trading?"
+    answer: "The minimum depends on commission structure, position granularity, and drawdown tolerance. A practical floor is $5,000 for equities and $10,000 for futures or forex, but many traders start with less using fractional shares or micro contracts. The real constraint is whether a single losing streak wipes out your ability to keep trading."
+  - question: "What is micro-sizing and why does it matter?"
+    answer: "Micro-sizing means risking a very small percentage of capital per trade or per strategy, often 0.25% to 0.5%. It matters because live markets introduce slippage, partial fills, latency, and emotional reactions that paper accounts hide. Small size lets you validate execution quality before scaling up."
+  - question: "How do I know my algo is ready for live trading?"
+    answer: "Readiness comes from stable paper performance, conservative assumptions, clean code, documented rules, broker integration testing, and a written trading plan. If any of these is missing, stay in simulation until the gap is closed."
+  - question: "What are kill-switch rules?"
+    answer: "Kill-switch rules are automatic or manual circuit breakers that stop trading when losses, volatility, or technical errors exceed predefined thresholds. Examples include daily loss limits, consecutive-loss limits, spread blowouts, and connection failures."
+  - question: "Why do profitable paper strategies fail in live markets?"
+    answer: "Common reasons include unrealistic fill assumptions, ignoring slippage, overfitting to historical data, underestimating latency, emotional interference, and changes in market regime. Paper trading is necessary but not sufficient for live success."
+  - question: "Should I trade the same strategy on paper and live at the same time?"
+    answer: "Yes, running a shadow paper account alongside a live micro account is one of the safest ways to detect drift. Divergence between paper and live fills can reveal slippage, routing issues, or data-feed problems before they become expensive."
+---
+
+<Disclaimer />
+
+Moving from paper trading to live trading is the most dangerous transition in an algo trader's journey. On paper, everything feels clean. Entries and exits execute at the midpoint. Commissions disappear. Slippage is a rounding error. Emotions are absent. Then you flip the switch to real capital, and suddenly the same strategy bleeds money.
+
+This guide is a 60-day checklist designed for retail and semi-professional algo traders who want to fund a live account without funding regret. It is not a promise of profits. It is a structured way to reduce the probability of self-inflicted damage. By the end of this article, you will have a day-by-day framework, a set of readiness indicators, capital allocation rules, micro-sizing guidelines, kill-switch rules, and psychological preparation tactics. Print it, adapt it, and check off each item before risking meaningful capital.
+
+## Why Paper Trading Comes First
+
+Paper trading has a bad reputation among experienced traders. Critics say it teaches bad habits, encourages overtrading, and produces unrealistic confidence. There is truth in that criticism, but it misses the larger point. Paper trading is not meant to prove you will make money. It is meant to prove you will not lose money stupidly.
+
+In simulation, you can test whether your code connects to the broker correctly, whether your data feed is stable, whether your order types behave as expected, and whether your logic handles edge cases. You can observe how your strategy behaves during high-volatility events, low-liquidity periods, and gap opens. These observations are cheap in paper and expensive in live markets.
+
+The honest purpose of paper trading is to transfer as much operational risk as possible out of the live account. Operational risk includes bad API keys, missing error handling, timezone bugs, dividend adjustments, splits, and contract rollovers. Every bug you catch on paper is a donation to your future self.
+
+<Alert type="info">
+  Paper trading is not a profit guarantee. It is a filtering mechanism. Use it to
+  remove reasons your strategy can fail before those failures cost real money.
+</Alert>
+
+The danger is staying in paper too long or treating it as a video game. Some traders optimize endlessly in simulation, chasing a smooth equity curve that only exists because they are overfitting. Others paper trade with position sizes they would never use live, inflating returns and hiding risk. The checklist below solves both problems by giving you clear exit criteria.
+
+## Readiness Indicators Before You Start the 60 Days
+
+Before beginning the 60-day plan, you should already have a strategy with a defined edge, even if that edge is modest. A checklist cannot invent alpha. It can only protect alpha from preventable mistakes.
+
+Here are the minimum readiness indicators. Do not start the countdown until every box is checked.
+
+| Readiness Indicator | What Good Looks Like | Why It Matters |
+|--------------------|----------------------|----------------|
+| Strategy definition | Entry, exit, position sizing, and filters are written in plain language | Removes ambiguity and emotional override |
+| Backtest quality | Walk-forward or rolling window, out-of-sample data, realistic costs | Reduces overfitting and hindsight bias |
+| Code stability | Handles errors, reconnections, and edge cases without manual intervention | Prevents overnight disasters |
+| Broker integration | Orders route correctly, fills are logged, API limits understood | Live execution depends on plumbing |
+| Data integrity | Clean historical data, corporate actions adjusted, no lookahead bias | Bad data produces bad signals |
+| Risk framework | Max daily loss, max position size, max drawdown defined | Keeps one mistake from ending the journey |
+| Trade journal | Spreadsheet or system logging every planned and executed trade | Creates accountability and audit trail |
+| Time commitment | You can monitor markets, review logs, and maintain code regularly | Algos are not set-and-forget |
+
+If you cannot honestly mark every item as complete, spend another two to four weeks closing the gaps. The 60 days are for disciplined rehearsal, not for building the airplane while taxiing.
+
+## The 60-Day Paper-to-Live Plan
+
+The plan is split into three phases: validation, stress testing, and controlled live entry. Each phase has daily and weekly deliverables. The pace is deliberate. Rushing the transition is how accounts die.
+
+### Phase 1: Validation — Days 1 to 21
+
+The first three weeks are about confirming that your strategy behaves in simulation the way your research predicted. This is not the time to tweak parameters. It is the time to confirm that your documented rules produce the expected signal frequency, win rate, and risk profile.
+
+| Day Range | Focus | Deliverable |
+|-----------|-------|-------------|
+| Days 1-7 | Baseline paper run | 5-10 trades minimum, complete log of entries and exits |
+| Days 8-14 | Operational audit | List of every API warning, delay, or unexpected fill |
+| Days 15-21 | Assumption check | Compare paper fills to live bid-ask spread data for the same symbols |
+
+During this phase, run your strategy exactly as you would trade it live. Use the same symbols, the same time frames, and the same scheduled trading hours. If you plan to trade only the first two hours of the US session, do not run the strategy all day in paper just to collect more signals. Quantity of trades does not matter if the context is wrong.
+
+Track three numbers every day: number of signals taken, number of signals skipped by filters, and the difference between expected fill price and actual paper fill price. The last number is your early slippage estimate. If it grows, investigate immediately.
+
+<Alert type="warning">
+  Do not optimize your strategy during Phase 1. Optimization before stress testing
+  is usually overfitting in disguise. Document issues and move to Phase 2.
+</Alert>
+
+### Phase 2: Stress Testing — Days 22 to 42
+
+Stress testing means exposing the strategy to conditions it will eventually face live. This includes high-volatility days, earnings announcements, economic releases, and low-volume holiday sessions. You cannot control when these occur, but you can extend your observation window until you have seen enough of them.
+
+| Week | Stress Test | What to Watch |
+|------|-------------|---------------|
+| Week 4 | High volatility | Wider spreads, increased slippage, larger adverse selection |
+| Week 5 | Low liquidity | Partial fills, stale quotes, difficulty exiting at target |
+| Week 6 | Fast market events | Order rejections, lag between signal and fill, downtime |
+
+A common mistake is to disable the strategy during stressful periods and then declare it ready. That is cheating. If your plan includes avoiding certain events, that rule must be coded and tested in paper too. Otherwise, you are just hiding from data.
+
+Use this phase to test your kill-switch logic. Trigger a fake daily loss limit, a connection failure, and an order rejection. Make sure the algo stops, alerts you, and does not restart automatically unless that is part of the design. Many traders discover their so-called safety code is broken only after a live drawdown.
+
+### Phase 3: Controlled Live Entry — Days 43 to 60
+
+The final phase introduces real money at micro size while keeping a parallel paper account running. The goal is not to make money. The goal is to measure the gap between paper and live execution.
+
+| Day Range | Live Action | Paper Action |
+|-----------|-------------|--------------|
+| Days 43-49 | 10% of intended size | Full intended size, same signals |
+| Days 50-56 | 25% of intended size | Full intended size, same signals |
+| Days 57-60 | 50% of intended size if metrics are stable | Full intended size, same signals |
+
+At each step, compare live P&L to paper P&L after adjusting for size. A small negative gap is normal due to slippage and commissions. A large gap means something is wrong with execution, data, or assumptions. Do not increase size until the gap is explained.
+
+If at any point during Phase 3 you hit a kill-switch rule or your emotional state deteriorates, drop back to paper immediately. There is no shame in reversing. The only shame is pressing forward because of pride.
+
+## Capital Allocation Rules
+
+Capital allocation is the decision of how much total capital to devote to a new strategy. Many traders answer this question backward. They decide what returns they want, then choose a size that would produce those returns. This usually leads to overleveraging and ruin.
+
+The right sequence is: determine the maximum loss you can tolerate, then size the strategy so that a worst-case drawdown does not exceed it.
+
+| Account Layer | Purpose | Typical Allocation |
+|---------------|---------|-------------------|
+| Reserve cash | Emergency buffer, not traded | 20% to 50% of trading budget |
+| Core strategies | Proven, stable algos | 50% to 70% of risk capital |
+| New strategy | The algo being validated | 10% to 20% of risk capital |
+| Opportunistic buffer | Future adjustments or second strategy | 0% to 10% of risk capital |
+
+For example, if your total trading budget is $50,000 and you can afford to lose $5,000 on a new strategy without affecting your life, then your new strategy allocation is $5,000. That is your risk capital for this strategy, not your position size. Position size comes later through micro-sizing.
+
+Never fund a new live account with money you need within the next twelve months. Trading capital must be risk capital. If losing it would force you to change your lifestyle, skip size, or take on debt, the account is too large.
+
+<Alert type="danger">
+  Do not borrow money to fund a trading account, and do not use rent, emergency
+  savings, or retirement capital. The psychological pressure alone will degrade
+  decision-making before the first trade.
+</Alert>
+
+## Micro-Sizing: The Live Entry Hack
+
+Micro-sizing is the single most effective risk control for the paper-to-live transition. It means trading at a fraction of your intended size, often so small that a single day of losses is emotionally irrelevant. The purpose is to exchange P&L volatility for learning.
+
+A useful rule of thumb is to risk no more than 0.25% to 0.5% of allocated strategy capital per trade in the first live month. If your strategy allocation is $5,000, that means a maximum risk of $12.50 to $25 per trade. That sounds tiny, and it is supposed to.
+
+| Stage | Risk Per Trade | Position Size Logic |
+|-------|----------------|---------------------|
+| Paper baseline | Full intended risk | Used to validate signal quality |
+| Live week 1 | 0.25% of strategy capital | Validate broker fills and emotional response |
+| Live week 2 | 0.5% of strategy capital | Observe sequence of wins and losses |
+| Live week 3 | 1% of strategy capital if stable | Measure drawdown under real conditions |
+| Scale up | Gradual increase to target | Only after consistent execution and mindset |
+
+The real benefit of micro-sizing is not mathematical. It is psychological. When the numbers are small, you can observe your strategy without attachment. You can watch a losing streak and ask whether the strategy is broken, rather than panicking because you just lost a month of salary. You can also detect whether you have the discipline to follow rules when real money is at stake, even tiny amounts.
+
+Some brokers and platforms make micro-sizing difficult. They have minimum order sizes, fixed commissions, or contracts that are too large for small accounts. Solve this before going live. If you cannot scale down, you are not ready to scale up.
+
+## Kill-Switch Rules
+
+Kill switches are non-negotiable conditions that stop trading. They protect you from technical failures, market regime shifts, and emotional spirals. Every algo trader should have them written down, coded where possible, and reviewed daily.
+
+### Daily Loss Limits
+
+A daily loss limit caps how much you can lose in one session. A reasonable starting point is 2% to 3% of allocated strategy capital per day. Once hit, trading stops until the next session. No exceptions, no averaging down, no "just one more trade."
+
+### Consecutive Loss Limits
+
+Some strategies have clustered losses due to mean reversion or momentum shifts. A rule such as "stop after three consecutive losing trades" or "stop after two consecutive losing days" prevents you from trading through a regime that is hostile to your model.
+
+### Technical Kill Switches
+
+| Trigger | Action |
+|---------|--------|
+| Broker API disconnects for more than 30 seconds | Flatten open positions and pause |
+| Data feed stale for more than one minute | Pause new signals, review open exposure |
+| Order rejected twice in a row | Stop strategy, inspect error log |
+| Position size exceeds intended maximum | Flatten to target and halt |
+| Spreads widen beyond historical 95th percentile | Skip new entries, tighten exits |
+
+The key is to define these thresholds in advance. In the heat of a losing day, your judgment will be compromised. Predefined rules remove the need for judgment.
+
+<Alert type="warning">
+  A kill switch is only as good as your willingness to obey it. If you override it
+  once, you no longer have a safety system. You have a suggestion.
+</Alert>
+
+## Psychological Preparation
+
+Paper trading does not prepare you for the feeling of watching real money disappear. The first live loss produces a physiological reaction that no simulation can replicate. Your heart rate rises, your focus narrows, and your mind invents reasons to deviate from the plan. Psychological preparation is therefore part of the checklist, not an afterthought.
+
+### Pre-Trade Routine
+
+Before the market opens, read your trading plan out loud. State the strategy rules, the daily loss limit, and the conditions under which you will stop. This sounds silly, but it primes your brain to follow rules when emotions flare.
+
+### Post-Trade Review
+
+At the end of each session, answer five questions in your journal:
+
+1. Did the algo follow the documented rules?
+2. Were there any unexpected fills or rejections?
+3. Did I feel an urge to override the system, and did I act on it?
+4. What was the largest single-trade drawdown, and was it within expectations?
+5. What is one thing I can improve tomorrow?
+
+### Expectation Management
+
+Set your first live goal as "survive 60 days without breaking rules," not "make a profit." If you follow the process and lose a small amount, you have still succeeded. The money spent is tuition. If you break rules and make money, you have failed, because you have reinforced dangerous behavior.
+
+Another useful tactic is to tell someone about your plan. Accountability reduces the chance that you will hide losses, revenge trade, or quietly increase size. Choose someone who understands risk, not someone who will panic with you.
+
+### Sleep and Lifestyle
+
+Trading while sleep-deprived, sick, or emotionally distracted is a form of impaired driving. Automated execution reduces but does not eliminate the need for human oversight. During the 60-day transition, protect your sleep, exercise, and relationships. A stable life supports stable decisions.
+
+## Common Mistakes to Avoid
+
+Even with a good checklist, traders make predictable errors. Here are the most common ones during the paper-to-live transition.
+
+| Mistake | Why It Happens | How to Prevent It |
+|---------|----------------|-------------------|
+| Jumping to full size after a few winners | Recency bias and overconfidence | Use fixed scaling schedule, not P&L |
+| Hiding from bad days | Fear of seeing losses logged | Automated journaling and alerts |
+| Changing rules mid-stream | Desire to "fix" a losing streak | Only change rules outside market hours with a written hypothesis |
+| Ignoring commissions and fees | Paper accounts often hide them | Model realistic costs in backtests and paper |
+| Trading through technical issues | Hope that the problem will resolve | Kill switches and manual overrides |
+| Comparing yourself to social media returns | Selection bias and fake results | Focus on your own metrics and edge |
+
+The last mistake deserves extra attention. Social media is filled with traders posting cherry-picked wins, leveraged returns, and screenshots from demo accounts. Their results are irrelevant to your plan. The only benchmark that matters is whether your strategy, executed with discipline, produces a positive expectancy after all costs over a meaningful sample of trades.
+
+## FAQ
+
+Below are answers to the most common questions about moving from paper to live trading. These match the FAQ schema used by the page component for structured search results.
+
+### How long should I paper trade before going live?
+
+Most successful algo traders paper trade for at least 60 days of out-of-sample results, including a mix of market regimes. Two months gives you roughly 40 trading days, enough to observe variance, slippage assumptions, and emotional discipline without risking capital.
+
+### What is the minimum capital needed to start live algo trading?
+
+The minimum depends on commission structure, position granularity, and drawdown tolerance. A practical floor is $5,000 for equities and $10,000 for futures or forex, but many traders start with less using fractional shares or micro contracts. The real constraint is whether a single losing streak wipes out your ability to keep trading.
+
+### What is micro-sizing and why does it matter?
+
+Micro-sizing means risking a very small percentage of capital per trade or per strategy, often 0.25% to 0.5%. It matters because live markets introduce slippage, partial fills, latency, and emotional reactions that paper accounts hide. Small size lets you validate execution quality before scaling up.
+
+### How do I know my algo is ready for live trading?
+
+Readiness comes from stable paper performance, conservative assumptions, clean code, documented rules, broker integration testing, and a written trading plan. If any of these is missing, stay in simulation until the gap is closed.
+
+### What are kill-switch rules?
+
+Kill-switch rules are automatic or manual circuit breakers that stop trading when losses, volatility, or technical errors exceed predefined thresholds. Examples include daily loss limits, consecutive-loss limits, spread blowouts, and connection failures.
+
+### Why do profitable paper strategies fail in live markets?
+
+Common reasons include unrealistic fill assumptions, ignoring slippage, overfitting to historical data, underestimating latency, emotional interference, and changes in market regime. Paper trading is necessary but not sufficient for live success.
+
+### Should I trade the same strategy on paper and live at the same time?
+
+Yes, running a shadow paper account alongside a live micro account is one of the safest ways to detect drift. Divergence between paper and live fills can reveal slippage, routing issues, or data-feed problems before they become expensive.
+
+## Bottom Line
+
+The paper-to-live transition is not a single decision. It is a controlled process that should take at least 60 days, include validation and stress testing, and introduce real capital only at micro size. The goal of those first two months is not to get rich. It is to prove that you can follow rules, manage risk, and survive the emotional reality of trading with real money.
+
+Use the checklist in this article as a starting template. Customize it for your market, strategy, and personality. Then follow it with more discipline than you think you need. The traders who survive long enough to develop an edge are the ones who refused to rush the transition.
+
+

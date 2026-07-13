@@ -1,0 +1,384 @@
+---
+title: "backtrader 回测基础：在加入 AI 之前先验证"
+description: "学习如何使用 backtrader 回测简单的 SMA 均线交叉策略、绘制权益曲线，并在引入机器学习之前进行滚动样本外验证。"
+date: "2026-07-13"
+category: "Tutorials"
+tags: ["backtrader", "backtesting", "python", "basics"]
+readTime: "18 分钟阅读"
+featured: false
+lang: "zh"
+faq:
+  - question: "为什么在把 AI 加入交易策略之前要先回测？"
+    answer: >
+      回测能让你看到策略在历史数据上会怎样表现，从而在投入机器学习之前暴露曲线拟合、幸存者偏差和不切实际假设等问题。
+  - question: "使用 backtrader 需要会 Python 吗？"
+    answer: >
+      是的，需要基础 Python。你需要把策略写成类，从 CSV 或 API 导入数据，再用少量代码运行回测。
+  - question: "backtrader 能保证盈利吗？"
+    answer: >
+      不能。回测只是模拟。过去的表现永远不能保证未来收益，而且很多回测在实盘交易中会因为滑点、成本和过拟合而失效。
+  - question: "什么是滚动样本外验证（walk-forward），为什么重要？"
+    answer: >
+      滚动样本外验证不断在样本内窗口上训练参数，然后在紧随其后的样本外窗口上测试。它比单次静态回测更接近真实交易中的优化过程。
+  - question: "最常见的回测错误有哪些？"
+    answer: >
+      最常见的错误包括 lookahead 偏差、对历史噪声过拟合、忽略交易成本和滑点、幸存者偏差以及数据窥探。
+  - question: "backtrader 还在维护吗？"
+    answer: >
+      原版 backtrader 仓库已趋于稳定，更新不频繁。社区仍在使用和扩展它，它仍然是一个可靠的教学和研究工具。
+---
+
+<Disclaimer />
+
+几乎每个交易者都曾在看图时想过："如果我在这里买入、那里卖出，我早就发财了。"这种事后之明充满诱惑，也正是回测存在的意义。回测让你用结构化的模拟取代一厢情愿的想象。你不必再相信直觉，而是把规则套到历史价格上，逐日、逐笔地看会发生什么。
+
+这一点在考虑人工智能时尤为重要。机器学习可以发现人类忽略的规律，但也会记住噪声、追逐随机相关性，并生成在纸面上光鲜亮丽、实盘却崩塌的模型。在你把神经网络、梯度提升树或大语言模型加入工作流之前，你需要一个坚实的基线：一个简单、基于规则的策略，用干净的历史数据诚实地测试过。
+
+在本教程中，我们将使用 [backtrader](https://www.backtrader.com/)——一款流行的开源 Python 回测引擎——来构建并评估一条简单的移动平均线交叉策略。我们会安装库、加载行情数据、编写策略代码、绘制权益曲线，并介绍滚动样本外验证。过程中我们会重点指出那些能把漂亮回测变成实盘灾难的常见错误。
+
+## 为什么要回测？
+
+回测不是为了证明一个策略能赚钱，而是为了排除那些不太可能经受住现实考验的策略。在投入真金白银之前，一次好的回测可以回答几个问题：
+
+| 问题 | 它揭示了什么 |
+|------|--------------|
+| 信号是否能产生交易？ | 一个很少交易的策略很难评估，也可能不适合你的经纪商或市场。 |
+| 回撤有多深？ | 50% 的回撤可能让你在策略恢复之前就被迫离场。 |
+| 胜率和盈亏比如何？ | 高胜率配小亏损，与低胜率配大盈利是完全不同的体验。 |
+| 结果是否由少数异常交易驱动？ | 一笔幸运交易可能让糟糕策略看起来很美。 |
+| 对成本有多敏感？ | 手续费、滑点和价差会迅速吞噬纸面利润。 |
+
+回测还给了你描述风险的语言。只看收益没有意义，必须结合回撤、波动和敞口。之后当你加入 AI 层时，可以在相同数据和相同指标下比较 AI 版本与简单规则版本。如果 AI 连两条移动平均线在扣费后都打不过，那说明模型并没有带来价值。
+
+<Alert type="warning">
+  正向的回测结果并不能预测未来盈利，它只说明这些规则在过去有效。市场会变、环境会变、任何优势都会衰减。
+</Alert>
+
+回测还能保护你不被自己欺骗。它迫使你精确地定义入场、出场和仓位规则。像 "逢低买入" 这种模糊计划会变成明确条件：当 20 日简单移动平均线上穿 50 日简单移动平均线时买入，投入 95% 可用资金，并在下穿时卖出。这种精确性是可复现研究的基础。
+
+## 什么是 backtrader？
+
+backtrader 是一个用 Python 编写的事件驱动型回测库。它由 Daniel Rodriguez 创建，因其灵活、面向对象、贴合交易者思维方式而拥有大量用户。你创建一个 `Cerebro` 引擎，挂载一个或多个数据源，添加一个或多个策略，然后运行模拟。引擎会逐根 K 线推进，调用你的策略逻辑，执行模拟订单，并跟踪绩效。
+
+backtrader 的核心概念：
+
+| 概念 | 作用 |
+|------|------|
+| `Cerebro` | 统筹数据、策略、经纪商和分析器的引擎。 |
+| Data feed | OHLCV 数据来源，通常是 CSV 或 yfinance 等库。 |
+| `Strategy` | 定义指标、信号和订单逻辑的 Python 类。 |
+| `Indicator` | 计算出的时间序列，例如均线或 RSI。 |
+| `Broker` | 模拟现金、仓位、手续费和订单执行。 |
+| `Analyzer` | 绩效报告工具，例如夏普比率或最大回撤。 |
+
+backtrader 并不是市场上最新的回测框架，原版仓库的开发也不活跃。但它稳定、文档丰富、功能足够用来学习基础原理，而这些基础原理可以迁移到任何引擎。一旦你理解了 backtrader 中的事件驱动回测，再去使用 Zipline、QuantConnect、VectorBT 或自研 C++ 引擎都会轻松很多。
+
+## 安装 backtrader
+
+从一个干净的 Python 环境开始。backtrader 支持 Python 3.7 及以上版本，但推荐使用 3.10 或 3.11 环境。如果你还没有虚拟环境，先创建一个：
+
+```bash
+python -m venv vbt-env
+source vbt-env/bin/activate  # Windows 用：vbt-env\Scripts\activate
+pip install --upgrade pip
+```
+
+然后安装本教程需要的核心包：
+
+```bash
+pip install backtrader yfinance pandas matplotlib
+```
+
+各包的用途：
+
+| 包名 | 用途 |
+|------|------|
+| `backtrader` | 回测引擎。 |
+| `yfinance` | 从 Yahoo Finance 下载历史日线数据。 |
+| `pandas` | 处理表格数据，yfinance 依赖它。 |
+| `matplotlib` | 渲染策略和权益曲线图表。 |
+
+如果你计划运行大量回测，还可以安装 `numpy` 和 `scipy` 用于统计分析。backtrader 本身不需要它们，但在滚动样本外优化和绩效衡量时非常有用。
+
+<Alert type="info">
+  每个交易项目都要使用虚拟环境。把库混装在全局 Python 环境中会引发版本冲突，排查起来非常痛苦。
+</Alert>
+
+测试安装是否成功，打开 Python 提示符并运行：
+
+```python
+import backtrader as bt
+print(bt.__version__)
+```
+
+如果看到版本号且没有报错，你就可以开始构建第一个策略了。
+
+## 编写一条简单的 SMA 均线交叉策略
+
+均线交叉是系统化交易的 "Hello World"。当短期趋势上穿长期趋势时买入，下穿时卖出。它简单、易懂，而且出人意料地是一个有用的基准。很多机器学习策略连一个参数良好的趋势跟踪模型都打不过，所以永远不要跳过这个基线。
+
+创建一个名为 `sma_cross.py` 的文件，并添加以下代码：
+
+```python
+import backtrader as bt
+import yfinance as yf
+
+
+class SmaCross(bt.Strategy):
+    params = (
+        ('fast', 20),
+        ('slow', 50),
+    )
+
+    def __init__(self):
+        # 保存收盘价引用，用于日志输出
+        self.dataclose = self.datas[0].close
+
+        # 创建均线和交叉指标
+        self.fast_sma = bt.indicators.SMA(self.data.close, period=self.p.fast)
+        self.slow_sma = bt.indicators.SMA(self.data.close, period=self.p.slow)
+        self.crossover = bt.indicators.CrossOver(self.fast_sma, self.slow_sma)
+
+        # 跟踪未成交订单，防止同一根 K 线发出多个订单
+        self.order = None
+
+    def log(self, txt, dt=None):
+        dt = dt or self.datas[0].datetime.date(0)
+        print(f'{dt.isoformat()} {txt}')
+
+    def notify_order(self, order):
+        if order.status in [order.Submitted, order.Accepted]:
+            return
+
+        if order.status in [order.Completed]:
+            if order.isbuy():
+                self.log(f'买入成交, {order.executed.size} 股 @ {order.executed.price:.2f}')
+            elif order.issell():
+                self.log(f'卖出成交, {order.executed.size} 股 @ {order.executed.price:.2f}')
+
+        elif order.status in [order.Canceled, order.Margin, order.Rejected]:
+            self.log('订单取消/保证金不足/被拒绝')
+
+        # 重置未成交订单跟踪器
+        self.order = None
+
+    def next(self):
+        # 等待未成交订单完成后再发出新订单
+        if self.order:
+            return
+
+        # 没有仓位时检查买入信号
+        if not self.position:
+            if self.crossover > 0:
+                self.log(f'买入信号, {self.dataclose[0]:.2f}')
+                self.order = self.buy()
+        # 持有仓位时检查卖出信号
+        else:
+            if self.crossover < 0:
+                self.log(f'卖出信号, {self.dataclose[0]:.2f}')
+                self.order = self.sell()
+
+
+if __name__ == '__main__':
+    cerebro = bt.Cerebro()
+
+    # 从 Yahoo Finance 下载 SPY 数据
+    df = yf.download('SPY', start='2018-01-01', end='2023-12-31', auto_adjust=True)
+    data = bt.feeds.PandasData(dataname=df)
+    cerebro.adddata(data)
+
+    # 添加策略
+    cerebro.addstrategy(SmaCross)
+
+    # 设置起始资金和手续费
+    cerebro.broker.setcash(10000.0)
+    cerebro.broker.setcommission(commission=0.001)  # 每笔交易 0.1%
+
+    # 每次买入信号投入 95% 可用现金
+    cerebro.addsizer(bt.sizers.PercentSizer, percents=95)
+
+    # 附加分析器
+    cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='sharpe', riskfreerate=0.0)
+    cerebro.addanalyzer(bt.analyzers.DrawDown, _name='drawdown')
+    cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name='trades')
+
+    print('初始账户价值: %.2f' % cerebro.broker.getvalue())
+    results = cerebro.run()
+    print('最终账户价值: %.2f' % cerebro.broker.getvalue())
+
+    # 输出分析器结果
+    strat = results[0]
+    print(f"夏普比率: {strat.analyzers.sharpe.get_analysis()['sharperatio']:.3f}")
+    print(f"最大回撤: {strat.analyzers.drawdown.get_analysis()['max']['drawdown']:.2f}%")
+
+    cerebro.plot()
+```
+
+我们来逐段讲解代码中重要的部分，以便你后续修改。
+
+### 策略参数
+
+`params` 元组定义了 `fast` 和 `slow` 两个窗口。把它们暴露为参数后，后续优化时无需重写策略。20/50 是一个常见的起点，但并非神圣不可更改。
+
+| 参数 | 默认值 | 含义 |
+|------|--------|------|
+| `fast` | 20 | 短期简单移动平均线，单位为 K 线数。 |
+| `slow` | 50 | 长期简单移动平均线，单位为 K 线数。 |
+
+### 指标
+
+backtrader 的 `bt.indicators.SMA` 会自动完成滚动计算。`CrossOver` 在快线上穿慢线时返回 `1`，下穿时返回 `-1`，否则返回 `0`。这让信号逻辑清晰可读。
+
+### 订单管理
+
+在事件驱动回测中，`next()` 方法每根 K 线执行一次。如果你在 K 线 `t` 发出订单，可能要等到 `t+1` 才成交。`notify_order()` 回调会告诉你订单是已提交、已接受、已成交还是被拒绝。我们把未成交订单保存在 `self.order` 中，在经纪商报告成交前不再发新信号。如果没有这个保护，你可能在同一根 K 线上堆积多个订单。
+
+### 经纪商与仓位
+
+`setcash` 设置账户起始资金。`setcommission` 模拟 0.1% 的往返交易成本，这对流动性好的美股 ETF 比较现实，但对小盘股或加密货币可能过低。`PercentSizer` 在每次买入信号时投入 95% 可用现金。我们保留 5% 现金，以吸收价格小幅波动并避免保证金问题。
+
+<Alert type="warning">
+  手续费和滑点假设对结果影响巨大。一个在零成本下看起来很棒的策略，加入真实成本后往往会变得无利可图。
+</Alert>
+
+### 分析器
+
+我们附加了三个分析器：夏普比率衡量风险调整后收益，最大回撤衡量峰值到谷底的亏损，交易分析器检查单笔交易统计。这些数字比最终权益值更重要，因为它们描述了你在策略运行期间的真实体验。
+
+## 绘制权益曲线
+
+脚本运行结束后，`cerebro.plot()` 会打开一个 matplotlib 窗口，显示价格图、均线、买卖标记以及账户价值随时间变化的子图。在无头服务器上，你可能需要保存图片而不是直接显示：
+
+```python
+import matplotlib.pyplot as plt
+
+figs = cerebro.plot(style='candlestick')
+plt.savefig('sma_cross_equity.png')
+```
+
+权益曲线讲述的故事比最终盈亏更丰富。留意以下形态：
+
+| 形态 | 含义 |
+|------|------|
+| 平滑向上的斜率 | 策略捕捉到了持续的趋势。 |
+| 长期横盘 | 策略处于空仓，在震荡市中这通常是健康的。 |
+| 快速垂直下跌 | 单笔或少数几笔交易造成大额亏损，需要检查仓位大小。 |
+| 深跌后反弹 | 大回撤考验你是否能坚持执行系统。 |
+
+一个常见错误是只关注最终数字。一个把 1 万美元变成 1.8 万美元，但中间曾跌到 6 千美元的策略，与平稳到达 1.7 万美元的策略完全不同。前者可能让你在最坏的时刻放弃策略。
+
+看图时把权益曲线与买入持有基准对比。如果策略连直接持有 SPY 都跑不过，你需要一个强有力的理由去交易它。也许它降低了回撤，也许它只是把 mediocre 收益复杂化了。图表会让这一点显而易见。
+
+## 滚动样本外验证（Walk-Forward Validation）
+
+在整段数据上跑一次回测是有用的，但可能具有误导性。如果你在测试数据的同一部分上优化 SMA 窗口，相当于偷看了答案。这叫做过拟合，它会让参数在历史上看起来完美，却在实盘交易中失效。
+
+滚动样本外验证通过模拟真实的研究和部署流程来解决这个问题。你把数据切分成多个窗口。每个窗口内，在样本内部分优化参数，然后在样本外部分测试。窗口不断向前滚动，重复该过程。
+
+| 窗口 | 样本内（训练） | 样本外（测试） | 操作 |
+|------|----------------|----------------|------|
+| 1 | 2018-01 至 2020-12 | 2021-01 至 2021-06 | 优化，然后测试。 |
+| 2 | 2018-07 至 2021-06 | 2021-07 至 2021-12 | 优化，然后测试。 |
+| 3 | 2019-01 至 2021-12 | 2022-01 至 2022-06 | 优化，然后测试。 |
+| 4 | 2019-07 至 2022-06 | 2022-07 至 2022-12 | 优化，然后测试。 |
+
+主要有两种变体：
+
+1. **滚动 walk-forward：** 训练窗口长度固定，不断向前滑动，旧数据被丢弃。这适用于你认为近期数据更相关的情况。
+2. **锚定 walk-forward：** 训练窗口从最早数据开始不断变长。它使用全部历史数据，并在新数据到来时重新训练。
+
+下面的伪代码展示了滚动方法：
+
+```python
+from itertools import product
+
+windows = [
+    ('2018-01-01', '2020-12-31', '2021-01-01', '2021-06-30'),
+    ('2018-07-01', '2021-06-30', '2021-07-01', '2021-12-31'),
+    ('2019-01-01', '2021-12-31', '2022-01-01', '2022-06-30'),
+]
+
+best_out_of_sample_results = []
+
+for train_start, train_end, test_start, test_end in windows:
+    best_sharpe = -1e9
+    best_params = None
+
+    # 样本内优化
+    for fast, slow in product(range(10, 31, 5), range(40, 91, 10)):
+        if fast >= slow:
+            continue
+        df_train = yf.download('SPY', start=train_start, end=train_end, auto_adjust=True)
+        # 用 (fast, slow) 在 df_train 上运行 cerebro 并记录夏普
+        # ...
+        if sharpe > best_sharpe:
+            best_sharpe = sharpe
+            best_params = (fast, slow)
+
+    # 用最优参数做样本外测试
+    df_test = yf.download('SPY', start=test_start, end=test_end, auto_adjust=True)
+    # 在 df_test 上用 best_params 运行 cerebro
+    # 把结果追加到 best_out_of_sample_results
+```
+
+<Alert type="info">
+  滚动样本外验证比单次回测慢，但它是在不等待实盘数据的情况下，最接近诚实样本外测试的方法。
+</Alert>
+
+当你汇总所有样本外结果时，得到的是一条反映"如果反复优化并部署"的绩效曲线。如果样本外表现很差，而样本内表现很好，说明策略过拟合。这正是 AI 可能放大十倍的风险，因为机器学习模型的参数远远超过两条均线的窗口。
+
+## 常见回测错误
+
+即使安装正确，设计草率的回测也会欺骗你。以下是常见错误及避免方法。
+
+| 错误 | 危害 | 避免方法 |
+|------|------|----------|
+| Lookahead 偏差 | 使用了决策时还不存在的信息。 | 只用当前及之前的数据计算指标，避免未来函数。 |
+| 过拟合 | 优化参数直到它们适配随机噪声。 | 使用滚动样本外验证，并保持参数网格精简。 |
+| 忽略成本 | 手续费、滑点、价差和融券成本会侵蚀收益。 | 模拟真实成本并重新运行回测。 |
+| 幸存者偏差 | 只测试今天仍然存在的股票。 | 使用某一时点的全宇宙数据，包含已退市标的。 |
+| 数据窥探 | 在同一数据集上进行大量实验。 | 保留最终验证集，限制反复调试。 |
+| 时间粒度错误 | 用日线测试日内信号，或反之。 | 让策略频率与数据频率一致。 |
+| 过度自信 | 把回测当成交易许可证。 | 把它当作证据而非证明，先用模拟盘验证。 |
+
+Lookahead 偏差特别隐蔽。它可能在你使用复权收盘价时悄然出现，因为复权是事后应用的；也可能在你用当日收盘价调仓时出现，而收盘价在当时并不知道。在 backtrader 中，`next()` 里的决策只能看到当前及之前的数据，这有帮助。但仍需小心外部数据，如财报日历、分析师评级或宏观经济发布。
+
+过拟合是 AI 交易项目的无声杀手。拥有数百个特征的模型几乎总能在历史数据中找到某种规律。问题是这种规律是否会重复。防范过拟合的一个简单方法是：对每个特征都要求有经济或行为逻辑解释。如果你无法解释为什么某个变量能预测收益，那它很可能是噪声。
+
+<Alert type="danger">
+  再完美的回测也无法预测市场制度转换。始终保持保守的仓位，永远不要用你承受不起损失的资金去交易。
+</Alert>
+
+## 常见问题
+
+**为什么在把 AI 加入交易策略之前要先回测？**
+
+回测能让你看到策略在历史数据上会怎样表现，从而在投入机器学习之前暴露曲线拟合、幸存者偏差和不切实际假设等问题。
+
+**使用 backtrader 需要会 Python 吗？**
+
+是的，需要基础 Python。你需要把策略写成类，从 CSV 或 API 导入数据，再用少量代码运行回测。
+
+**backtrader 能保证盈利吗？**
+
+不能。回测只是模拟。过去的表现永远不能保证未来收益，而且很多回测在实盘交易中会因为滑点、成本和过拟合而失效。
+
+**什么是滚动样本外验证，为什么重要？**
+
+滚动样本外验证不断在样本内窗口上训练参数，然后在紧随其后的样本外窗口上测试。它比单次静态回测更接近真实交易中的优化过程。
+
+**最常见的回测错误有哪些？**
+
+最常见的错误包括 lookahead 偏差、对历史噪声过拟合、忽略交易成本和滑点、幸存者偏差以及数据窥探。
+
+**backtrader 还在维护吗？**
+
+原版 backtrader 仓库已趋于稳定，更新不频繁。社区仍在使用和扩展它，它仍然是一个可靠的教学和研究工具。
+
+## 总结
+
+回测是交易中最便宜的实验室。它能让你测试想法、衡量风险，并在策略造成真实损失之前剔除坏主意。本教程中，我们安装了 backtrader，构建了一个简单的 SMA 均线交叉策略，绘制了权益曲线，并引入滚动样本外验证作为对抗过拟合的防线。
+
+真正的教训是谦逊。回测能告诉你一个策略在过去表现良好，但它不能保证同样的市场环境会继续。用回测来建立现实预期，而不是追逐轻松致富的承诺。一旦你有了一个诚实的、基于规则的基线，就能判断 AI 是否真正提升了你的优势，还是只是增加了复杂度。
+
+如果你想进一步深入，可以尝试修改策略：加入波动率过滤、测试不同市场、或引入止损。每次改动都应该有逻辑支撑，并通过滚动样本外测试重新验证。现在就建立这种纪律，你未来的 AI 实验才会有坚实的基础。

@@ -1,0 +1,381 @@
+---
+title: "使用 QuantConnect Lean 在本地部署你的第一个交易策略"
+description: "一份实操指南，带你安装 QuantConnect Lean CLI、创建第一个算法项目、在本地运行回测，并从自己的电脑进行模拟交易。"
+date: "2026-07-13"
+category: "Tutorials"
+tags: ["quantconnect", "lean", "algorithmic trading", "tutorial"]
+readTime: "18 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "QuantConnect Lean 是什么？它和 QuantConnect 网站有什么区别？"
+    answer: "Lean 是 QuantConnect 背后的开源算法交易引擎。QuantConnect 网站提供云端 IDE、数据和算力，而 Lean 让你可以在自己的电脑上运行同样的引擎，完全掌控代码、数据和执行。"
+  - question: "在本地使用 Lean 做回测需要付费购买数据吗？"
+    answer: "Lean 自带样本数据供测试使用。对于严肃的回测，你可以导入自己的数据、订阅 QuantConnect 数据包，或使用 Yahoo Finance、券商 API 等免费来源。成本取决于你需要的资产类别和数据粒度。"
+  - question: "我可以用 Lean 在本地进行实盘交易吗？"
+    answer: "可以。Lean 支持通过与 Interactive Brokers、Tradier、Coinbase 等券商集成进行实盘交易。不过，大多数初学者应先从模拟交易开始，在冒真实资金风险之前验证策略逻辑。"
+  - question: "使用 Lean 应该选择哪种编程语言？"
+    answer: "Lean 支持 C#、Python 和 F#。Python 因其庞大的数据科学生态系统，是量化交易者最流行的选择。如果你追求极致性能或想为 Lean 本身贡献代码，C# 是最佳选择。"
+  - question: "在本地运行 Lean 需要多少成本？"
+    answer: "Lean 是开源的，可以免费运行。成本主要来自数据订阅、券商佣金以及你所选择的硬件或云服务器。基础的回测环境在现代笔记本电脑上就能流畅运行。"
+  - question: "本地算法交易的主要风险有哪些？"
+    answer: "风险包括对历史数据过度拟合、网络中断或断电等基础设施故障、执行滑点，以及对券商费用的误解。务必充分测试，并从小资金开始。"
+---
+
+<Disclaimer />
+
+QuantConnect Lean 是散户和专业算法交易者能使用的最强大的开源工具之一。它是驱动 QuantConnect 云端数十亿次回测的同款引擎，但你可以把它安装在自己的电脑上，用 Python 或 C# 编写策略，并掌控从研究到部署的每一个环节。
+
+本教程将带你走完完整的本地工作流：安装 Lean CLI、创建你的第一个项目、运行本地回测、连接模拟交易券商，以及判断什么时候应该选择 Lean、什么时候应该选择更简单的替代工具。读完本文，你将在本地拥有一套可运行的算法，并对如何负责任地迈向实盘交易有清晰的认识。
+
+## QuantConnect Lean 是什么？
+
+Lean 是 QuantConnect 最初开发的开源算法交易引擎。它负责市场数据接入、投资组合建模、订单执行、风险管理和绩效报告。由于它是开源的，你可以查看源码、扩展组件，并在任何环境中运行：笔记本电脑、家庭服务器或云主机。
+
+与 QuantConnect 生态交互主要有两种方式：
+
+| 方式 | 代码运行位置 | 最适合 | 掌控程度 |
+|------|--------------|--------|----------|
+| QuantConnect 云端 | QuantConnect 服务器 | 快速研究、无需本地环境、内置数据 | 较低 |
+| Lean 本地 | 你自己的电脑 | 完全掌控、自定义数据、自动化部署 | 较高 |
+
+云端平台非常适合快速上手。你登录后，在浏览器里写算法，然后点击回测。Lean 本地则是下一步，当你需要版本控制、自定义库、私有数据源，或希望在不依赖第三方网页界面的情况下调度策略时，就该考虑本地部署。
+
+Lean 支持多种资产类别，包括美国股票、外汇、加密货币、期货和期权。它还支持多个券商的实盘交易，包括 Interactive Brokers、Tradier、Coinbase 和 OANDA。这种灵活性使其成为希望用同一套引擎处理不同市场和策略的交易者的热门选择。
+
+<Alert type="info">
+  在本地运行 Lean 并不能让你的策略盈利。它只提供一个透明、可复现的
+  环境来构建和测试策略。盈利来自扎实的研究、严格的风险管理，以及
+  贴近现实的执行假设。
+</Alert>
+
+## 前置条件
+
+在安装 Lean CLI 之前，请确保你的环境满足一些基本要求。Lean 是跨平台的，支持 Windows、macOS 和 Linux。
+
+| 要求 | 最低配置 | 推荐配置 |
+|------|----------|----------|
+| 操作系统 | Windows 10、macOS 11、Ubuntu 20.04 | 最新稳定版 |
+| 内存 | 8 GB | 16 GB 或更多 |
+| 磁盘空间 | 10 GB 可用空间 | 50 GB 或更多，用于存放历史数据 |
+| Docker | CLI 必需 | 最新稳定版 Docker Desktop |
+| .NET SDK | Python 用户非必需 | C# 用户使用最新 LTS 版 |
+| Python | 3.8 或更新 | 3.10 或更新 |
+
+Docker 是最重要的依赖。Lean CLI 使用 Docker 容器在隔离、可复现的环境中运行回测和实盘部署。这能避免经典的"在我电脑上能跑"问题，因为本地和云端使用的是同一个容器镜像。
+
+如果你是 Docker 新手，请从官网下载 Docker Desktop，并在终端运行 `docker run hello-world` 验证安装。Docker 就绪后，Lean CLI 的安装就很简单了。
+
+## 安装 Lean CLI
+
+Lean CLI 是一个通过 PyPI 分发的 Python 包。打开终端，用 pip 安装：
+
+```bash
+pip install lean
+```
+
+安装完成后，验证 CLI 是否可用：
+
+```bash
+lean --version
+```
+
+你应该能看到版本号输出。如果没有，请检查 Python 脚本目录是否已加入系统 PATH。
+
+第一次使用 CLI 时，它会拉取 Lean 的 Docker 镜像。这个镜像包含引擎、依赖和运行时，体积可能达到数 GB，因此较快的网络连接会很有帮助。你可以手动提前拉取，避免后续等待。
+
+```bash
+lean config set default-engine image quantconnect/lean:latest
+lean library add "QuantConnect.Algorithm.Python"
+```
+
+<Alert type="warning">
+  首次下载 Docker 镜像可能需要 10 到 30 分钟，具体取决于你的网络速度。
+  请提前规划好这一步，并避免中断下载。
+</Alert>
+
+接下来，使用你的 QuantConnect 账户登录，这样 CLI 才能同步项目和数据订阅。
+
+```bash
+lean login
+```
+
+系统会提示你输入用户 ID 和 API token，这些信息可以在 QuantConnect 账户设置中找到。对于纯本地开发来说，登录是可选的；但如果你想拉取云端数据或将项目推回云端，就必须登录。
+
+## 创建你的第一个项目
+
+CLI 安装完成后，创建一个新的项目目录。CLI 会自动生成所需的一切文件。
+
+```bash
+lean create-project "MyFirstLeanAlgorithm"
+```
+
+该命令会创建一个名为 `MyFirstLeanAlgorithm` 的文件夹，里面包含一个入门算法文件、一个配置文件和一个研究笔记本模板。默认语言是 Python，但你可以通过 `--language csharp` 指定 C#。
+
+自动生成的 Python 算法通常长这样：
+
+```python
+from AlgorithmImports import *
+
+class MyFirstLeanAlgorithm(QCAlgorithm):
+    def Initialize(self):
+        self.SetStartDate(2020, 1, 1)
+        self.SetEndDate(2021, 1, 1)
+        self.SetCash(100000)
+        self.symbol = self.AddEquity("SPY", Resolution.Daily).Symbol
+
+    def OnData(self, data):
+        if not self.Portfolio.Invested:
+            self.SetHoldings(self.symbol, 1.0)
+```
+
+这是最简单的买入持有策略：在第一个可用机会出现时，把 100% 的资金投入 SPY 并持有整个回测周期。这当然不是你会拿去实盘交易的策略，但它非常适合用来学习 Lean 算法的基本结构。
+
+每个 Lean 算法都有两个必需的方法：
+
+| 方法 | 用途 | 调用时机 |
+|------|------|----------|
+| `Initialize` | 设置日期、资金、资产、指标和预热 | 算法启动时调用一次 |
+| `OnData` | 处理传入的市场数据并做出交易决策 | 每个数据切片到来时调用 |
+
+理解算法生命周期至关重要。`Initialize` 用于配置模拟环境，`OnData` 用于承载交易逻辑。你还可以添加可选方法，例如 `OnOrderEvent` 接收订单更新、`OnSecuritiesChanged` 处理股票池变化、`OnEndOfDay` 进行每日收尾。
+
+让我们把示例稍作扩展，加入一个均线交叉逻辑。这样我们就有理由在每一根 K 线上检查条件并下条件单了。
+
+```python
+from AlgorithmImports import *
+
+class MyFirstLeanAlgorithm(QCAlgorithm):
+    def Initialize(self):
+        self.SetStartDate(2020, 1, 1)
+        self.SetEndDate(2021, 1, 1)
+        self.SetCash(100000)
+        self.SetBrokerageModel(BrokerageName.InteractiveBrokersBrokerage, AccountType.Margin)
+        self.symbol = self.AddEquity("SPY", Resolution.Daily).Symbol
+        self.fast = self.SMA(self.symbol, 50, Resolution.Daily)
+        self.slow = self.SMA(self.symbol, 200, Resolution.Daily)
+        self.SetWarmUp(200)
+
+    def OnData(self, data):
+        if self.IsWarmingUp:
+            return
+
+        if self.fast.Current.Value > self.slow.Current.Value:
+            if not self.Portfolio[self.symbol].IsLong:
+                self.SetHoldings(self.symbol, 1.0)
+        else:
+            if self.Portfolio[self.symbol].IsLong:
+                self.Liquidate(self.symbol)
+```
+
+这个版本在 50 日简单移动均线上穿 200 日均线时买入 SPY，在下穿时卖出。预热期确保在第一个交易信号出现之前，指标已经准备就绪。
+
+## 运行本地回测
+
+回测是任何新算法的关键时刻。Lean CLI 让这一步变得简单。
+
+```bash
+lean backtest MyFirstLeanAlgorithm
+```
+
+CLI 会打包你的项目，把它挂载到 Docker 容器中，然后使用可用的数据运行 Lean 引擎。默认情况下，CLI 会在本地数据目录中查找数据，如果你已登录并有数据订阅，也可以从 QuantConnect 获取数据。
+
+回测运行时，你会在终端看到日志输出。完成后，CLI 会在项目文件夹中写入几个有用的文件：
+
+| 文件 | 用途 |
+|------|------|
+| `backtests/<时间戳>/results.json` | 原始回测指标和交易记录 |
+| `backtests/<时间戳>/report.html` | 可视化的绩效报告 |
+| `backtests/<时间戳>/log.txt` | 算法日志和错误信息 |
+
+用浏览器打开 HTML 报告，你会看到权益曲线、最大回撤、交易统计和月度收益分解。请仔细阅读每个部分，而不要只关注最终盈利数字。
+
+对于第一次回测，最重要的指标包括：
+
+| 指标 | 为什么重要 | 健康起点 |
+|------|------------|----------|
+| 净利润 | 策略整体收益 | 为正，但不是唯一目标 |
+| 夏普比率 | 单位风险带来的收益 | 高于 1.0 令人鼓舞 |
+| 最大回撤 | 从高点到低点的最大跌幅 | 应符合你的风险承受能力 |
+| 胜率 | 盈利交易占比 | 需结合盈亏比综合判断 |
+| 盈亏因子 | 总盈利除以总亏损 | 高于 1.5 说明可能存在优势 |
+| 交易次数 | 统计显著性 | 交易次数越多，指标越可靠 |
+
+<Alert type="danger">
+  单次高净利润的回测并不能证明策略有效。市场会变化，而且对历史数据
+  过度拟合非常容易。把第一次回测当作健康检查，而不是盈利保证。
+</Alert>
+
+回测完成后，将报告与你的预期进行对比。算法是否在应该交易的时候交易了？回撤是否出现在已知的波动时期？交易成本是否被真实地建模？Lean 会根据你指定的券商模型估算手续费，但你应该再次核对这些费用是否与你实际使用的券商一致。
+
+## 逐步改进策略
+
+好的研究工作流是每次只做一个改动，然后重新运行回测。这种纪律能避免你一次引入多个变量，却不知道到底是哪个在帮助或损害绩效。
+
+以下是初学者算法常见的逐步改进方向：
+
+| 改动 | 预期效果 |
+|------|----------|
+| 加入止损规则 | 降低最大回撤，可能降低总收益 |
+| 把分辨率改为小时线 | 更多信号、更真实的成交、更慢的回测 |
+| 增加第二个资产 | 分散信号，测试相关性假设 |
+| 引入佣金模型 | 净利润更真实，通常会降低表面上的优势 |
+| 做滚动前向测试 | 用未见过数据测试，减少过拟合 |
+
+让我们在均线交叉策略中加入一个简单的止损。在 Lean 中，你可以在入场后记录入场价，并提交止损单。
+
+```python
+def OnData(self, data):
+    if self.IsWarmingUp:
+        return
+
+    if self.fast.Current.Value > self.slow.Current.Value:
+        if not self.Portfolio[self.symbol].IsLong:
+            self.SetHoldings(self.symbol, 1.0)
+            self.stopPrice = self.Securities[self.symbol].Price * 0.95
+    else:
+        if self.Portfolio[self.symbol].IsLong:
+            self.Liquidate(self.symbol)
+
+    if self.Portfolio[self.symbol].IsLong:
+        if self.Securities[self.symbol].Price < self.stopPrice:
+            self.Liquidate(self.symbol)
+```
+
+这个版本在价格下跌到入场价下方 5% 时清仓。固定百分比止损比较粗糙，但它展示了风险管理逻辑如何融入 `OnData`。更复杂的方法包括基于 ATR 的止损、跟踪止损或波动率缩放。
+
+每次改动后，重新运行 `lean backtest MyFirstLeanAlgorithm` 并比较报告。用电子表格或笔记本记录每次改动及对应的指标。这个审计记录在你日后追问"当初为什么选这个参数"时会非常宝贵。
+
+## 本地模拟交易
+
+回测告诉你策略过去可能表现如何，模拟交易则告诉你它在实时行情和模拟成交下的真实行为。Lean 通过连接券商的模拟或沙盒账户，或使用 QuantConnect 数据流配合模拟执行，来支持模拟交易。
+
+实盘模拟交易的命令如下：
+
+```bash
+lean live MyFirstLeanAlgorithm --environment paper
+```
+
+在运行模拟交易之前，你需要配置券商。Lean 将券商凭证存储在 `lean.json` 文件中，或使用 QuantConnect 云端的券商连接。对于本地模拟交易，最简单的方式通常是通过已登录的账户使用 QuantConnect 数据流。
+
+模拟交易检查清单：
+
+| 检查项 | 为什么重要 |
+|--------|------------|
+| 算法使用与实盘券商匹配的 `SetBrokerageModel` | 费用和保证金规则才会真实 |
+| 分辨率合适 | 日线策略所需的基础设施远小于 tick 策略 |
+| 日志写入磁盘 | 事后可以复盘决策 |
+| 包含错误处理 | 网络抖动不应导致算法崩溃 |
+| 监控首次运行 | 在问题放大之前发现意外行为 |
+
+<Alert type="info">
+  模拟交易能暴露回测隐藏的问题，例如数据延迟、过时报价和部分成交。
+  把它当作必经步骤，而不是可选项。
+</Alert>
+
+至少运行几周模拟交易，或跨越多种市场环境。一个在回测中表现出色的策略，可能在震荡的模拟交易环境中失效。记录预期行为与实际行为之间的每一个差异。
+
+## 本地开发的数据管理
+
+数据是任何回测引擎的燃料。Lean 支持多种数据格式和来源。对于本地开发，你通常采用以下方式之一：
+
+| 数据来源 | 成本 | 最适合 |
+|----------|------|--------|
+| QuantConnect 云端数据 | 订阅制 | 方便、干净 |
+| 本地 CSV 文件 | 自行整理则免费 | 自定义数据集和离线工作 |
+| 券商 API | 通常免费 | 最新 tick 或分钟级数据 |
+| 第三方数据商 | 各异 | 高质量基本面或另类数据 |
+
+Lean 要求数据按特定的目录结构组织，按证券类型、代码、分辨率和日期分类。例如，SPY 的日线股票数据位于 `data/equity/usa/daily/spy.csv`。CSV 列必须符合 Lean 的要求：日期、开盘价、最高价、最低价、收盘价和成交量。
+
+如果你只有少量自定义数据，可以在算法中使用 `Download` 方法从远程 URL 获取。这在原型数据集阶段有用，但不建议用于生产回测，因为速度慢且可复现性较差。
+
+对于初学者，最简单的方式是通过 CLI 使用 QuantConnect 云端数据。随着研究深入，再投资建立干净的本地数据集，这样你就可以在没有网络连接的情况下回测，并把数据与代码一起纳入版本控制。
+
+## 什么时候用 Lean，什么时候用更简单的工具
+
+Lean 很强大，但并不总是最佳选择。合适的工具取决于你的目标、技能和约束。
+
+应该在以下情况使用 QuantConnect Lean：
+
+- 你想完全掌控代码、数据和执行环境。
+- 你计划用同一套代码交易多种资产类别或多个券商。
+- 你需要机构级的回测功能，例如自定义滑点模型和股息处理。
+- 你熟悉 Docker、Python 或 C#，以及版本控制。
+- 你想在自己的服务器或私有云上运行策略。
+
+以下情况可考虑更简单的工具：
+
+- 你只需要基础图表和警报。TradingView 或 TrendSpider 可能就够。
+- 你想要无代码自动化。3Commas 或 Composer 等平台部署更快。
+- 你只是快速验证一个想法，不需要本地基础设施。
+- 你不习惯调试容器化环境。
+
+| 场景 | 推荐工具 | 理由 |
+|------|----------|------|
+| 无代码加密货币机器人 | 3Commas 或 TradingView webhook | 部署更快，内置交易所连接 |
+| 简单股票筛选器 | Finviz 或 TradingView 筛选器 | 无需开发 |
+| Python 策略研究 | Lean 或 Zipline | 可复现回测，代码灵活 |
+| 生产级多资产交易 | Lean 或自研框架 | 掌控力强、可扩展、券商选择多 |
+| 学习算法交易 | Lean 模拟交易或 Alpaca | 成本低、教育性强、透明 |
+
+坦率地说，大多数散户交易者第一天并不需要 Lean。从能回答你问题的最简单工具开始。当简单工具从加速器变成约束时，再迁移到 Lean。
+
+## 初学者常见错误
+
+每位 Lean 新手都会遇到一些可预见的坑。提前了解它们可以节省数小时的沮丧时间。
+
+| 错误 | 危害 | 如何避免 |
+|------|------|----------|
+| 跳过模拟交易 | 实盘 bug 和过拟合被掩盖 | 实盘前模拟交易数周 |
+| 忽视手续费和滑点 | 回测看起来虚高 | 设置贴近现实的券商模型 |
+| 过度优化参数 | 策略拟合噪音而非信号 | 用样本外和滚动前向测试 |
+| 实盘后不监控 | 基础设施故障可能代价高昂 | 每日检查日志并设置警报 |
+| 数据量太少 | 指标统计不可靠 | 样本应覆盖多个市场阶段 |
+| 硬编码密钥 | API 密钥可能泄漏到版本控制 | 使用环境变量或密钥管理工具 |
+
+另一个常见问题是把相关关系当成因果关系。仅仅因为某个均线交叉在牛市中碰巧表现良好，并不意味着它在未来会继续有效。始终追问策略优势背后的经济或行为机制，并测试该机制在当前市场条件下是否仍然成立。
+
+## 安全与运维注意事项
+
+在自己的机器上运行交易引擎，会带来一些云端平台替你承担的责任。从一开始就要认真对待安全。
+
+将 API 密钥和券商凭证存储在源代码之外。使用环境变量、已加入 `.gitignore` 的 `.env` 文件，或专用密钥管理工具。永远不要把凭证提交到 GitHub。一旦误提交，立即轮换密钥。
+
+保持操作系统、Docker 和 Lean 镜像更新。任何一层的漏洞都可能暴露你的账户或数据。为代码和回测结果设置自动备份。一块硬盘损坏不应抹掉数月的研究成果。
+
+对于实盘交易，建议把 Lean 跑在高可用服务器上，配备不间断电源和冗余网络连接。家庭网络和消费级笔记本适合学习，但对高可用性策略来说并不理想。
+
+## 常见问题
+
+### QuantConnect Lean 是什么？它和 QuantConnect 网站有什么区别？
+
+Lean 是 QuantConnect 背后的开源算法交易引擎。QuantConnect 网站提供云端 IDE、数据和算力，而 Lean 让你可以在自己的电脑上运行同样的引擎，完全掌控代码、数据和执行。
+
+### 在本地使用 Lean 做回测需要付费购买数据吗？
+
+Lean 自带样本数据供测试使用。对于严肃的回测，你可以导入自己的数据、订阅 QuantConnect 数据包，或使用 Yahoo Finance、券商 API 等免费来源。成本取决于你需要的资产类别和数据粒度。
+
+### 我可以用 Lean 在本地进行实盘交易吗？
+
+可以。Lean 支持通过与 Interactive Brokers、Tradier、Coinbase 等券商集成进行实盘交易。不过，大多数初学者应先从模拟交易开始，在冒真实资金风险之前验证策略逻辑。
+
+### 使用 Lean 应该选择哪种编程语言？
+
+Lean 支持 C#、Python 和 F#。Python 因其庞大的数据科学生态系统，是量化交易者最流行的选择。如果你追求极致性能或想为 Lean 本身贡献代码，C# 是最佳选择。
+
+### 在本地运行 Lean 需要多少成本？
+
+Lean 是开源的，可以免费运行。成本主要来自数据订阅、券商佣金以及你所选择的硬件或云服务器。基础的回测环境在现代笔记本电脑上就能流畅运行。
+
+### 本地算法交易的主要风险有哪些？
+
+风险包括对历史数据过度拟合、网络中断或断电等基础设施故障、执行滑点，以及对券商费用的误解。务必充分测试，并从小资金开始。
+
+## 总结
+
+QuantConnect Lean 为你提供了一个专业级平台，用于在自己的电脑上设计、回测和部署交易算法。它的学习曲线比无代码平台更陡，但对于严肃交易者来说，透明度和灵活性是值得的。
+
+请记住，没有任何工具能保证盈利。你的优势来自提出正确的问题、用严格测试验证假设，以及每天管理风险。从简单回测开始，进入模拟交易，只有在有证据证明策略稳健后，才考虑投入真实资金。
+
+如果你准备深入，可以阅读 QuantConnect 官方文档、加入社区论坛，并建立可复用的算法组件库。持续、渐进的进步，远胜于每次寻找"神奇策略"。
