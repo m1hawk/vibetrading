@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8">
-      <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">About</p>
-      <h1 className="mt-5 text-5xl font-semibold tracking-[-0.045em] sm:text-6xl">Market ideas should be testable.</h1>
+      <div className="nx-label">About</div>
+      <h1 className="nx-display mt-5 text-5xl sm:text-6xl">Market ideas should be testable.</h1>
       <div className="prose mt-10 max-w-3xl">
         <p>VibeTrading.fun is a practical field guide for people using AI to research markets, formalize strategies, build tools, and test trading workflows.</p>
         <p>We believe the most useful part of AI is not a confident prediction. It is the ability to move faster from a vague idea to explicit assumptions, inspectable rules, working code, and evidence that can prove the idea wrong.</p>
@@ -23,7 +23,9 @@ export default function AboutPage() {
         <h2>Responsibility</h2>
         <p>Everything on this site is educational. AI can help write research and code, but it cannot take responsibility for capital. Every tool, assumption, and output must be independently checked.</p>
       </div>
-      <Link href="/vibe-trading" className="mt-10 inline-flex rounded-full bg-accent px-6 py-3 font-medium text-white hover:bg-accent-hover">Read the Vibe Trading guide</Link>
+      <Link href="/vibe-trading" className="nx-btn nx-btn-primary mt-10">
+        Read the Vibe Trading guide
+      </Link>
     </div>
   );
 }

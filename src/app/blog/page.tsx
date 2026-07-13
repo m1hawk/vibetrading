@@ -22,11 +22,11 @@ export default function BlogPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="mb-12">
-        <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">Guides</p>
-        <h1 className="mt-5 text-5xl font-semibold tracking-[-0.045em] text-foreground sm:text-6xl">
+        <div className="nx-label">Guides</div>
+        <h1 className="nx-display mt-5 text-5xl text-foreground sm:text-6xl">
           The Vibe Trading field guide
         </h1>
-        <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
+        <p className="nx-lead mt-5 max-w-2xl text-lg">
           Learn the concepts, inspect the tools, reproduce the builds, and test
           every idea before capital is involved.
         </p>
@@ -36,7 +36,7 @@ export default function BlogPage() {
             <a
               key={category}
               href={`#${category.toLowerCase()}`}
-              className="rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-muted transition-colors hover:border-accent hover:text-accent"
+              className="border border-border bg-surface px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-muted transition-colors hover:border-accent hover:text-accent"
             >
               {category}
             </a>

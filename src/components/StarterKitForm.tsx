@@ -32,7 +32,7 @@ export function StarterKitForm() {
             />
             <button
               type="submit"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-base font-medium text-accent-foreground transition-colors hover:bg-accent-hover sm:w-auto"
+              className="nx-btn nx-btn-primary sm:w-auto"
             >
               <Mail className="h-5 w-5" />
               Get the Kit

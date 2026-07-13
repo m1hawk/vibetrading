@@ -1,7 +1,29 @@
 import type { Metadata } from "next";
+import { Inter, IBM_Plex_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const plex = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-plex",
+  display: "swap",
+  weight: ["400", "500", "600"],
+});
 
 export const metadata: Metadata = {
   title: {
@@ -46,8 +68,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+    <html
+      lang="en"
+      className={`h-full antialiased ${inter.variable} ${playfair.variable} ${plex.variable}`}
+    >
+      <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

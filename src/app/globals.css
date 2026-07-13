@@ -1,20 +1,26 @@
 @import "tailwindcss";
 
+/* ── Nexus-inspired design tokens (paper / ink / signal) ── */
 :root {
-  --background: #0a0a0f;
-  --foreground: #f4f4f5;
-  --muted: #a1a1aa;
-  --muted-foreground: #71717a;
-  --accent: #6366f1;
-  --accent-hover: #4f46e5;
-  --accent-foreground: #ffffff;
-  --surface: #12121a;
-  --surface-elevated: #1a1a25;
-  --border: #27272f;
-  --border-soft: #3f3f46;
-  --success: #22c55e;
-  --danger: #ef4444;
-  --warning: #f59e0b;
+  --page: #f6f3ee;
+  --background: #f6f3ee;
+  --foreground: #0b0b0b;
+  --muted: #6e6e6e;
+  --muted-foreground: #9a9a9a;
+  --accent: #ff8a57;
+  --accent-hover: #e56a35;
+  --accent-foreground: #0b0b0b;
+  --surface: #fbfaf7;
+  --surface-elevated: #ffffff;
+  --border: rgba(20, 16, 12, 0.1);
+  --border-soft: rgba(20, 16, 12, 0.16);
+  --ink: #0b0b0b;
+  --on-ink: #f6f3ee;
+  --on-ink-muted: rgba(246, 243, 238, 0.65);
+  --success: #12b76a;
+  --danger: #f04438;
+  --warning: #e2b34c;
+  --blend: clamp(140px, 18vw, 240px);
 }
 
 @theme inline {
@@ -29,11 +35,15 @@
   --color-surface-elevated: var(--surface-elevated);
   --color-border: var(--border);
   --color-border-soft: var(--border-soft);
+  --color-ink: var(--ink);
+  --color-on-ink: var(--on-ink);
+  --color-on-ink-muted: var(--on-ink-muted);
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-warning: var(--warning);
-  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", Consolas, monospace;
+  --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-mono: var(--font-plex), "IBM Plex Mono", ui-monospace, monospace;
 }
 
 html {
@@ -41,20 +51,272 @@ html {
 }
 
 body {
-  background: var(--background);
+  background: var(--page);
   color: var(--foreground);
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* ── Typography helpers ── */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.nx-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.nx-label::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.nx-label-on-ink {
+  color: var(--on-ink);
+}
+
+.nx-label-on-ink::before {
+  background: var(--accent);
+}
+
+.nx-display {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.nx-display em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.nx-lead {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* ── Soft section bands ── */
+.nx-section {
+  position: relative;
+  padding: clamp(4.5rem, 9vw, 7rem) 0;
+  overflow: hidden;
+}
+
+.nx-section-ink {
+  position: relative;
+  color: var(--on-ink);
+  background-color: #0b0b0b;
+  background-image: radial-gradient(
+    ellipse 90% 50% at 50% 40%,
+    rgba(255, 138, 87, 0.07),
+    transparent 70%
+  );
+  padding: calc(clamp(4.5rem, 9vw, 7rem) + clamp(2rem, 4vw, 3.5rem)) 0;
+  overflow: hidden;
+}
+
+.nx-section-ink::before,
+.nx-section-ink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--blend);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.nx-section-ink::before {
+  top: 0;
+  background: linear-gradient(
+    180deg,
+    var(--page) 0%,
+    rgba(246, 243, 238, 0.9) 14%,
+    rgba(246, 243, 238, 0.55) 40%,
+    rgba(246, 243, 238, 0.2) 68%,
+    rgba(246, 243, 238, 0) 100%
+  );
+}
+
+.nx-section-ink::after {
+  bottom: 0;
+  background: linear-gradient(
+    0deg,
+    var(--page) 0%,
+    rgba(246, 243, 238, 0.9) 14%,
+    rgba(246, 243, 238, 0.55) 40%,
+    rgba(246, 243, 238, 0.2) 68%,
+    rgba(246, 243, 238, 0) 100%
+  );
+}
+
+.nx-section-ink > * {
+  position: relative;
+  z-index: 1;
+}
+
+.nx-section-ink .nx-display em {
+  color: var(--on-ink-muted);
+}
+
+.nx-section-ink .text-muted {
+  color: var(--on-ink-muted);
+}
+
+.nx-section-ink .text-foreground {
+  color: var(--on-ink);
+}
+
+/* Soft grid (hero) */
 .hero-grid {
   background-image:
-    linear-gradient(rgba(99, 102, 241, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99, 102, 241, 0.055) 1px, transparent 1px);
-  background-size: 48px 48px;
-  background-position: center center;
+    linear-gradient(rgba(11, 11, 11, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11, 11, 11, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
 }
 
-/* Typography */
+/* Cards */
+.nx-card {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.95), rgba(251, 250, 247, 0.9));
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 10px 32px rgba(20, 16, 12, 0.04);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.nx-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 138, 87, 0.28);
+  box-shadow: 0 18px 44px rgba(20, 16, 12, 0.07);
+}
+
+.nx-card-ink {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.nx-card-ink:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 138, 87, 0.35);
+  background: linear-gradient(165deg, rgba(255, 138, 87, 0.1), rgba(255, 255, 255, 0.02));
+}
+
+/* Buttons */
+.nx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+  white-space: nowrap;
+}
+
+.nx-btn:hover {
+  transform: translateY(-1px);
+}
+
+.nx-btn-primary {
+  background: var(--ink);
+  color: var(--on-ink);
+  border-color: var(--ink);
+}
+
+.nx-btn-primary:hover {
+  background: #1a1a1a;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+.nx-btn-accent {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-color: var(--accent);
+}
+
+.nx-btn-accent:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.nx-btn-outline {
+  background: transparent;
+  color: var(--foreground);
+  border-color: var(--border-soft);
+}
+
+.nx-btn-outline:hover {
+  border-color: var(--ink);
+  background: rgba(11, 11, 11, 0.03);
+}
+
+.nx-btn-outline-light {
+  background: transparent;
+  color: var(--on-ink);
+  border-color: rgba(246, 243, 238, 0.35);
+}
+
+.nx-btn-outline-light:hover {
+  background: rgba(246, 243, 238, 0.08);
+  border-color: rgba(246, 243, 238, 0.55);
+}
+
+/* Live pulse */
+.nx-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  display: inline-block;
+  box-shadow: 0 0 0 0 rgba(255, 138, 87, 0.45);
+  animation: nx-pulse 1.8s ease infinite;
+}
+
+@keyframes nx-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 138, 87, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 138, 87, 0);
+  }
+}
+
+/* Typography — prose (blog) */
 .prose {
   color: var(--foreground);
   line-height: 1.75;
@@ -65,7 +327,8 @@ body {
 .prose h3,
 .prose h4 {
   color: var(--foreground);
-  font-weight: 600;
+  font-family: var(--font-serif);
+  font-weight: 700;
   letter-spacing: -0.02em;
   scroll-margin-top: 6rem;
 }
@@ -97,13 +360,13 @@ body {
 }
 
 .prose a {
-  color: var(--accent);
+  color: var(--accent-hover);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .prose a:hover {
-  color: var(--accent-hover);
+  color: var(--accent);
   text-decoration: underline;
 }
 
@@ -123,21 +386,22 @@ body {
 }
 
 .prose code {
-  background: var(--surface-elevated);
+  background: rgba(20, 16, 12, 0.06);
   color: var(--foreground);
   padding: 0.2rem 0.4rem;
-  border-radius: 0.375rem;
-  font-family: var(--font-geist-mono), monospace;
+  border-radius: 0.25rem;
+  font-family: var(--font-mono);
   font-size: 0.875em;
 }
 
 .prose pre {
-  background: var(--surface-elevated);
-  border: 1px solid var(--border);
+  background: #0f0e0d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 0.75rem;
   padding: 1.25rem;
   overflow-x: auto;
   margin-bottom: 1.5rem;
+  color: #f6f3ee;
 }
 
 .prose pre code {
@@ -146,14 +410,16 @@ body {
   border-radius: 0;
   font-size: 0.875rem;
   line-height: 1.7;
+  color: inherit;
 }
 
 .prose blockquote {
   border-left: 3px solid var(--accent);
-  background: var(--surface);
+  background: rgba(255, 138, 87, 0.06);
   padding: 1rem 1.25rem;
-  border-radius: 0 0.75rem 0.75rem 0;
+  border-radius: 0 0.5rem 0.5rem 0;
   margin-bottom: 1.5rem;
+  font-family: var(--font-serif);
   font-style: italic;
 }
 
@@ -165,7 +431,7 @@ body {
 }
 
 .prose th {
-  background: var(--surface-elevated);
+  background: rgba(20, 16, 12, 0.04);
   color: var(--foreground);
   font-weight: 600;
   text-align: left;
@@ -179,7 +445,7 @@ body {
 }
 
 .prose tr:hover td {
-  background: var(--surface);
+  background: rgba(20, 16, 12, 0.02);
 }
 
 .prose hr {
@@ -190,7 +456,7 @@ body {
 
 /* Selection */
 ::selection {
-  background: rgba(99, 102, 241, 0.3);
+  background: rgba(255, 138, 87, 0.28);
   color: var(--foreground);
 }
 
@@ -201,14 +467,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: var(--page);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-soft);
+  background: rgba(20, 16, 12, 0.18);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
+  background: rgba(20, 16, 12, 0.3);
 }

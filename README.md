@@ -53,9 +53,12 @@ Static files are output to `out/`.
 
 ## Design System
 
-- **Colors:** Dark mode by default (`#0a0a0f` background, `#6366f1` accent).
-- **Typography:** System font stack with Inter and JetBrains Mono.
-- **Layout:** 12-column grid, max content width 720px, sticky TOC on article pages.
+Nexus-inspired editorial system:
+
+- **Colors:** Paper page `#f6f3ee`, ink `#0b0b0b`, signal orange `#ff8a57`. Soft light/dark section ramps (no hard seams).
+- **Typography:** Playfair Display (display), Inter (body), IBM Plex Mono (labels).
+- **Components:** `nx-label`, `nx-display`, `nx-card`, `nx-section-ink`, `nx-btn-*` utilities in `globals.css`.
+- **Layout:** max content ~`max-w-6xl`, sticky header, soft section bands.
 
 ## SEO
 

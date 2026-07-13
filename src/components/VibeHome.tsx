@@ -8,7 +8,6 @@ import {
   MessageSquareText,
   Search,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { getAllPosts, getFeaturedPosts, type Lang } from "@/lib/posts";
 import { JsonLd } from "@/components/JsonLd";
@@ -18,6 +17,7 @@ const copy = {
   en: {
     eyebrow: "The practical field guide to AI-powered trading",
     title: "Vibe Trading for Everyone",
+    titleEm: "No quant degree required.",
     intro:
       "Turn a market idea into research, a strategy, a backtest, or an automated workflow by talking to AI. Start with no-code. Go as deep as you want.",
     primaryCta: "Start vibe trading",
@@ -25,6 +25,7 @@ const copy = {
     proof: ["No quant background required", "Paper first", "No signals for sale"],
     pathEyebrow: "Choose a starting point",
     pathTitle: "What do you want to make with AI?",
+    pathLead: "Four practical entry points. Pick one and start building.",
     paths: [
       {
         title: "Research a market",
@@ -32,6 +33,7 @@ const copy = {
         href: "/blog/does-ai-trading-really-work",
         cta: "Learn the foundations",
         icon: Search,
+        fig: "01",
       },
       {
         title: "Test a strategy",
@@ -39,6 +41,7 @@ const copy = {
         href: "/lab",
         cta: "Explore the lab",
         icon: BarChart3,
+        fig: "02",
       },
       {
         title: "Build a trading tool",
@@ -46,6 +49,7 @@ const copy = {
         href: "/build",
         cta: "Browse builds",
         icon: Braces,
+        fig: "03",
       },
       {
         title: "Choose the right tools",
@@ -53,6 +57,7 @@ const copy = {
         href: "/tools",
         cta: "Compare tools",
         icon: Bot,
+        fig: "04",
       },
     ],
     methodEyebrow: "The Vibe Trading loop",
@@ -67,7 +72,8 @@ const copy = {
       ["05", "Iterate", "Keep, change, or kill the idea based on evidence."],
     ],
     levelsEyebrow: "Built for every starting level",
-    levelsTitle: "Start with conversation. Add code only when it helps.",
+    levelsTitle: "Start with conversation.",
+    levelsTitleEm: "Add code only when it helps.",
     levels: [
       ["No-code", "Prompts, AI research, ready-made tools, and reusable checklists.", "Start here"],
       ["Low-code", "AI-generated scripts, TradingView strategies, and editable automations.", "Build a workflow"],
@@ -87,6 +93,7 @@ const copy = {
   zh: {
     eyebrow: "AI 驱动交易的实践指南",
     title: "人人都能开始的 Vibe Trading",
+    titleEm: "不需要量化学位。",
     intro:
       "用自然语言告诉 AI 你的市场想法，把它变成研究、策略、回测或自动化工作流。从无代码开始，按自己的节奏深入。",
     primaryCta: "开始 Vibe Trading",
@@ -94,6 +101,7 @@ const copy = {
     proof: ["不需要量化背景", "先模拟，再实盘", "不出售交易信号"],
     pathEyebrow: "选择你的起点",
     pathTitle: "你想用 AI 做什么？",
+    pathLead: "四个可执行入口，选一个开始构建。",
     paths: [
       {
         title: "研究一个市场",
@@ -101,6 +109,7 @@ const copy = {
         href: "/zh/blog/does-ai-trading-really-work",
         cta: "了解基础",
         icon: Search,
+        fig: "01",
       },
       {
         title: "验证一个策略",
@@ -108,6 +117,7 @@ const copy = {
         href: "/zh/lab",
         cta: "进入实验室",
         icon: BarChart3,
+        fig: "02",
       },
       {
         title: "构建一个交易工具",
@@ -115,6 +125,7 @@ const copy = {
         href: "/zh/build",
         cta: "浏览构建指南",
         icon: Braces,
+        fig: "03",
       },
       {
         title: "选择正确的工具",
@@ -122,6 +133,7 @@ const copy = {
         href: "/zh/tools",
         cta: "比较工具",
         icon: Bot,
+        fig: "04",
       },
     ],
     methodEyebrow: "Vibe Trading 循环",
@@ -136,7 +148,8 @@ const copy = {
       ["05", "迭代", "根据证据保留、修改或者放弃想法。"],
     ],
     levelsEyebrow: "适合每一种起点",
-    levelsTitle: "从对话开始，只在真正有用时增加代码。",
+    levelsTitle: "从对话开始。",
+    levelsTitleEm: "只在真正有用时增加代码。",
     levels: [
       ["无代码", "Prompt、AI 研究、现成工具和可复用检查表。", "从这里开始"],
       ["低代码", "AI 生成脚本、TradingView 策略和可编辑自动化。", "构建工作流"],
@@ -173,53 +186,86 @@ export function VibeHome({ lang }: { lang: Lang }) {
     <>
       <JsonLd data={websiteSchema} />
       <div className="overflow-hidden">
-        <section className="hero-grid relative border-b border-border px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
-          <div className="absolute inset-x-0 top-0 mx-auto h-64 max-w-4xl bg-accent/10 blur-3xl" />
+        {/* Hero */}
+        <section className="hero-grid relative px-4 pb-20 pt-16 sm:px-6 sm:pb-24 sm:pt-20 lg:px-8 lg:pb-28 lg:pt-24">
+          <div className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-72 max-w-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,138,87,0.09),transparent_65%)]" />
           <div className="relative mx-auto max-w-6xl">
             <div className="max-w-4xl">
-              <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm text-accent">
-                <Sparkles className="h-4 w-4" />
-                {t.eyebrow}
-              </div>
-              <h1 className="max-w-5xl text-5xl font-semibold tracking-[-0.055em] text-foreground sm:text-6xl lg:text-8xl">
+              <div className="nx-label mb-7">{t.eyebrow}</div>
+              <h1 className="nx-display max-w-5xl text-5xl sm:text-6xl lg:text-[4.75rem]">
                 {t.title}
+                <em className="mt-2 block text-[0.72em] font-medium">{t.titleEm}</em>
               </h1>
-              <p className="mt-7 max-w-3xl text-lg leading-8 text-muted sm:text-xl">
-                {t.intro}
-              </p>
+              <p className="nx-lead mt-7 max-w-2xl text-lg sm:text-xl">{t.intro}</p>
               <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-                <Link href={`${prefix}/vibe-trading`} className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 font-medium text-accent-foreground transition hover:bg-accent-hover">
-                  {t.primaryCta}<ArrowRight className="h-4 w-4" />
+                <Link href={`${prefix}/vibe-trading`} className="nx-btn nx-btn-primary">
+                  {t.primaryCta}
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link href={`${prefix}/build`} className="inline-flex items-center justify-center gap-2 rounded-full border border-border-soft bg-surface/70 px-6 py-3.5 font-medium text-foreground transition hover:border-accent/50 hover:bg-surface-elevated">
+                <Link href={`${prefix}/build`} className="nx-btn nx-btn-outline">
                   {t.secondaryCta}
                 </Link>
               </div>
               <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted">
                 {t.proof.map((item) => (
-                  <span key={item} className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-success" />{item}</span>
+                  <span key={item} className="inline-flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-success" />
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Mini terminal strip */}
+            <div className="mt-14 overflow-hidden rounded-2xl border border-border bg-ink text-on-ink shadow-[0_24px_60px_rgba(0,0,0,0.12)]">
+              <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-white/45">
+                <span className="inline-flex items-center gap-2">
+                  <span className="nx-dot" />
+                  Vibe loop · live
+                </span>
+                <span className="text-accent">Describe → Build → Test</span>
+              </div>
+              <div className="grid gap-px bg-white/10 sm:grid-cols-5">
+                {t.steps.map(([number, title]) => (
+                  <div key={number} className="bg-ink px-4 py-4">
+                    <div className="font-mono text-[10px] tracking-[0.14em] text-accent">{number}</div>
+                    <div className="mt-2 font-serif text-base font-semibold">{title}</div>
+                  </div>
                 ))}
               </div>
             </div>
           </div>
         </section>
 
-        <section className="border-b border-border bg-surface px-4 py-20 sm:px-6 lg:px-8">
+        {/* Paths */}
+        <section className="nx-section px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-6xl">
-            <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">{t.pathEyebrow}</p>
-            <h2 className="mt-4 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">{t.pathTitle}</h2>
+            <div className="nx-label">{t.pathEyebrow}</div>
+            <h2 className="nx-display mt-4 max-w-3xl text-3xl sm:text-5xl">{t.pathTitle}</h2>
+            <p className="mt-4 max-w-2xl text-muted">{t.pathLead}</p>
             <div className="mt-10 grid gap-4 md:grid-cols-2">
               {t.paths.map((path) => {
                 const Icon = path.icon;
                 return (
-                  <Link key={path.title} href={path.href} className="group rounded-3xl border border-border bg-background p-7 transition hover:-translate-y-0.5 hover:border-accent/50 hover:bg-surface-elevated">
+                  <Link key={path.title} href={path.href} className="nx-card group p-7">
                     <div className="flex items-start justify-between gap-6">
-                      <div className="rounded-2xl border border-border bg-surface p-3 text-accent"><Icon className="h-6 w-6" /></div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-mono text-[11px] tracking-[0.14em] text-accent">
+                          FIG. {path.fig}
+                        </span>
+                        <span className="flex h-10 w-10 items-center justify-center border border-border bg-[var(--page)] text-accent">
+                          <Icon className="h-5 w-5" />
+                        </span>
+                      </div>
                       <ArrowRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-accent" />
                     </div>
-                    <h3 className="mt-8 text-2xl font-semibold tracking-tight">{path.title}</h3>
+                    <h3 className="mt-8 font-serif text-2xl font-semibold tracking-tight">
+                      {path.title}
+                    </h3>
                     <p className="mt-3 max-w-md leading-7 text-muted">{path.description}</p>
-                    <p className="mt-6 text-sm font-medium text-accent">{path.cta}</p>
+                    <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.12em] text-accent">
+                      {path.cta} →
+                    </p>
                   </Link>
                 );
               })}
@@ -227,68 +273,120 @@ export function VibeHome({ lang }: { lang: Lang }) {
           </div>
         </section>
 
-        <section className="border-b border-border px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+        {/* Method — ink band */}
+        <section className="nx-section-ink px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">{t.methodEyebrow}</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-5xl">{t.methodTitle}</h2>
-              <p className="mt-5 leading-7 text-muted">{t.methodIntro}</p>
+              <div className="nx-label nx-label-on-ink">{t.methodEyebrow}</div>
+              <h2 className="nx-display mt-4 text-3xl sm:text-5xl">{t.methodTitle}</h2>
+              <p className="mt-5 leading-7 text-on-ink-muted">{t.methodIntro}</p>
             </div>
-            <ol className="border-t border-border">
+            <ol className="space-y-3">
               {t.steps.map(([number, title, description]) => (
-                <li key={number} className="grid gap-3 border-b border-border py-6 sm:grid-cols-[3rem_9rem_1fr] sm:items-start">
+                <li
+                  key={number}
+                  className="nx-card-ink grid gap-2 px-5 py-5 sm:grid-cols-[3rem_8.5rem_1fr] sm:items-start sm:gap-4"
+                >
                   <span className="font-mono text-sm text-accent">{number}</span>
-                  <span className="font-semibold text-foreground">{title}</span>
-                  <span className="leading-7 text-muted">{description}</span>
+                  <span className="font-serif text-lg font-semibold text-on-ink">{title}</span>
+                  <span className="leading-7 text-on-ink-muted">{description}</span>
                 </li>
               ))}
             </ol>
           </div>
         </section>
 
-        <section className="border-b border-border bg-surface px-4 py-20 sm:px-6 lg:px-8">
+        {/* Levels */}
+        <section className="nx-section px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-6xl">
-            <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">{t.levelsEyebrow}</p>
-            <h2 className="mt-4 max-w-4xl text-3xl font-semibold tracking-tight sm:text-5xl">{t.levelsTitle}</h2>
-            <div className="mt-10 grid gap-px overflow-hidden rounded-3xl border border-border bg-border lg:grid-cols-3">
+            <div className="nx-label">{t.levelsEyebrow}</div>
+            <h2 className="nx-display mt-4 max-w-4xl text-3xl sm:text-5xl">
+              {t.levelsTitle}
+              <em className="mt-1 block text-[0.78em]">{t.levelsTitleEm}</em>
+            </h2>
+            <div className="mt-10 grid gap-4 lg:grid-cols-3">
               {t.levels.map(([title, description, cta], index) => (
-                <div key={title} className="bg-background p-7">
-                  <div className="flex items-center justify-between"><span className="font-mono text-xs text-muted-foreground">0{index + 1}</span><MessageSquareText className="h-5 w-5 text-accent" /></div>
-                  <h3 className="mt-10 text-2xl font-semibold">{title}</h3>
+                <div key={title} className="nx-card p-7">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[11px] tracking-[0.14em] text-muted-foreground">
+                      L{index + 1}
+                    </span>
+                    <MessageSquareText className="h-5 w-5 text-accent" />
+                  </div>
+                  <h3 className="mt-10 font-serif text-2xl font-semibold">{title}</h3>
                   <p className="mt-3 min-h-14 leading-7 text-muted">{description}</p>
-                  <Link href={`${prefix}/build`} className="mt-7 inline-flex items-center gap-2 text-sm font-medium text-accent">{cta}<ArrowRight className="h-4 w-4" /></Link>
+                  <Link
+                    href={`${prefix}/build`}
+                    className="mt-7 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent"
+                  >
+                    {cta}
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
+        {/* Featured builds */}
         {featuredPosts.length > 0 && (
-          <section id="builds" className="border-b border-border px-4 py-20 sm:px-6 lg:px-8">
+          <section id="builds" className="nx-section px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-6xl">
-              <div className="grid gap-6 lg:grid-cols-[1fr_0.8fr] lg:items-end">
-                <div><p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">{t.featuredEyebrow}</p><h2 className="mt-4 text-3xl font-semibold tracking-tight sm:text-5xl">{t.featuredTitle}</h2></div>
+              <div className="grid gap-6 lg:grid-cols-[1fr_0.85fr] lg:items-end">
+                <div>
+                  <div className="nx-label">{t.featuredEyebrow}</div>
+                  <h2 className="nx-display mt-4 text-3xl sm:text-5xl">{t.featuredTitle}</h2>
+                </div>
                 <p className="leading-7 text-muted lg:pb-1">{t.featuredIntro}</p>
               </div>
-              <div className="mt-10 grid gap-6 md:grid-cols-2">
-                {featuredPosts.map((post) => <PostCard key={post.slug} post={post} />)}
+              <div className="mt-10 grid gap-5 md:grid-cols-2">
+                {featuredPosts.map((post) => (
+                  <PostCard key={post.slug} post={post} />
+                ))}
               </div>
             </div>
           </section>
         )}
 
-        <section className="border-b border-border bg-surface px-4 py-20 sm:px-6 lg:px-8">
+        {/* Guides */}
+        <section className="nx-section px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-6xl">
-            <div className="flex items-end justify-between gap-6"><h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{t.guidesTitle}</h2><Link href={`${prefix}/blog`} className="hidden items-center gap-2 text-sm font-medium text-accent sm:flex">{t.guidesCta}<ArrowRight className="h-4 w-4" /></Link></div>
-            <div className="mt-8 grid gap-6 md:grid-cols-3">{recentPosts.map((post) => <PostCard key={post.slug} post={post} />)}</div>
+            <div className="flex items-end justify-between gap-6">
+              <h2 className="nx-display text-3xl sm:text-4xl">{t.guidesTitle}</h2>
+              <Link
+                href={`${prefix}/blog`}
+                className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent sm:inline-flex"
+              >
+                {t.guidesCta}
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            <div className="mt-8 grid gap-5 md:grid-cols-3">
+              {recentPosts.map((post) => (
+                <PostCard key={post.slug} post={post} />
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-accent/30 bg-accent/10 p-8 sm:p-12 lg:p-16">
+        {/* Principle CTA — ink */}
+        <section className="nx-section-ink px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-6xl">
             <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-3xl"><div className="inline-flex rounded-2xl border border-accent/30 bg-background/50 p-3 text-accent"><ShieldCheck className="h-6 w-6" /></div><h2 className="mt-7 text-3xl font-semibold tracking-tight sm:text-5xl">{t.principleTitle}</h2><p className="mt-5 text-lg leading-8 text-muted">{t.principleText}</p></div>
-              <Link href={`${prefix}/vibe-trading`} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-foreground px-6 py-3.5 font-medium text-background transition hover:opacity-90">{t.principleCta}<ArrowRight className="h-4 w-4" /></Link>
+              <div className="max-w-3xl">
+                <div className="inline-flex border border-white/15 bg-white/5 p-3 text-accent">
+                  <ShieldCheck className="h-6 w-6" />
+                </div>
+                <h2 className="nx-display mt-7 text-3xl sm:text-5xl">{t.principleTitle}</h2>
+                <p className="mt-5 text-lg leading-8 text-on-ink-muted">{t.principleText}</p>
+              </div>
+              <Link
+                href={`${prefix}/vibe-trading`}
+                className="nx-btn shrink-0 bg-on-ink text-ink hover:bg-white"
+              >
+                {t.principleCta}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           </div>
         </section>

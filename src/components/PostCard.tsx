@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Calendar, ArrowRight } from "lucide-react";
+import { ArrowRight, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/date";
 import type { Post } from "@/lib/posts";
 
@@ -14,20 +14,17 @@ export function PostCard({ post, featured = false }: PostCardProps) {
 
   return (
     <article
-      className={`group relative flex flex-col rounded-2xl border border-border bg-surface p-6 transition-all hover:border-border-soft hover:bg-surface-elevated ${
+      className={`nx-card group relative flex flex-col p-6 ${
         featured ? "lg:col-span-2 lg:grid lg:grid-cols-2 lg:gap-8" : ""
       }`}
     >
       <div className="flex flex-1 flex-col">
-        <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span className="rounded-full bg-accent/10 px-2.5 py-1 text-accent">
+        <div className="mb-3 flex flex-wrap items-center gap-2 font-mono text-[11px] text-muted-foreground">
+          <span className="border border-accent/25 bg-accent/10 px-2.5 py-1 text-accent">
             {post.category}
           </span>
           {post.tags.slice(0, 2).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-border bg-background px-2.5 py-1"
-            >
+            <span key={tag} className="border border-border bg-[var(--page)] px-2.5 py-1">
               {tag}
             </span>
           ))}
@@ -38,7 +35,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
         </div>
 
         <h3
-          className={`font-semibold tracking-tight text-foreground group-hover:text-accent ${
+          className={`font-serif font-semibold tracking-tight text-foreground transition-colors group-hover:text-accent-hover ${
             featured ? "text-2xl lg:text-3xl" : "text-lg"
           }`}
         >
@@ -48,13 +45,13 @@ export function PostCard({ post, featured = false }: PostCardProps) {
           </Link>
         </h3>
 
-        <p className={`mt-3 text-muted ${featured ? "text-base" : "text-sm"}`}>
+        <p className={`mt-3 text-muted ${featured ? "text-base leading-7" : "text-sm leading-6"}`}>
           {post.description}
         </p>
 
-        <div className="mt-4 flex items-center gap-2 text-sm font-medium text-accent">
+        <div className="mt-5 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent">
           {ctaText}
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
         </div>
       </div>
     </article>
