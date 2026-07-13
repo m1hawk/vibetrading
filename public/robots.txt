@@ -1,7 +1,5 @@
 User-agent: *
 Allow: /
 
+# Submit only this sitemap in Google Search Console
 Sitemap: https://vibetrading.fun/sitemap.xml
-Sitemap: https://vibetrading.fun/sitemap_index.xml
-Sitemap: https://vibetrading.fun/google-sitemap.xml
-Sitemap: https://vibetrading.fun/sitemap.txt
