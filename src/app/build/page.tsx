@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { HubPage } from "@/components/HubPage";
 import { getAllPosts } from "@/lib/posts";
 
-export const metadata: Metadata = { title: "Build with AI", description: "Build no-code workflows, TradingView strategies, Python bots, backtests, and trading agents with AI." };
+export const metadata: Metadata = { title: "Build with AI", description: "Build no-code workflows, TradingView strategies, Python bots, backtests, and trading agents with AI." ,
+  alternates: {
+    canonical: "/build",
+  }};
 
 export default function BuildPage() {
   const posts = getAllPosts("en").filter((post) => post.tags.includes("tutorial") || post.category === "Claude");

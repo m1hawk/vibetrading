@@ -6,7 +6,10 @@ export const metadata: Metadata = {
   title: "Vibe Trading Guides",
   description:
     "Practical field guides for understanding, building, testing, and improving AI-powered trading workflows.",
-};
+
+  alternates: {
+    canonical: "/blog",
+  }};
 
 export default function BlogPage() {
   const posts = getAllPosts("en");

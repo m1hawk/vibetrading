@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { HubPage } from "@/components/HubPage";
 import { getPostsByCategory } from "@/lib/posts";
 
-export const metadata: Metadata = { title: "AI 交易工具", description: "按 Vibe Trading 工作流选择 AI 模型、交易平台、API 和自动化工具。" };
+export const metadata: Metadata = { title: "AI 交易工具", description: "按 Vibe Trading 工作流选择 AI 模型、交易平台、API 和自动化工具。" ,
+  alternates: {
+    canonical: "/zh/tools",
+  }};
 
 export default function ZhToolsPage() {
   return <HubPage eyebrow="工具" title="按照你想构建的东西选择工具。" description="一套 Vibe Trading 工具栈可能包含 AI 模型、市场数据、回测环境和执行平台。我们按照工作流比较，而不是照搬营销宣传。" principles={["明确标注测试状态", "同时说明局限", "不出售排名"]} cards={[

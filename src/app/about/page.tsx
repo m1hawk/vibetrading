@@ -4,7 +4,10 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "About",
   description: "Why VibeTrading.fun exists, how we build and test, and what we will never sell.",
-};
+
+  alternates: {
+    canonical: "/about",
+  }};
 
 export default function AboutPage() {
   return (

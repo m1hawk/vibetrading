@@ -6,7 +6,10 @@ export const metadata: Metadata = {
   title: "Tutorials",
   description:
     "Step-by-step tutorials for building AI trading bots, automating strategies, and connecting broker APIs.",
-};
+
+  alternates: {
+    canonical: "/tutorials",
+  }};
 
 export default function TutorialsPage() {
   const posts = getPostsByCategory("Tutorials");

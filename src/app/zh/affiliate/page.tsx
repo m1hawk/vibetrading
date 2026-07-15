@@ -4,7 +4,10 @@ export const metadata: Metadata = {
   title: "联盟披露",
   description:
     "vibetrading.fun 的联盟披露。我们只推荐亲自测试或研究过的工具。",
-};
+
+  alternates: {
+    canonical: "/zh/affiliate",
+  }};
 
 export default function AffiliatePageZh() {
   return (

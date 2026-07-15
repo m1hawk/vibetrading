@@ -6,7 +6,10 @@ export const metadata: Metadata = {
   title: "Challenges",
   description:
     "Follow 30-day AI trading challenges with fixed rules, fixed capital, and transparent results.",
-};
+
+  alternates: {
+    canonical: "/challenges",
+  }};
 
 export default function ChallengesPage() {
   const posts = getPostsByCategory("Challenges");

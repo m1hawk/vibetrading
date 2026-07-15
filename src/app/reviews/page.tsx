@@ -6,7 +6,10 @@ export const metadata: Metadata = {
   title: "Reviews",
   description:
     "Honest, hands-on reviews of AI trading bots and software. We test each tool and publish the real results.",
-};
+
+  alternates: {
+    canonical: "/reviews",
+  }};
 
 export default function ReviewsPage() {
   const posts = getPostsByCategory("Reviews");

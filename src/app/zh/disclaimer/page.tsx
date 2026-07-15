@@ -4,7 +4,10 @@ export const metadata: Metadata = {
   title: "风险声明",
   description:
     "vibetrading.fun 的重要风险声明。交易涉及重大亏损风险。",
-};
+
+  alternates: {
+    canonical: "/zh/disclaimer",
+  }};
 
 export default function DisclaimerPageZh() {
   return (

@@ -4,7 +4,10 @@ export const metadata: Metadata = {
   title: "Risk Disclaimer",
   description:
     "Important risk disclaimer for vibetrading.fun. Trading involves substantial risk of loss.",
-};
+
+  alternates: {
+    canonical: "/disclaimer",
+  }};
 
 export default function DisclaimerPage() {
   return (

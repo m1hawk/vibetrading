@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { HubPage } from "@/components/HubPage";
 import { getPostsByCategory } from "@/lib/posts";
 
-export const metadata: Metadata = { title: "AI Trading Tools", description: "Independent guides to AI models, trading platforms, APIs, and automation tools for vibe trading." };
+export const metadata: Metadata = { title: "AI Trading Tools", description: "Independent guides to AI models, trading platforms, APIs, and automation tools for vibe trading." ,
+  alternates: {
+    canonical: "/tools",
+  }};
 
 export default function ToolsPage() {
   return <HubPage eyebrow="Tools" title="Choose tools by what you want to build." description="A Vibe Trading stack can include an AI model, market data, a backtesting environment, and an execution platform. We compare them by workflow—not marketing claims." principles={["Hands-on status clearly labeled", "Limits included", "No paid rankings"]} cards={[

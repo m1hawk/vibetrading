@@ -3,7 +3,10 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "隐私政策",
   description: "vibetrading.fun 的隐私政策。",
-};
+
+  alternates: {
+    canonical: "/zh/privacy",
+  }};
 
 export default function PrivacyPageZh() {
   return (

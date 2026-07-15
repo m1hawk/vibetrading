@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { HubPage } from "@/components/HubPage";
 import { getAllPosts } from "@/lib/posts";
 
-export const metadata: Metadata = { title: "用 AI 构建", description: "用 AI 构建无代码工作流、TradingView 策略、Python Bot、回测和交易 Agent。" };
+export const metadata: Metadata = { title: "用 AI 构建", description: "用 AI 构建无代码工作流、TradingView 策略、Python Bot、回测和交易 Agent。" ,
+  alternates: {
+    canonical: "/zh/build",
+  }};
 
 export default function ZhBuildPage() {
   const posts = getAllPosts("zh").filter((post) => post.tags.includes("tutorial") || post.category === "Claude");

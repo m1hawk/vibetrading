@@ -6,7 +6,10 @@ export const metadata: Metadata = {
   title: "Vibe Trading 实践指南",
   description:
     "关于理解、构建、验证和改进 AI 交易工作流的实践指南。",
-};
+
+  alternates: {
+    canonical: "/zh/blog",
+  }};
 
 export default function ZhBlogPage() {
   const posts = getAllPosts("zh");

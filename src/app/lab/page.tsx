@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { HubPage } from "@/components/HubPage";
 
-export const metadata: Metadata = { title: "Vibe Trading Lab", description: "Transparent AI trading experiments with fixed rules, realistic costs, paper trading, and published limits." };
+export const metadata: Metadata = { title: "Vibe Trading Lab", description: "Transparent AI trading experiments with fixed rules, realistic costs, paper trading, and published limits." ,
+  alternates: {
+    canonical: "/lab",
+  }};
 
 export default function LabPage() {
   return <HubPage eyebrow="Lab" title="Build in public. Test in public." description="The Lab is where promising ideas meet inconvenient evidence. Every experiment begins with fixed rules and ends with the complete result—including failures." principles={["Rules fixed before results", "Fees and slippage included", "No cherry-picking"]} cards={[

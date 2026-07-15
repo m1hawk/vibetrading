@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { HubPage } from "@/components/HubPage";
 
-export const metadata: Metadata = { title: "Vibe Trading 实验室", description: "公开规则、现实成本、模拟盘过程和失败结果的透明 AI 交易实验。" };
+export const metadata: Metadata = { title: "Vibe Trading 实验室", description: "公开规则、现实成本、模拟盘过程和失败结果的透明 AI 交易实验。" ,
+  alternates: {
+    canonical: "/zh/lab",
+  }};
 
 export default function ZhLabPage() {
   return <HubPage eyebrow="实验室" title="公开构建，公开验证。" description="实验室让有吸引力的想法面对不方便的证据。每个实验从固定规则开始，以完整结果结束，包括失败。" principles={["看到结果前固定规则", "计入手续费和滑点", "不挑选结果"]} cards={[

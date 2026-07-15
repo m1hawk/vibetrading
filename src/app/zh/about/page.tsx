@@ -5,7 +5,10 @@ export const metadata: Metadata = {
   title: "关于我们",
   description:
     "VibeTrading.fun 的存在原因、我们的构建与测试方式，以及我们永远不会销售什么。",
-};
+
+  alternates: {
+    canonical: "/zh/about",
+  }};
 
 export default function AboutPageZh() {
   return (

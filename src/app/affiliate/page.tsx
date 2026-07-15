@@ -4,7 +4,10 @@ export const metadata: Metadata = {
   title: "Affiliate Disclosure",
   description:
     "Affiliate disclosure for vibetrading.fun. We only recommend tools we have tested or researched.",
-};
+
+  alternates: {
+    canonical: "/affiliate",
+  }};
 
 export default function AffiliatePage() {
   return (
