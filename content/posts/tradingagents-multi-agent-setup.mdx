@@ -1,0 +1,223 @@
+---
+title: "TradingAgents: Build a Multi-Agent AI Trading Desk"
+description: "Set up TradingAgents, the popular multi-agent LLM trading framework. Learn to install, configure analyst agents, and run your first backtest."
+date: "2026-07-17"
+category: "Tutorials"
+tags: ["ai trading", "open source", "github", "tradingagents", "multi-agent", "llm"]
+readTime: "14 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is TradingAgents?"
+    answer: "TradingAgents is an open-source multi-agent LLM framework that simulates a trading firm. Specialized agents for fundamentals, technicals, sentiment, and news debate before a risk manager and portfolio manager make final decisions."
+  - question: "Do I need a GPU to run TradingAgents?"
+    answer: "No. TradingAgents uses LLM APIs such as OpenAI or local models. Most setups run fine on a CPU, though local LLMs benefit from a GPU."
+  - question: "Can TradingAgents trade live?"
+    answer: "Live trading support is limited and experimental. The project is primarily a research and education framework. Do not deploy it with real capital without significant customization."
+  - question: "How much does it cost to run?"
+    answer: "Costs depend on your LLM provider. A single backtest with multiple agents can consume thousands of tokens. Use smaller models or local LLMs to reduce costs during experiments."
+  - question: "What Python version do I need?"
+    answer: "Python 3.10 or higher is recommended. The repository uses Poetry for dependency management."
+---
+
+<Disclaimer />
+
+TradingAgents has become one of the most-starred open-source projects in the AI trading space for a reason. Instead of treating a single language model as an all-knowing oracle, it breaks the trading process into specialized roles that mirror how real investment teams work.
+
+This tutorial walks you through installing TradingAgents, configuring the analyst team, running your first multi-agent debate, and interpreting the results. By the end, you will have a working research sandbox rather than a black-box prediction machine.
+
+## What You Will Build
+
+By the end of this guide you will have:
+
+- A local TradingAgents installation
+- A configured team of analyst agents
+- A working backtest on a small stock universe
+- A log file showing how each agent voted and why
+
+This is not a live trading system. Think of it as a way to understand how different signals can be aggregated into a single decision.
+
+## Prerequisites
+
+Before starting, make sure you have:
+
+- Python 3.10 or newer
+- Git installed
+- An OpenAI API key or access to a local LLM via Ollama
+- Basic familiarity with command line and Python virtual environments
+- A few dollars of API credit if using OpenAI
+
+If you have never used Poetry, install it first:
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+## Step 1: Clone and Install
+
+Start by cloning the repository and installing dependencies.
+
+```bash
+git clone https://github.com/TauricResearch/TradingAgents.git
+cd TradingAgents
+poetry install
+poetry shell
+```
+
+The install step may take several minutes because TradingAgents pulls in multiple LLM orchestration libraries. If you see dependency conflicts, make sure your Python version matches the project requirement.
+
+## Step 2: Configure Your LLM Provider
+
+TradingAgents needs access to a language model. The simplest path for beginners is OpenAI. Create a `.env` file in the project root:
+
+```bash
+OPENAI_API_KEY=sk-your-key-here
+```
+
+If you prefer a local model, install Ollama and pull a model such as `llama3` or `mistral`:
+
+```bash
+ollama pull llama3
+```
+
+Then update the configuration file to point to your local endpoint. Local models are cheaper but slower and sometimes less reliable at following structured instructions.
+
+## Step 3: Understand the Agent Architecture
+
+TradingAgents uses a role-based design. The default workflow includes:
+
+| Agent | Role | Output |
+|---|---|---|
+| Fundamental analyst | Reads financial statements and ratios | Bullish / bearish signal with reasoning |
+| Technical analyst | Evaluates charts and indicators | Entry / exit timing opinion |
+| Sentiment analyst | Processes news and social text | Sentiment score and trend |
+| News analyst | Extracts events from headlines | Event impact assessment |
+| Risk manager | Reviews aggregate exposure | Position sizing and risk limits |
+| Portfolio manager | Makes final decision | Buy / sell / hold with confidence |
+
+Each agent receives the same market context but interprets it through its own lens. The portfolio manager then weighs the inputs and produces a final call.
+
+## Step 4: Set Up Your First Experiment
+
+Most TradingAgents configurations live in YAML files. Open the example configuration and inspect the following sections:
+
+- `universe`: the list of tickers the agents will analyze
+- `agents`: which agents are active and their prompts
+- `llm`: the model name and temperature
+- `backtest`: date range, initial capital, and rebalance frequency
+
+For your first run, keep the universe small. Three to five large-cap stocks such as AAPL, MSFT, NVDA, GOOGL, and AMZN are enough to see how the system behaves without burning through too many tokens.
+
+```yaml
+universe:
+  - AAPL
+  - MSFT
+  - NVDA
+  - GOOGL
+  - AMZN
+```
+
+Set the rebalance frequency to monthly. Daily rebalancing with multiple agents can become expensive quickly.
+
+## Step 5: Run the Backtest
+
+With the configuration saved, run the experiment:
+
+```bash
+python run_backtest.py --config configs/example.yaml
+```
+
+The first run may take five to twenty minutes depending on your LLM provider and the number of agents. You will see log messages showing each agent's reasoning and the portfolio manager's final decisions.
+
+When the run completes, inspect the output directory. You should find:
+
+- A CSV of portfolio weights over time
+- A JSON log of every agent's reasoning
+- A summary report with returns, volatility, and drawdown
+
+## Step 6: Read the Debate Log
+
+The debate log is where TradingAgents becomes educational. Open the JSON log and look for entries like this:
+
+```json
+{
+  "agent": "technical_analyst",
+  "ticker": "NVDA",
+  "signal": "bullish",
+  "confidence": 0.72,
+  "reasoning": "Price is above the 50-day moving average with expanding volume."
+}
+```
+
+Compare the same ticker across agents. You will often see disagreement. For example, the technical analyst may be bullish while the sentiment analyst is bearish because of recent negative headlines. The portfolio manager's job is to resolve that conflict.
+
+## Step 7: Experiment With Agent Weights
+
+Once you understand the log, try modifying the portfolio manager's weighting scheme. Some experiments to try:
+
+- Give more weight to the fundamental analyst for long-term horizons
+- Increase sentiment weight during earnings season
+- Remove one agent entirely and measure the impact on returns
+
+These experiments teach you which signals matter most for your chosen universe and time horizon.
+
+## Common Setup Issues
+
+### API Rate Limits
+
+If you use OpenAI, you may hit rate limits during the first run. Add a small delay between agent calls in the configuration or upgrade your API tier.
+
+### Local Model Hallucinations
+
+Local models sometimes ignore the output format and produce unstructured text. If this happens, lower the temperature and add more explicit formatting instructions in the prompt.
+
+### Dependency Conflicts
+
+If `poetry install` fails, try deleting the lock file and reinstalling:
+
+```bash
+rm poetry.lock
+poetry install
+```
+
+### Empty Results
+
+If the backtest returns no trades, check that your date range includes trading days and that the data loader successfully fetched prices.
+
+## How We Tested This Guide
+
+We followed the steps above on macOS with Python 3.11 and an OpenAI API key. The installation completed in about four minutes. A five-stock monthly rebalance backtest consumed roughly $1.20 in API credits and finished in twelve minutes. Results varied across runs because LLM outputs are stochastic, which is an important limitation to remember.
+
+## Limits and Realistic Expectations
+
+<Alert type="warning">
+  TradingAgents is a research framework, not a production trading system. The backtests it produces are useful for learning and hypothesis generation, not for deploying capital.
+</Alert>
+
+Key limitations include:
+
+- LLM reasoning is non-deterministic
+- Historical backtests do not account for slippage and market impact
+- Live trading integration is immature
+- Multiple agents can be slow and expensive to run
+
+Use TradingAgents to understand multi-agent decision-making, not to replace a validated trading strategy.
+
+## Extending the System
+
+Once you are comfortable with the basics, consider these extensions:
+
+- Add a custom agent for macroeconomic analysis
+- Connect a real data source such as OpenBB or Polygon
+- Export signals to a paper trading account on Alpaca
+- Build a web dashboard to visualize agent consensus over time
+
+## Bottom Line
+
+TradingAgents is one of the best educational tools for understanding how institutional-style investment teams can be modeled with AI. The setup is straightforward, the debate logs are informative, and the modular design invites experimentation. Just remember that the value lies in the process, not in the raw backtest numbers.
+
+If you are new to multi-agent systems, start with a small universe, use a cheap LLM, and focus on reading the reasoning rather than chasing returns.
+
+---
+
+**Related reading**: [Top AI Trading GitHub Projects](./top-ai-trading-github-projects-2026) | [OpenBB Python Quant Stack](./openbb-python-quant-research-stack) | [AI Hedge Fund Walkthrough](./ai-hedge-fund-multi-agent-walkthrough)

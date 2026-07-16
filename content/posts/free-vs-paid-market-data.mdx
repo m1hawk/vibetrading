@@ -1,0 +1,159 @@
+---
+title: "Free vs Paid Market Data: What You Actually Need"
+description: "Compare free and paid market data sources for algorithmic trading. Learn when to upgrade and what to avoid at each stage."
+date: "2026-07-26"
+category: "Guides"
+tags: ["market data", "data providers", "algo trading", "free data", "paid data", "beginners"]
+readTime: "12 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "Is free market data good enough for algo trading?"
+    answer: "Free data is fine for learning and simple strategies. Serious strategies usually require clean, complete paid data."
+  - question: "When should I pay for data?"
+    answer: "Upgrade when you need intraday data, options chains, international markets, or clean historical datasets for backtesting."
+  - question: "What is survivorship bias?"
+    answer: "Survivorship bias means your historical dataset only includes companies that still exist, ignoring delisted stocks. This inflates backtest results."
+  - question: "Which paid data provider is best?"
+    answer: "It depends on your needs. Polygon is popular for stocks and options. Tiingo and Nasdaq Data Link are strong alternatives. For forex, consider Dukascopy or OANDA."
+---
+
+<Disclaimer />
+
+Data is the foundation of every trading system. Free data can take you surprisingly far, but it has limits. Knowing when to upgrade and what to pay for can save you from bad backtests and lost capital.
+
+Many beginners overpay for data they do not need. Others launch live strategies on free data that contains gaps, splits errors, and survivorship bias. The right choice depends on your stage and strategy.
+
+## The Stages of Data Needs
+
+Your data needs evolve as your trading matures:
+
+| Stage | Need | Best Data Source |
+|---|---|---|
+| Learning | Daily prices, basic indicators | Yahoo Finance, yfinance |
+| Prototyping | Intraday, paper trading | Alpaca, OpenBB |
+| Serious backtesting | Clean historical data, no survivorship bias | Polygon, Tiingo, Norgate |
+| Options strategies | Options chains, greeks | Polygon, Cboe, ORATS |
+| International | Non-US equities | Bloomberg, Refinitiv, local exchanges |
+| High frequency | Tick data, order book | Exchanges, specialist vendors |
+
+## Free Data Sources
+
+### Yahoo Finance
+
+Best for daily historical prices of stocks and ETFs. Easy to access through `yfinance`.
+
+Pros: free, simple, broad coverage
+Cons: no guarantee of accuracy, can change without notice, no intraday
+
+### Alpaca
+
+Free real-time and historical US stock data for paper and live accounts.
+
+Pros: real-time, API-friendly
+Cons: US-only, limited history, options data limited
+
+### OpenBB
+
+Aggregates free and paid sources through one interface.
+
+Pros: unified access, good for research
+Cons: still limited by underlying free sources
+
+## Paid Data Sources
+
+### Polygon
+
+Popular for stocks, options, and crypto. Clean historical data and APIs.
+
+Cost: starts around $199/month for stocks, more for options
+
+### Tiingo
+
+Affordable end-of-day and intraday data with good fundamentals.
+
+Cost: starts around $10/month for basic plans
+
+### Norgate
+
+Specializes in clean historical stock data including delisted stocks, important for avoiding survivorship bias.
+
+Cost: subscription-based, varies by coverage
+
+### Dukascopy / OANDA
+
+Forex and CFD data.
+
+## When to Upgrade
+
+Consider paid data when:
+
+- You are deploying real capital
+- Your strategy uses intraday signals
+- You need options chains
+- You trade international markets
+- You want accurate backtests without survivorship bias
+- Free data delays cost you money
+
+## What to Avoid
+
+- Paying for tick data when you trade daily
+- Using free data for live strategies without validation
+- Ignoring survivorship bias in backtests
+- Assuming expensive data guarantees better results
+
+## Free vs Paid Decision Tree
+
+1. Are you learning? → Free data is enough.
+2. Are you paper trading short-term strategies? → Alpaca or OpenBB.
+3. Are you backtesting multi-year equity strategies? → Consider Norgate or Polygon.
+4. Are you trading options? → Polygon or ORATS.
+5. Are you trading crypto? → Exchange APIs or CoinMetrics.
+
+## Data Quality Checklist
+
+Before trusting any dataset, verify:
+
+1. Are corporate actions such as splits and dividends adjusted?
+2. Does the dataset include delisted stocks?
+3. Are there missing bars or suspicious outliers?
+4. Does the timezone match your trading schedule?
+5. Have you cross-checked a few symbols against a second source?
+
+## Building a Data Budget
+
+Your data spending should match your capital and strategy:
+
+| Monthly Capital | Monthly Data Budget | Suitable Sources |
+|---|---|---|
+| Under $5,000 | $0-$50 | yfinance, Alpaca, OpenBB |
+| $5,000-$50,000 | $50-$200 | Tiingo, Polygon basic |
+| Over $50,000 | $200-$500+ | Polygon, Norgate, ORATS |
+
+Spending 1% to 2% of capital annually on data is reasonable for active strategies. Spending 10% is usually not.
+
+## Red Flags in Data Providers
+
+Be cautious if a provider:
+
+- Refuses to explain how data is cleaned
+- Has no documented history of corporate actions
+- Offers impossibly cheap tick data
+- Cannot provide sample data for testing
+- Has no support channel or documentation
+
+Bad data is more expensive than good data because it creates false confidence.
+
+## Survivorship Bias Example
+
+Imagine backtesting a strategy on current S&P 500 constituents from 2000 to 2024. Your dataset includes winners like Apple and NVIDIA but excludes companies that went bankrupt or were delisted. The result is an inflated backtest that ignores the losers.
+
+A clean dataset includes delisted stocks and corporate actions. This is why services like Norgate exist. The difference between biased and unbiased backtests can be several percentage points of annual return. Paying for clean data is often cheaper than losing capital to a flawed strategy. Think of data as infrastructure, not an optional expense.
+
+## Bottom Line
+
+Free data is a powerful learning tool. Paid data becomes worthwhile when your strategy's edge depends on accuracy, completeness, or speed. Match your data spending to your actual needs rather than assuming more expensive is always better.
+
+---
+
+**Related reading**: [OpenBB Alpaca Live Data Pipeline](./openbb-alpaca-live-data-pipeline) | [Minimum Viable Python Stack Trading](./minimum-viable-python-stack-trading) | [OpenBB vs Bloomberg Terminal](./openbb-vs-bloomberg-terminal-retail)

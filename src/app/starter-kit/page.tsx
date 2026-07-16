@@ -15,7 +15,10 @@ import {
 export const metadata: Metadata = {
   title: "Learn AI Trading",
   description:
-    "Free, evidence-based learning resources for retail traders: guides, checklists, tool comparisons, and a structured path from idea to paper trading.",
+    "Free, evidence-based AI trading learning resources for retail traders: guides, checklists, tool comparisons, and a structured path from idea to paper trading.",
+  alternates: {
+    canonical: "/starter-kit",
+  },
 };
 
 const learningPath = [

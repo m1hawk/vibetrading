@@ -29,12 +29,27 @@ export async function generateMetadata({
     return {};
   }
 
+  const availableLanguages = getAvailableLanguages(slug);
+  const hasEn = availableLanguages.includes("en");
+
+  const alternates: Metadata["alternates"] = {
+    canonical: `/zh/blog/${post.slug}`,
+    languages: {
+      "zh": `/zh/blog/${post.slug}`,
+    },
+  };
+
+  if (hasEn) {
+    alternates.languages = {
+      ...alternates.languages,
+      "en": `/blog/${post.slug}`,
+    };
+  }
+
   return {
     title: post.title,
     description: post.description,
-    alternates: {
-      canonical: `/zh/blog/${post.slug}`,
-    },
+    alternates,
     openGraph: {
       title: post.title,
       description: post.description,
@@ -42,6 +57,7 @@ export async function generateMetadata({
       publishedTime: post.date,
       modifiedTime: post.updated,
       tags: post.tags,
+      locale: "zh_CN",
     },
   };
 }

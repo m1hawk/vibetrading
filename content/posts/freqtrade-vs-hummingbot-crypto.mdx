@@ -1,0 +1,189 @@
+---
+title: "freqtrade vs Hummingbot: Crypto Bot Comparison"
+description: "Compare freqtrade and Hummingbot across features, asset support, strategy types, and ease of use. Find the best open-source crypto trading bot for your goals."
+date: "2026-07-17"
+category: "Tools"
+tags: ["ai trading", "crypto", "freqtrade", "hummingbot", "open source", "bot"]
+readTime: "12 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "Is freqtrade better than Hummingbot?"
+    answer: "It depends on your strategy. freqtrade is better for directional swing and trend strategies on spot and futures markets. Hummingbot is better for market making and arbitrage across centralized and decentralized exchanges."
+  - question: "Can beginners use Hummingbot?"
+    answer: "Hummingbot has a steeper learning curve than freqtrade because it focuses on market making and arbitrage. Beginners with directional strategies should usually start with freqtrade."
+  - question: "Does freqtrade support market making?"
+    answer: "freqtrade is not designed for market making. It is built around directional strategies with entry and exit signals."
+  - question: "Are both bots free?"
+    answer: "Yes, both are open-source and free to use. You may still pay exchange fees, data costs, and infrastructure costs."
+  - question: "Which exchanges are supported?"
+    answer: "freqtrade supports dozens of exchanges via CCXT, including Binance, Bybit, Kraken, and OKX. Hummingbot supports both centralized exchanges and DEXs on Ethereum, Solana, and other chains."
+---
+
+<Disclaimer />
+
+If you want to run an open-source crypto trading bot, two names appear almost everywhere: freqtrade and Hummingbot. Both are free, well-maintained, and production-capable. But they are built for very different styles of trading.
+
+This article compares the two across strategy fit, setup complexity, exchange support, and risk profile. By the end, you will know which one matches your goals and where each tool falls short.
+
+## Quick Comparison
+
+| Feature | freqtrade | Hummingbot |
+|---|---|---|
+| **Primary strategy** | Directional swing / trend / scalping | Market making / arbitrage |
+| **Best market** | Centralized spot and futures | CEX and DEX liquidity provision |
+| **Coding required** | Python for custom strategies | Python for scripts, YAML for configs |
+| **Web UI** | Yes, built-in | Yes, optional dashboard |
+| **Paper trading** | Yes, dry-run mode | Yes, paper trade mode |
+| **Machine learning** | FreqAI module included | Not built-in |
+| **Exchange support** | 100+ via CCXT | CEX + DEX connectors |
+| **Community** | Very large | Large, DeFi-heavy |
+
+The table already tells most of the story. Choose freqtrade if you think in terms of buy signals and sell signals. Choose Hummingbot if you think in terms of spreads, order books, and arbitrage loops.
+
+## What freqtrade Does Best
+
+freqtrade is a Python framework for running directional trading strategies on crypto exchanges. You write a strategy class that defines entry and exit conditions, and freqtrade handles data fetching, execution, logging, and reporting.
+
+### Strengths
+
+- **Mature backtesting**: The backtest engine handles fees, slippage, and realistic order execution.
+- **Strategy ecosystem**: Hundreds of public strategies exist, although quality varies.
+- **FreqAI**: Built-in machine-learning module for adaptive strategies.
+- **Docker support**: Easy deployment on a VPS or Raspberry Pi.
+- **Dry-run mode**: Test with real exchange data but fake money.
+
+### Typical Use Cases
+
+- EMA crossover strategies on 4-hour charts
+- RSI mean-reversion on altcoins
+- ML-based trend following with FreqAI
+- Multi-pair portfolio strategies
+
+### Weaknesses
+
+- Crypto-only, no stocks or forex
+- Many public strategies are overfit
+- Requires Python knowledge for customization
+- API key security is your responsibility
+
+## What Hummingbot Does Best
+
+Hummingbot is a market-making and arbitrage framework. Instead of predicting direction, it profits from the spread between bid and ask prices or from price differences across venues.
+
+### Strengths
+
+- **Market making out of the box**: Scripts for pure market making, cross-exchange market making, and arbitrage.
+- **DEX support**: Trade directly on Uniswap, PancakeSwap, Jupiter, and other decentralized exchanges.
+- **Inventory management**: Built-in logic for balancing base and quote assets.
+- **Strategy templates**: Pre-built strategies reduce time to first trade.
+
+### Typical Use Cases
+
+- Providing liquidity on a low-volume altcoin
+- Cross-exchange Bitcoin arbitrage
+- Earning fees on a stablecoin pair
+- Running a market-making strategy on a DEX
+
+### Weaknesses
+
+- Steeper learning curve for directional traders
+- Requires more capital to absorb inventory risk
+- DEX gas fees can erode profits
+- Market making is competitive and capital-intensive
+
+## Strategy Fit Decision Tree
+
+Use this simple decision tree to choose:
+
+1. **Do you want to predict price direction?** → freqtrade
+2. **Do you want to profit from spreads or price differences?** → Hummingbot
+3. **Do you want to use machine learning?** → freqtrade
+4. **Do you want to trade on DEXs?** → Hummingbot
+5. **Do you have limited coding experience?** → freqtrade web UI is more beginner-friendly
+6. **Do you have large inventory and want low-frequency passive income?** → Hummingbot
+
+## Setup Complexity
+
+### freqtrade Setup
+
+```bash
+git clone https://github.com/freqtrade/freqtrade.git
+cd freqtrade
+./setup.sh --install
+source .venv/bin/activate
+freqtrade create-userdir --userdir user_data
+freqtrade new-config --config config.json
+```
+
+You then edit `config.json` to add your exchange, dry-run mode, and Telegram alerts. Strategy files go in `user_data/strategies/`.
+
+### Hummingbot Setup
+
+```bash
+docker pull hummingbot/hummingbot:latest
+docker run -it --name hummingbot hummingbot/hummingbot:latest
+```
+
+Inside the container, you create an API key, choose a strategy, and configure parameters such as spread, order amount, and refresh time.
+
+Both setups are well-documented, but freqtrade feels more like a traditional Python project, while Hummingbot feels more like infrastructure software.
+
+## Risk Profiles
+
+### freqtrade Risks
+
+- Directional strategies can produce large drawdowns
+- Overfit public strategies are common
+- Leveraged futures amplify losses
+- Exchange API downtime can leave positions exposed
+
+### Hummingbot Risks
+
+- Inventory imbalance can leave you holding a falling asset
+- Adverse selection means you often buy before a drop and sell before a rally
+- Smart contract risk on DEXs
+- Gas fees and failed transactions on Ethereum
+
+<Alert type="warning">
+  Both bots can lose money. Start with paper trading, use small position sizes, and never trade capital you cannot afford to lose.
+</Alert>
+
+## Backtesting Differences
+
+freqtrade has a strong built-in backtester. You can run:
+
+```bash
+freqtrade backtesting --strategy MyStrategy --timerange 20230101-20240101
+```
+
+Hummingbot backtesting is more limited because market making depends on order book dynamics that historical tick data captures poorly. Hummingbot users often rely on paper trading instead.
+
+If historical validation matters to you, freqtrade has the stronger tooling.
+
+## Machine Learning
+
+freqtrade includes FreqAI, which lets you train adaptive models as part of your strategy. Hummingbot has no equivalent built-in feature. If you want to experiment with ML in crypto, freqtrade is the clear choice.
+
+## Community and Ecosystem
+
+freqtrade has a larger general audience with many beginner tutorials. Hummingbot's community is more DeFi and professional market-making oriented. Both have active Discords and GitHub repositories.
+
+## When to Use Both
+
+Some advanced traders run both bots in parallel:
+
+- Use freqtrade for directional positions
+- Use Hummingbot to earn spreads on the same assets while holding them
+
+This is not a beginner setup, but it shows how the two tools can complement each other.
+
+## Bottom Line
+
+Choose **freqtrade** if you want to build directional crypto strategies with strong backtesting and machine-learning support. Choose **Hummingbot** if you want to run market-making or arbitrage strategies across centralized and decentralized exchanges.
+
+There is no universal best bot. The right choice is the one that matches your strategy, capital, and technical comfort level.
+
+---
+
+**Related reading**: [Freqtrade Beginner Guide](./freqtrade-beginner-guide-crypto-bot) | [Top AI Trading GitHub Projects](./top-ai-trading-github-projects-2026) | [How to Backtest Without Overfitting](./how-to-backtest-without-overfitting)

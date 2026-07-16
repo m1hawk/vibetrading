@@ -1,0 +1,167 @@
+---
+title: "AI Multi-Factor Ranking: Build a Stock Screener"
+description: "Learn how to combine value, momentum, quality, and volatility factors into an AI-powered stock ranking system."
+date: "2026-07-23"
+category: "Strategies"
+tags: ["ai trading", "factor investing", "ranking", "value", "momentum", "quality", "python"]
+readTime: "13 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is multi-factor ranking?"
+    answer: "It is the process of scoring stocks using multiple characteristics such as value, momentum, quality, and volatility, then ranking them to select the best candidates."
+  - question: "Which factors work best?"
+    answer: "Value, momentum, quality, and low volatility have the strongest long-term evidence. The best combination depends on the market regime."
+  - question: "Do I need machine learning?"
+    answer: "No. You can build a multi-factor model with simple z-scores. Machine learning helps optimize weights and interactions."
+  - question: "How often should I rebalance?"
+    answer: "Monthly or quarterly rebalancing is common. More frequent rebalancing increases costs."
+---
+
+<Disclaimer />
+
+Single-factor strategies are easy to understand but often underperform in certain market regimes. Combining multiple factors can produce more robust results. AI makes it possible to dynamically weight factors and detect interactions that simple models miss.
+
+This guide explains how to build an AI multi-factor ranking system for stock selection.
+
+## Classic Factors
+
+The most studied equity factors include:
+
+- **Value**: Cheap stocks relative to fundamentals
+- **Momentum**: Stocks with strong recent performance
+- **Quality**: Companies with stable earnings and low debt
+- **Low volatility**: Stocks with smaller price swings
+- **Size**: Smaller companies historically outperform
+
+Each factor can work well in some periods and poorly in others. Value underperformed for much of the 2010s. Momentum suffered sharp drawdowns during the COVID crash. Combining factors smooths these cycles.
+
+## Building a Multi-Factor Score
+
+A simple approach assigns z-scores to each factor and combines them.
+
+```python
+import pandas as pd
+from scipy.stats import zscore
+
+factors = pd.DataFrame({
+    'value': df['pe_ratio'].rank(ascending=True),
+    'momentum': df['return_6m'].rank(ascending=False),
+    'quality': df['roe'].rank(ascending=False),
+    'low_vol': df['volatility'].rank(ascending=True)
+})
+
+factors_z = factors.apply(zscore)
+df['combined_score'] = factors_z.mean(axis=1)
+```
+
+This gives every stock a single score that balances multiple characteristics. The highest-scoring stocks are cheap, have strong momentum, high quality, and low volatility relative to peers.
+
+A numerical example makes this concrete. Suppose two stocks have the following z-scores:
+
+| Stock | Value | Momentum | Quality | Low Vol | Combined |
+|---|---|---|---|---|---|
+| A | 1.2 | 0.8 | 0.5 | -0.2 | 0.575 |
+| B | -0.5 | 1.5 | -0.8 | 0.6 | 0.200 |
+
+Stock A has a higher combined score because it scores well across all factors. Stock B has strong momentum but weak quality, dragging down its overall rank.
+
+## AI Enhancements
+
+Machine learning can improve multi-factor ranking by:
+
+- Learning optimal factor weights from historical data
+- Detecting nonlinear interactions between factors
+- Adapting weights as market regimes change
+- Adding alternative features such as sentiment and options flow
+
+A gradient-boosted model can predict future returns from factor values:
+
+```python
+from lightgbm import LGBMRegressor
+
+model = LGBMRegressor()
+model.fit(X_train[factors.columns], y_train)
+```
+
+Feature importance from the model tells you which factors are currently predictive. This is more flexible than fixed weights.
+
+## Regime-Dependent Factor Weights
+
+Some factors work better in certain environments:
+
+- Momentum tends to work in trending markets
+- Value tends to work in recovery periods
+- Quality tends to work in downturns
+- Low volatility tends to work in uncertain markets
+
+A regime classifier can adjust factor weights dynamically. For example, when a volatility regime model signals high uncertainty, the ranking system can increase the weight of quality and low volatility while reducing momentum exposure.
+
+## Risk Considerations
+
+- **Factor crowding**: Too much capital chasing the same factors reduces returns.
+- **Turnover**: Rebalancing too often increases costs.
+- **Data mining**: Past factor performance may not repeat.
+- **Concentration**: Top-ranked stocks may cluster in one sector.
+
+Mitigate these with sector neutrality, turnover limits, and out-of-sample validation.
+
+## Practical Workflow
+
+1. Choose a universe of liquid stocks
+2. Collect factor data
+3. Handle missing values and outliers
+4. Normalize and combine factors
+5. Train a model or use rule-based weights
+6. Backtest with realistic costs
+7. Rebalance monthly or quarterly
+
+## When to Use Multi-Factor Ranking
+
+This approach works well when:
+
+- You have access to clean fundamental and price data
+- You can hold a diversified portfolio
+- You rebalance systematically
+- You understand the economic rationale behind each factor
+
+## When Not to Use It
+
+Avoid multi-factor ranking when:
+
+- Your universe is too small for diversification
+- Transaction costs dominate expected alpha
+- You cannot explain why a factor should work
+- You overfit weights to recent performance
+
+## Feature Engineering Checklist
+
+Before feeding factors into a model, clean them carefully:
+
+1. **Handle missing values**: Use sector medians or forward-fill sparingly
+2. **Winsorize outliers**: Cap extreme values at the 1st and 99th percentiles
+3. **Neutralize sector effects**: Subtract sector median from each factor
+4. **Check for lookahead bias**: Never use future data to compute current scores
+5. **Validate stability**: Ensure factors are not purely noise over short windows
+
+Skipping these steps is a common reason multi-factor models fail in live trading.
+
+## Backtesting Best Practices
+
+A good backtest should reflect real-world friction:
+
+- Use point-in-time data only
+- Include commission and slippage estimates
+- Account for rebalancing delay
+- Test across multiple market regimes
+- Reserve an out-of-sample period for final validation
+
+For more on avoiding overfitting, see [How to Backtest Without Overfitting](./how-to-backtest-without-overfitting).
+
+## Bottom Line
+
+Multi-factor ranking is one of the most practical applications of AI in equity trading. By combining complementary signals and adapting to market conditions, you can build a stock selection process that is more robust than any single factor alone.
+
+---
+
+**Related reading**: [AI Momentum Strategy Python](./ai-momentum-strategy-python) | [AI Long-Short Equity Strategy](./ai-long-short-equity-strategy) | [AI Sector Rotation Strategy](./ai-sector-rotation-strategy)

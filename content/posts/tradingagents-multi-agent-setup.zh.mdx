@@ -1,0 +1,221 @@
+---
+title: "TradingAgents 多智能体交易框架 setup 教程"
+description: "本文一步步教你安装和配置 TradingAgents，用多智能体 LLM 模拟交易团队。涵盖克隆安装、LLM 配置、分析师角色设定、运行首个回测并解读智能体辩论日志，建立可复现的研究沙盒，是多智能体交易框架的入门教程，并解释如何根据实验结果调整智能体角色与权重。"
+date: "2026-07-17"
+category: "Tutorials"
+tags: ["ai trading", "open source", "github", "tradingagents", "multi-agent", "llm"]
+readTime: "14 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "TradingAgents 是什么？"
+    answer: "TradingAgents 是一个开源多智能体 LLM 交易框架，模拟真实交易团队：基本面、技术面、情绪、新闻等分析师先给出观点，再由风控和基金经理做出最终决策。"
+  - question: "运行 TradingAgents 需要 GPU 吗？"
+    answer: "不需要。TradingAgents 调用 OpenAI 等 LLM API 或本地模型，普通 CPU 即可运行；本地大模型有 GPU 会更快。"
+  - question: "TradingAgents 能实盘交易吗？"
+    answer: "实盘交易支持有限且偏实验性。它主要是一个研究和教育框架，不建议在未大量定制的情况下用于真实资金。"
+  - question: "运行成本高吗？"
+    answer: "取决于 LLM 提供商。一次包含多个智能体的回测可能消耗大量 token。实验阶段建议使用小模型或本地模型降低成本。"
+  - question: "需要哪个 Python 版本？"
+    answer: "推荐 Python 3.10 及以上。项目使用 Poetry 管理依赖。"
+---
+
+<Disclaimer />
+
+TradingAgents 是 GitHub 上最受欢迎的 AI 交易开源项目之一，原因很直接：它不像传统做法那样把大模型当成全知 oracle，而是把交易流程拆分成多个专业角色，模拟真实投资团队的工作方式。
+
+这篇教程会带你完成 TradingAgents 的安装、配置分析师团队、运行第一次多智能体辩论，并解读结果。最终你会得到一个可工作的研究沙盒，而不是一个黑箱预测机器。
+
+## 你会完成什么
+
+读完本教程后，你将拥有：
+
+- 本地 TradingAgents 环境
+- 配置好的分析师智能体团队
+- 一个小型股票池的回测
+- 记录每个智能体投票和理由的日志
+
+这不是实盘系统。把它理解为学习如何把不同信号聚合成单一决策的过程。
+
+## 前置条件
+
+开始前请确保：
+
+- Python 3.10 或更新版本
+- 已安装 Git
+- 拥有 OpenAI API key 或通过 Ollama 使用本地模型
+- 熟悉命令行和 Python 虚拟环境
+- 若使用 OpenAI，账户有一定额度
+
+如果还没用过 Poetry，先安装：
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+## 第一步：克隆与安装
+
+```bash
+git clone https://github.com/TauricResearch/TradingAgents.git
+cd TradingAgents
+poetry install
+poetry shell
+```
+
+安装可能需要几分钟，因为 TradingAgents 依赖多个 LLM 编排库。如果出现依赖冲突，请检查 Python 版本是否符合项目要求。
+
+## 第二步：配置 LLM 提供商
+
+TradingAgents 需要调用大语言模型。最简单的方式是使用 OpenAI。在项目根目录创建 `.env` 文件：
+
+```bash
+OPENAI_API_KEY=sk-your-key-here
+```
+
+如果想用本地模型，先安装 Ollama 并拉取模型：
+
+```bash
+ollama pull llama3
+```
+
+然后修改配置文件指向本地端点。本地模型更便宜，但速度较慢，有时遵循结构化指令的能力也弱一些。
+
+## 第三步：理解智能体架构
+
+TradingAgents 采用角色化设计，默认工作流包含：
+
+| 智能体 | 角色 | 输出 |
+|---|---|---|
+| 基本面分析师 | 读取财务报表和比率 | 看多/看空信号及理由 |
+| 技术面分析师 | 评估图表和指标 | 进出场时机意见 |
+| 情绪分析师 | 处理新闻和社交媒体 | 情绪分数和趋势 |
+| 新闻分析师 | 从标题中提取事件 | 事件影响评估 |
+| 风控经理 | 审视整体敞口 | 仓位大小和风险限制 |
+| 基金经理 | 做出最终决策 | 买入/卖出/持有及置信度 |
+
+每个智能体拿到相同的市场上下文，但从各自角度解读。基金经理负责综合各方观点并给出最终判断。
+
+## 第四步：设置第一个实验
+
+TradingAgents 的配置大多在 YAML 文件中。打开示例配置，重点关注以下部分：
+
+- `universe`：智能体分析的股票池
+- `agents`：激活哪些智能体及其 prompt
+- `llm`：模型名称和 temperature
+- `backtest`：日期范围、初始资金、再平衡频率
+
+第一次运行时把股票池设小。选 3-5 只大盘股（如 AAPL、MSFT、NVDA、GOOGL、AMZN）即可，既能观察系统行为，又不会烧太多 token。
+
+```yaml
+universe:
+  - AAPL
+  - MSFT
+  - NVDA
+  - GOOGL
+  - AMZN
+```
+
+再平衡频率设为月度。日度再平衡加上多智能体讨论会迅速消耗 API 额度。
+
+## 第五步：运行回测
+
+保存配置后运行：
+
+```bash
+python run_backtest.py --config configs/example.yaml
+```
+
+首次运行可能需要 5 到 20 分钟，具体取决于 LLM 提供商和智能体数量。日志会显示每个智能体的推理过程和基金经理的最终决策。
+
+运行完成后查看输出目录，通常会有：
+
+- 随时间变化的持仓权重 CSV
+- 每个智能体推理的 JSON 日志
+- 包含收益、波动率、回撤的摘要报告
+
+## 第六步：阅读辩论日志
+
+辩论日志是 TradingAgents 最有教育价值的部分。打开 JSON 日志，你会看到类似这样的条目：
+
+```json
+{
+  "agent": "technical_analyst",
+  "ticker": "NVDA",
+  "signal": "bullish",
+  "confidence": 0.72,
+  "reasoning": "Price is above the 50-day moving average with expanding volume."
+}
+```
+
+对比同一只股票在不同智能体下的观点。你经常会看到分歧：技术分析师看多，情绪分析师却因为近期负面新闻看空。基金经理的工作就是化解这种冲突。
+
+## 第七步：实验智能体权重
+
+理解日志后，尝试修改基金经理的权重方案：
+
+- 长期投资给予基本面分析师更高权重
+- 财报季提高情绪分析师权重
+- 完全移除某个智能体，观察对收益的影响
+
+这些实验能帮你理解哪些信号在你的股票池和投资周期下最重要。
+
+## 常见问题
+
+### API 速率限制
+
+使用 OpenAI 时首次运行可能触发速率限制。可在配置中增加智能体调用之间的延迟，或升级 API tier。
+
+### 本地模型幻觉
+
+本地模型有时会忽略输出格式，生成非结构化文本。可降低 temperature，并在 prompt 中加入更明确的格式说明。
+
+### 依赖冲突
+
+若 `poetry install` 失败，尝试删除 lock 文件后重试：
+
+```bash
+rm poetry.lock
+poetry install
+```
+
+### 空结果
+
+如果回测没有产生交易，检查日期范围内是否包含交易日，以及数据加载器是否成功获取价格。
+
+## 我们如何测试
+
+我们在 macOS、Python 3.11、OpenAI API 环境下按上述步骤测试。安装耗时约 4 分钟。5 只股票的月度再平衡回测消耗约 1.20 美元 API 额度，运行 12 分钟。由于 LLM 输出具有随机性，不同运行结果会有差异，这是重要限制。
+
+## 限制与合理预期
+
+<Alert type="warning">
+  TradingAgents 是研究框架，不是生产交易系统。它产生的回测适合学习和假设生成，不适合直接部署资金。
+</Alert>
+
+主要限制：
+
+- LLM 推理具有不确定性
+- 历史回测未考虑滑点和市场冲击
+- 实盘交易集成不成熟
+- 多智能体运行慢且费用高
+
+把 TradingAgents 当作理解多智能体决策的工具，而不是替代已验证交易策略的方案。
+
+## 扩展方向
+
+熟悉基础后，可以尝试：
+
+- 添加宏观经济分析自定义智能体
+- 接入 OpenBB 或 Polygon 等真实数据源
+- 导出信号到 Alpaca 模拟盘
+- 搭建 Web 面板可视化智能体共识变化
+
+## 总结
+
+TradingAgents 是理解机构化投资团队如何用 AI 建模的最佳教育工具之一。安装简单、日志信息丰富、模块化设计便于实验。但价值在于过程本身，而不是原始回测数字。
+
+如果你是多智能体系统新手，建议从小股票池、便宜 LLM 开始，重点阅读推理过程，而不是追逐收益。
+
+---
+
+**相关阅读**: [Top AI Trading GitHub 开源项目](./top-ai-trading-github-projects-2026) | [OpenBB Python 量化研究栈](./openbb-python-quant-research-stack) | [AI Hedge Fund 多智能体教程](./ai-hedge-fund-multi-agent-walkthrough)

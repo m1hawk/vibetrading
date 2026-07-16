@@ -1,0 +1,211 @@
+---
+title: "freqtrade FreqAI: Add ML to Your Crypto Bot"
+description: "A practical guide to using FreqAI in freqtrade to build adaptive, machine-learning-driven crypto trading strategies."
+date: "2026-07-20"
+category: "Tutorials"
+tags: ["freqtrade", "freqai", "machine learning", "crypto", "algo trading", "open source"]
+readTime: "14 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is FreqAI?"
+    answer: "FreqAI is a machine-learning module built into freqtrade. It lets you train models on historical data and use predictions as signals in your crypto trading strategies."
+  - question: "Do I need deep learning expertise?"
+    answer: "No. FreqAI supports scikit-learn, XGBoost, and LightGBM out of the box. You can start with simple models."
+  - question: "Can FreqAI guarantee profits?"
+    answer: "No. Machine learning can improve strategy adaptation, but it does not eliminate risk, overfitting, or market regime changes."
+  - question: "What data does FreqAI use?"
+    answer: "FreqAI uses price, volume, and any custom features you define. It can also incorporate external data such as sentiment or funding rates."
+  - question: "Is FreqAI suitable for beginners?"
+    answer: "You should be comfortable with freqtrade basics before adding FreqAI. The module adds complexity."
+---
+
+<Disclaimer />
+
+freqtrade is already one of the most capable open-source crypto bots. Its FreqAI module adds machine learning on top, allowing strategies to adapt as market conditions change. This guide explains how to get started with FreqAI without drowning in complexity.
+
+## What Is FreqAI?
+
+FreqAI is a machine-learning framework integrated into freqtrade. It trains models on historical features and generates predictions that your strategy can use. For example, FreqAI might predict whether the price of BTC will be higher in one hour based on recent indicators and order book data.
+
+Key capabilities include:
+
+- Automated feature engineering
+- Model training and retraining
+- Prediction generation for live trading
+- Support for classification, regression, and forecasting
+- Integration with scikit-learn, XGBoost, and LightGBM
+
+## When FreqAI Helps
+
+FreqAI is most useful when:
+
+- Market conditions change frequently
+- Simple rule-based strategies underperform
+- You have clear features that predict short-term moves
+- You can validate models rigorously out-of-sample
+
+It is less useful when:
+
+- You do not have enough historical data
+- Your strategy is already robust
+- You cannot explain why the model makes predictions
+
+## Setting Up FreqAI
+
+FreqAI is included with freqtrade. Make sure you have a recent version installed:
+
+```bash
+pip install -U freqtrade
+```
+
+Enable FreqAI in your config file:
+
+```json
+"freqai": {
+  "enabled": true,
+  "identifier": "my_freqai_model",
+  "feature_parameters": {
+    "include_timeframes": ["5m", "15m", "1h"],
+    "include_corr_pairlist": ["BTC/USDT", "ETH/USDT"],
+    "label_period_candles": 24,
+    "include_shifted_candles": 2,
+    "DI_threshold": 0.9,
+    "use_SVM_to_remove_outliers": true
+  },
+  "data_split_parameters": {
+    "test_size": 0.2,
+    "random_state": 1
+  },
+  "model_training_parameters": {
+    "n_estimators": 100
+  }
+}
+```
+
+This configuration tells FreqAI to train on 5-minute, 15-minute, and 1-hour candles, predict 24 candles ahead, and use 20% of data for validation.
+
+## Creating a FreqAI Strategy
+
+A FreqAI strategy inherits from `IFreqaiStrategy` instead of the regular `IStrategy`. The key difference is that you can access predictions from the model.
+
+```python
+from freqtrade.strategy import IStrategy, merge_informative_pair
+from freqtrade.strategy.interface import IStrategy
+import talib.abstract as ta
+
+class FreqaiExample(IStrategy):
+    def populate_indicators(self, dataframe, metadata):
+        dataframe = self.freqai.start(dataframe, metadata, self)
+        return dataframe
+
+    def populate_entry_trend(self, dataframe, metadata):
+        dataframe.loc[
+            (dataframe['&-s_target'] > 0.02),
+            'enter_long'] = 1
+        return dataframe
+
+    def populate_exit_trend(self, dataframe, metadata):
+        dataframe.loc[
+            (dataframe['&-s_target'] < -0.01),
+            'exit_long'] = 1
+        return dataframe
+```
+
+The `&-s_target` column contains the model's prediction. In this example, the strategy enters long when the predicted return is above 2%.
+
+## Feature Engineering
+
+FreqAI can generate features automatically, but the best results usually come from thoughtful feature design. Common features include:
+
+- Lagged returns and volatility
+- Moving averages and RSI
+- Order book imbalance
+- Funding rates
+- Sentiment scores
+
+Avoid creating hundreds of random features. That path leads to overfitting.
+
+## Model Selection
+
+FreqAI supports several model types:
+
+- `LightGBMRegressor`: Fast gradient boosting, good default
+- `XGBoostRegressor`: Powerful but slower
+- `CatboostRegressor`: Handles categorical features well
+- `SKLearnRandomForestRegressor`: Simple and interpretable
+
+Start with LightGBM. It is fast, accurate, and handles financial tabular data well.
+
+## Avoiding Overfitting
+
+This is the hardest part of FreqAI. Common mistakes include:
+
+- Using too many features
+- Training on too short a history
+- Predicting too far ahead for the model's signal horizon
+- Ignoring transaction costs
+
+Use these safeguards:
+
+- Out-of-sample validation
+- Walk-forward analysis
+- Paper trading for weeks
+- Limit the number of features
+- Include realistic fees in backtests
+
+## Live Trading with FreqAI
+
+FreqAI retrains models automatically on a schedule you define. In live mode, it:
+
+1. Downloads recent data
+2. Retrains the model if enough new data is available
+3. Generates predictions for the current candle
+4. Passes predictions to your strategy
+
+Start with dry-run mode to make sure the training and prediction pipeline works without errors.
+
+## Monitoring FreqAI Performance
+
+Track these metrics over time:
+
+- Prediction accuracy vs actual returns
+- Feature importance drift
+- Model retraining frequency
+- Live P&L compared to backtest
+
+If prediction quality degrades, the market regime may have shifted and the model needs retraining or redesign.
+
+
+## When FreqAI Adds Noise Instead of Edge
+
+Machine learning is not always helpful. FreqAI can hurt performance when:
+
+- The feature set is too large and the model memorizes noise.
+- The label horizon is too short and the signal is dominated by transaction costs.
+- The market regime changes and the model has not been retrained.
+- The strategy was already profitable without ML, and ML adds complexity without benefit.
+
+If adding FreqAI does not improve out-of-sample Sharpe or reduce drawdown, remove it. A simpler rule-based strategy with good risk management is often better than a complex model that barely beats a coin flip.
+
+## Feature Selection Checklist
+
+Before training a FreqAI model, review every feature:
+
+- [ ] It can be computed at the exact time of the prediction, with no future data.
+- [ ] It has an intuitive economic or behavioral explanation.
+- [ ] It is not highly correlated with another feature already in the set.
+- [ ] It adds value in a univariate test or feature importance analysis.
+- [ ] It is stable across different market regimes.
+
+Good features are usually simple: lagged returns, volatility, volume trends, and order-book imbalance. Fancy features often fail out-of-sample.
+
+## Bottom Line
+
+FreqAI adds genuine power to freqtrade, but it is not a magic upgrade. Success depends on good features, careful validation, and disciplined risk management. Treat FreqAI as an adaptive layer on top of a solid strategy, not as a replacement for one.
+
+Start simple, validate honestly, and scale up only when paper trading shows consistent edge.
+
+---
+
+**Related reading**: [Freqtrade Beginner Guide](./freqtrade-beginner-guide-crypto-bot) | [FinRL vs Stable Baselines 3](./finrl-vs-stable-baselines3-trading) | [How to Backtest Without Overfitting](./how-to-backtest-without-overfitting)

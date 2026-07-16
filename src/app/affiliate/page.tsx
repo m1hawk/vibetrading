@@ -3,7 +3,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Affiliate Disclosure",
   description:
-    "Affiliate disclosure for vibetrading.fun. We only recommend tools we have tested or researched.",
+    "VibeTrading.fun affiliate disclosure: we only recommend AI trading tools and platforms we have tested, researched, or believe deliver genuine value to retail traders.",
 
   alternates: {
     canonical: "/affiliate",

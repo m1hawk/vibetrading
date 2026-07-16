@@ -1,0 +1,91 @@
+---
+title: "AI Trading Metrics: Measure What Actually Matters"
+description: "A practical guide to AI trading performance metrics: total return, Sharpe ratio, Sortino, max drawdown, win rate, expectancy, and profit factor."
+date: "2026-07-16"
+category: "Guides"
+tags: ["ai trading", "performance metrics", "backtesting", "sharpe ratio"]
+readTime: "10 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "Which performance metric is most important?"
+    answer: "No single metric tells the whole story. Return, risk-adjusted return, and drawdown together give a clearer picture than any one number."
+  - question: "What is a good Sharpe ratio?"
+    answer: "For retail strategies, a Sharpe ratio above 1.0 is respectable, above 1.5 is strong, and above 2.0 is exceptional — but past Sharpe does not guarantee future performance."
+  - question: "Is win rate alone enough?"
+    answer: "No. A strategy can win 90% of trades and still lose money if the average loss is much larger than the average win."
+  - question: "How should I compare two AI strategies?"
+    answer: "Compare them over the same out-of-sample period, using the same costs and slippage assumptions, and look at return, Sharpe, drawdown, and expectancy together."
+---
+
+<Disclaimer />
+
+Performance metrics are the scoreboard for any AI trading strategy. Without them, you cannot tell whether a backtest result is good, lucky, or dangerous. This guide explains the metrics that matter most for retail AI traders, when to use each one, and how to avoid common misinterpretations.
+
+## Total Return
+
+Total return is the simplest metric: how much money the strategy made over a period, expressed as a percentage. It is easy to understand and easy to misuse. A strategy that returns 200% may look amazing until you discover it did so by taking huge leverage or holding through catastrophic drawdowns.
+
+Use total return as a starting point, never as the final verdict. Always pair it with a measure of risk. Before you measure returns, make sure your backtest is realistic; our [backtrader backtesting basics](./backtrader-backtesting-basics) guide covers the mechanics.
+
+## Sharpe Ratio
+
+The Sharpe ratio measures return per unit of total risk. It subtracts the risk-free rate from your strategy return and divides by the standard deviation of returns. A higher Sharpe ratio means more reward for the volatility endured.
+
+Sharpe is useful for comparing strategies with similar trading frequency and return distributions. It is less useful when returns are skewed or have fat tails, because standard deviation treats upside and downside volatility the same.
+
+## Sortino Ratio
+
+The Sortino ratio is a variation of Sharpe that penalizes only downside volatility. For strategies with positive skew — occasional large winners and many small losses — Sortino gives a fairer picture than Sharpe.
+
+Use Sortino when your strategy's upside volatility is not a concern. Trend-following systems, for example, often benefit from this metric.
+
+## Maximum Drawdown
+
+Maximum drawdown is the largest peak-to-trough decline in your equity curve. It measures the worst historical loss you would have experienced. Unlike volatility, drawdown is intuitive: it tells you how much capital you would have lost and how long it would have taken to recover.
+
+Set a drawdown budget before trading. If your backtest shows a 30% drawdown and you know you cannot stomach more than 15%, the strategy is too risky regardless of its returns. Drawdown limits are part of a broader risk framework; see our [AI trading risk management framework](./ai-trading-risk-management-framework).
+
+## Win Rate
+
+Win rate is the percentage of trades that were profitable. Retail traders love high win rates, but a high win rate does not guarantee profitability. A strategy that wins small amounts frequently and loses big occasionally can still destroy capital.
+
+Use win rate alongside expectancy to understand whether your winners outweigh your losers.
+
+## Expectancy
+
+Expectancy tells you the average expected profit or loss per trade. It combines win rate with average win and average loss. A positive expectancy means the strategy is profitable over many trades, assuming the future resembles the past.
+
+Expectancy is especially useful for position-sizing decisions. If expectancy is small relative to volatility, you need more trades or smaller size to realize the edge.
+
+## Profit Factor
+
+Profit factor is gross profit divided by gross loss. A profit factor above 1.0 means the strategy made more than it lost. Values above 1.5 are generally considered healthy, while values below 1.2 leave little room for error.
+
+Profit factor is easy to compute but sensitive to outliers. One huge winning trade can hide many small losses, so inspect the trade distribution rather than relying on the number alone.
+
+## Key Formulas
+
+| Metric | Formula | When to Use |
+|--------|---------|-------------|
+| Total return | (Final Value / Initial Value) - 1 | Quick headline comparison |
+| Sharpe ratio | (Strategy Return - Risk-Free Rate) / StdDev(Returns) | Compare reward per unit of total risk |
+| Sortino ratio | (Strategy Return - Risk-Free Rate) / Downside StdDev | Focus on harmful volatility only |
+| Max drawdown | (Peak - Trough) / Peak | Understand worst historical loss |
+| Win rate | Winning Trades / Total Trades | Pair with expectancy |
+| Expectancy | (Win% × Avg Win) - (Loss% × Avg Loss) | Judge per-trade edge |
+| Profit factor | Gross Profit / Gross Loss | Simple health check |
+
+## Choosing the Right Metrics
+
+No metric is perfect. Start with total return, Sharpe or Sortino, max drawdown, and expectancy. Add win rate and profit factor when you want a finer view of trade quality.
+
+The most important rule is consistency. Compare strategies over the same market regime, the same out-of-sample period, and the same cost assumptions. A Sharpe ratio from a backtest with zero costs is not comparable to a live Sharpe ratio with commissions and slippage.
+
+## Bottom Line
+
+Performance metrics turn raw profit and loss into actionable insight. Focus on risk-adjusted returns and drawdown before celebrating total return, and always evaluate strategies as a bundle rather than trusting a single number. For a deeper look at realistic testing, see [how to backtest without overfitting](./how-to-backtest-without-overfitting).
+
+---
+
+**Related reading**: [How to Backtest Without Overfitting](./how-to-backtest-without-overfitting) | [AI Trading Risk Management Framework](./ai-trading-risk-management-framework) | [Backtrader Backtesting Basics](./backtrader-backtesting-basics)

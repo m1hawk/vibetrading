@@ -1,0 +1,176 @@
+---
+title: "Hummingbot Avellaneda: Crypto Market Making Basics"
+description: "Learn how to run the Avellaneda-Stoikov market-making strategy on Hummingbot. Understand parameters, risks, and how to avoid common mistakes."
+date: "2026-07-19"
+category: "Tutorials"
+tags: ["hummingbot", "market making", "avellaneda", "crypto", "algo trading", "open source"]
+readTime: "12 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is the Avellaneda-Stoikov strategy?"
+    answer: "It is a mathematical market-making model that optimizes bid and ask prices based on inventory risk, volatility, and time horizon."
+  - question: "Is market making profitable for retail traders?"
+    answer: "Sometimes, but it is competitive. Profitability depends on spreads, fees, inventory management, and market conditions."
+  - question: "What is inventory risk?"
+    answer: "Inventory risk is the chance that you accumulate a position in an asset that then moves against you before you can offload it."
+  - question: "Can I lose money with Avellaneda market making?"
+    answer: "Yes. Adverse selection, volatility spikes, and high fees can all cause losses. Start with paper trading."
+  - question: "Which pairs work best?"
+    answer: "Pairs with consistent volume, tight natural spreads, and relatively stable prices tend to work better. Stablecoin pairs are common starting points."
+---
+
+<Disclaimer />
+
+Market making sounds like free money. You place bids and asks, collect the spread, and repeat. In reality, it is one of the most competitive and risky forms of algorithmic trading. The Avellaneda-Stoikov strategy, available in Hummingbot, is a popular way for retail traders to experiment with market making. This guide explains how it works and how to use it responsibly.
+
+## What Is Market Making?
+
+Market makers provide liquidity by continuously quoting buy and sell prices. They profit from the spread between bid and ask, but they also take on inventory risk. If prices move sharply, the market maker can be left holding a losing position.
+
+## The Avellaneda-Stoikov Model
+
+The Avellaneda-Stoikov model is a classic market-making framework from quantitative finance. It calculates optimal bid and ask prices based on:
+
+- **Current mid price**: The average of best bid and best ask
+- **Inventory position**: How much of the asset you currently hold
+- **Volatility**: How much the price fluctuates
+- **Time horizon**: How long until the strategy rebalances
+- **Risk aversion**: How aggressively you want to reduce inventory risk
+
+The strategy skews quotes to encourage inventory to return toward a target level. If you hold too much of the asset, it lowers the ask price to sell more. If you hold too little, it raises the bid price to buy more.
+
+## Setting Up Hummingbot
+
+If you have not installed Hummingbot, start with Docker:
+
+```bash
+docker pull hummingbot/hummingbot:latest
+docker run -it --name hummingbot hummingbot/hummingbot:latest
+```
+
+Inside Hummingbot, create the Avellaneda strategy:
+
+```bash
+create
+```
+
+Select `avellaneda_market_making` and follow the prompts.
+
+## Key Parameters
+
+| Parameter | What It Does | Typical Range |
+|---|---|---|
+| `market` | Trading pair such as BTC-USDT | Depends on exchange |
+| `execution_timeframe_mode` | How often to refresh quotes | Infinite or from_date/to_date |
+| `order_amount` | Size of each quote | Based on your capital |
+| `risk_factor` | Controls inventory skew aggression | 0.5 to 2.0 |
+| `order_refresh_time` | How often to cancel and replace orders | 10 to 60 seconds |
+| `minimum_spread` | Lowest spread you are willing to quote | Above trading fees |
+| `volatility_buffer` | Safety margin for volatility estimates | 0.1 to 0.5 |
+
+## A Conservative Starting Configuration
+
+For a first experiment on a stablecoin pair, consider:
+
+- Order amount: small, such as $10 per side
+- Risk factor: 0.5 to 1.0
+- Order refresh time: 30 seconds
+- Minimum spread: 0.2% or higher
+- Paper trading enabled
+
+This configuration will not make much money, but it will help you understand how the strategy behaves without large risk.
+
+## Paper Trading First
+
+Hummingbot has a paper trading mode. Always enable it for your first runs:
+
+```bash
+paper_trade_mode_enabled: true
+```
+
+Watch how the bot reacts to price moves, how inventory shifts, and how fees accumulate. Run paper trading for at least a week before considering live capital.
+
+## Risks to Understand
+
+### Adverse Selection
+
+Other traders may pick off your quotes when they have better information. You end up buying before a drop or selling before a rally.
+
+### Inventory Risk
+
+If the market trends in one direction, your bot will accumulate the losing side of the trade. Without inventory controls, this can lead to large losses.
+
+### Fee Erosion
+
+High trading frequency means high fees. Make sure your quoted spread comfortably covers exchange fees and expected slippage.
+
+### Volatility Spikes
+
+Sudden volatility can move prices faster than the bot can adjust quotes. Kill switches and position limits are essential.
+
+## Monitoring
+
+Track these metrics during paper and live trading:
+
+- Total P&L
+- Inventory ratio
+- Average spread captured
+- Fees paid
+- Number of trades
+- Maximum drawdown
+
+## When Market Making Makes Sense
+
+Market making works best when:
+
+- Spreads are wide enough to cover fees
+- Volatility is moderate
+- You have enough capital to absorb inventory swings
+- You can monitor the bot closely
+
+It works poorly when:
+
+- Spreads are razor-thin
+- Markets are trending strongly
+- Fees are high
+- You cannot react to problems quickly
+
+
+## Inventory Skew in Action
+
+Imagine you run the Avellaneda strategy on BTC-USDT with a target inventory split of 50% BTC and 50% USDT. If a series of buys leaves you holding 70% BTC, the model adjusts quotes to encourage selling. Your ask price moves closer to the mid price, making it more likely to execute, while your bid price moves lower, discouraging further buying.
+
+This dynamic rebalancing is the core of the Avellaneda-Stoikov model. The `risk_factor` controls how aggressively the bot skews. A higher risk factor means faster inventory correction but also narrower spreads and potentially lower profitability per trade.
+
+## Kill Switch and Circuit Breakers
+
+Market making without a kill switch is dangerous. Configure Hummingbot to stop trading when:
+
+- Inventory skew exceeds a maximum threshold, such as 80% of capital in one asset.
+- Total P&L drawdown exceeds a predefined limit, such as 5% of capital.
+- Volatility spikes above a threshold measured by recent price range.
+- The exchange API returns repeated errors.
+
+Test these kill switches in paper trading. In a live market, emotions and latency can prevent you from reacting manually.
+
+## When to Stop Market Making
+
+Stop or reduce the strategy when:
+
+- Spreads tighten below your fee structure plus a safety margin.
+- The market enters a strong directional trend that creates one-sided inventory.
+- Exchange fees increase or rebates change.
+- You cannot monitor the bot for an extended period.
+
+Market making is an active strategy, not a set-and-forget system. Constant monitoring and parameter tuning are required.
+
+## Bottom Line
+
+The Avellaneda-Stoikov strategy is a powerful introduction to algorithmic market making. Hummingbot makes it accessible to retail traders. But accessibility is not the same as safety. Market making requires careful parameter tuning, inventory management, and constant monitoring.
+
+Start with paper trading, use conservative settings, and never allocate capital you cannot afford to lose.
+
+---
+
+**Related reading**: [Freqtrade vs Hummingbot](./freqtrade-vs-hummingbot-crypto) | [Top AI Trading GitHub Projects](./top-ai-trading-github-projects-2026) | [AI Risk Management Framework](./ai-trading-risk-management-framework)

@@ -1,0 +1,155 @@
+---
+title: "AI Kelly Position Sizing: Bet the Right Amount"
+description: "Learn how to use the Kelly criterion and AI-enhanced estimates to size positions optimally without blowing up your account."
+date: "2026-07-23"
+category: "Strategies"
+tags: ["ai trading", "kelly criterion", "position sizing", "risk management", "python"]
+readTime: "11 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is the Kelly criterion?"
+    answer: "The Kelly criterion is a formula that calculates the optimal fraction of capital to bet based on win rate and payoff ratio."
+  - question: "Is full Kelly too risky?"
+    answer: "Yes. Full Kelly can produce extreme drawdowns. Most traders use fractional Kelly such as half or quarter Kelly."
+  - question: "How does AI improve Kelly sizing?"
+    answer: "AI can estimate win probability and payoff ratio dynamically from market conditions rather than using fixed historical averages."
+  - question: "Should beginners use Kelly?"
+    answer: "Beginners should understand the concept but start with fixed fractional risk such as 1% per trade."
+---
+
+<Disclaimer />
+
+Position sizing is often more important than entry timing. A good strategy with poor sizing can blow up. A mediocre strategy with excellent sizing can survive and compound. The Kelly criterion is one of the most famous frameworks for optimal bet sizing.
+
+The Kelly formula was originally developed for information theory and gambling. In trading, it tells you how much of your capital to allocate to a bet with known probabilities and payoffs. The catch is that those probabilities are never truly known in markets.
+
+## The Kelly Formula
+
+For a simple bet with two outcomes:
+
+```
+f* = (p * b - q) / b
+```
+
+Where:
+
+- `f*` = fraction of capital to bet
+- `p` = probability of winning
+- `q` = probability of losing = 1 - p
+- `b` = average win / average loss
+
+Example: If you win 60% of trades with a 2:1 payoff ratio:
+
+```python
+p = 0.60
+b = 2.0
+f = (p * b - (1 - p)) / b
+print(f)  # 0.40
+```
+
+Full Kelly says bet 40% of capital. That is almost always too aggressive.
+
+## Fractional Kelly
+
+Most traders use fractional Kelly to reduce volatility:
+
+- Half Kelly: 20% in the example above
+- Quarter Kelly: 10%
+- Many systematic traders use even less
+
+Fractional Kelly sacrifices some theoretical growth for much smoother equity curves. A common rule is to start with quarter Kelly or less until you have high confidence in your edge estimates.
+
+## Estimating Inputs With AI
+
+The hard part of Kelly is estimating `p` and `b`. Historical averages are often stale. AI can estimate them dynamically:
+
+- Predict win probability from current market features
+- Estimate expected payoff from volatility and recent price action
+- Adjust for regime changes
+
+For example, a model might predict that under current conditions, a breakout setup has a 55% win rate with a 1.8:1 payoff ratio.
+
+## Practical Implementation
+
+```python
+def kelly_size(capital, win_prob, payoff_ratio, fraction=0.25):
+    kelly = (win_prob * payoff_ratio - (1 - win_prob)) / payoff_ratio
+    kelly = max(0, kelly)  # never bet negative
+    return capital * kelly * fraction
+
+position = kelly_size(100000, 0.55, 1.8, fraction=0.25)
+```
+
+This gives a conservative position size based on the current trade's estimated edge.
+
+## Kelly vs Fixed Fractional
+
+Fixed fractional risk such as 1% per trade is simpler and often safer. Kelly is most useful when:
+
+- You have many similar trades
+- Edge varies meaningfully across setups
+- You can estimate probabilities accurately
+
+If your probability estimates are wrong, Kelly sizing can make losses worse.
+
+A comparison table helps clarify the tradeoff:
+
+| Method | Best For | Risk |
+|---|---|---|
+| Fixed fractional | Beginners, consistent setups | Low, predictable |
+| Fractional Kelly | Varying edge, experienced traders | Moderate |
+| Full Kelly | Theoretical optimal, rarely used | Very high |
+
+## Common Mistakes
+
+- Using full Kelly
+- Ignoring correlation between simultaneous trades
+- Overestimating win rate from backtests
+- Applying Kelly to strategies with skewed payoff distributions
+- Forgetting that Kelly assumes you can reinvest continuously
+
+## When to Use Kelly
+
+Use Kelly-based sizing when:
+
+- You have a large sample of similar trades
+- Your edge estimates come from out-of-sample data
+- You want to scale positions up when edge is high
+- You can handle larger position sizes emotionally
+
+## When Not to Use Kelly
+
+Avoid Kelly when:
+
+- You are a beginner
+- Your strategy has fat-tailed or skewed returns
+- You cannot estimate probabilities reliably
+- You hold highly correlated positions
+
+For a simpler alternative, see [AI Stop Loss Dynamic ATR](./ai-stop-loss-dynamic-atr).
+
+## Combining Kelly With Risk Management
+
+Kelly sizing should not exist in isolation. Pair it with:
+
+- Maximum position limits per trade
+- Portfolio heat limits for correlated trades
+- Stop losses to define the actual loss amount
+- Regular recalculation as market conditions change
+
+For example, you might cap any single position at 5% of capital even if Kelly suggests 8%. This keeps a single mistake from dominating your outcome. The Kelly output is a starting point for discussion, not a final order size.
+
+## Kelly in a Multi-Strategy Portfolio
+
+When running multiple strategies, Kelly can help allocate capital across them. Treat each strategy as a bet with its own return distribution. Strategies with higher risk-adjusted returns get more capital. Strategies in drawdown get less.
+
+This is sometimes called growth-optimal portfolio allocation. It requires long track records and stable correlations between strategies.
+
+## Bottom Line
+
+The Kelly criterion is a powerful tool for thinking about position size, but it is not a magic formula. Use fractional Kelly, validate your edge estimates out-of-sample, and never let one trade threaten your account.
+
+---
+
+**Related reading**: [AI Risk Parity Portfolio](./ai-risk-parity-portfolio) | [AI Stop Loss Dynamic ATR](./ai-stop-loss-dynamic-atr) | [AI Risk Management Framework](./ai-trading-risk-management-framework)

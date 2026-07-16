@@ -1,0 +1,147 @@
+---
+title: "Hummingbot Avellaneda 做市策略新手指南"
+description: "本文学习在 Hummingbot 上运行 Avellaneda-Stoikov 做市策略，理解模型原理、关键参数设置、库存风险、买卖价差动态与常见错误。强调先用模拟交易 responsibly 探索做市，再考虑小额实盘与严格止损，是散户入门做市的必读指南。"
+date: "2026-07-19"
+category: "Tutorials"
+tags: ["hummingbot", "market making", "avellaneda", "crypto", "algo trading", "open source"]
+readTime: "12 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "Avellaneda-Stoikov 策略是什么？"
+    answer: "它是一种数学做市模型，根据库存风险、波动率和时间范围优化买卖报价。"
+  - question: "散户做市能盈利吗？"
+    answer: "有时可以，但竞争激烈。盈利取决于价差、手续费、库存管理和市场状况。"
+  - question: "什么是库存风险？"
+    answer: "库存风险是指你积累了某种资产的仓位，然后价格下跌，在你平仓前造成损失的可能性。"
+  - question: "Avellaneda 做市会亏钱吗？"
+    answer: "会。逆向选择、波动率飙升和高手续费都可能导致亏损。务必先用模拟盘。"
+  - question: "哪些交易对更适合？"
+    answer: "成交量稳定、自然价差窄、价格相对稳定的交易对通常更好。稳定币对是常见起点。"
+---
+
+<Disclaimer />
+
+做市听起来像免费赚钱：挂买单和卖单，赚价差，重复操作。实际上，它是算法交易中最具竞争性和风险的形式之一。Hummingbot 中的 Avellaneda-Stoikov 策略是散户尝试做市的流行方式。本文解释其工作原理和如何负责任地使用。
+
+## 什么是做市
+
+做市商通过持续报出买卖价格来提供流动性。他们从买卖价差中获利，但也承担库存风险。如果价格剧烈波动，做市商可能被迫持有一个亏损的仓位。
+
+## Avellaneda-Stoikov 模型
+
+Avellaneda-Stoikov 模型是量化金融中的经典做市框架。它根据以下因素计算最优买卖价格：
+
+- **当前中间价**：最优买价和卖价的平均
+- **库存头寸**：当前持有多少标的
+- **波动率**：价格波动幅度
+- **时间范围**：策略再平衡前还有多久
+- **风险厌恶程度**：你希望多积极地降低库存风险
+
+该策略会倾斜报价以促使库存回归目标水平。如果你持有过多标的，就降低卖价以卖出更多；如果持有过少，就提高买价以买入更多。
+
+## Hummingbot 设置
+
+如果还没安装 Hummingbot，先用 Docker：
+
+```bash
+docker pull hummingbot/hummingbot:latest
+docker run -it --name hummingbot hummingbot/hummingbot:latest
+```
+
+在 Hummingbot 内创建 Avellaneda 策略：
+
+```bash
+create
+```
+
+选择 `avellaneda_market_making` 并按提示配置。
+
+## 关键参数
+
+| 参数 | 作用 | 常见范围 |
+|---|---|---|
+| `market` | 交易对，如 BTC-USDT | 取决于交易所 |
+| `execution_timeframe_mode` | 刷新报价频率 | Infinite 或 from_date/to_date |
+| `order_amount` | 每笔报价数量 | 根据资金量 |
+| `risk_factor` | 控制库存倾斜激进程度 | 0.5 到 2.0 |
+| `order_refresh_time` | 撤单并重挂频率 | 10 到 60 秒 |
+| `minimum_spread` | 愿意报出的最小价差 | 高于交易手续费 |
+| `volatility_buffer` | 波动率估计安全边际 | 0.1 到 0.5 |
+
+## 保守起始配置
+
+在稳定币对上做首次实验时，可考虑：
+
+- 挂单量：每侧较小，如 10 美元
+- 风险因子：0.5 到 1.0
+- 订单刷新时间：30 秒
+- 最小价差：0.2% 或更高
+- 启用模拟交易
+
+这种配置赚不了多少钱，但能帮你理解策略行为而不冒大风险。
+
+## 先模拟交易
+
+Hummingbot 有模拟交易模式。首次运行务必启用：
+
+```bash
+paper_trade_mode_enabled: true
+```
+
+观察机器人如何应对价格波动、库存如何变化、手续费如何累积。考虑实盘前至少模拟一周。
+
+## 需要理解的风险
+
+### 逆向选择
+
+其他交易者可能在信息优势时吃掉你的报价。结果是你常在下跌前买入、上涨前卖出。
+
+### 库存风险
+
+如果市场单向趋势运行，你的机器人会积累亏损方向的头寸。没有库存控制可能导致大额亏损。
+
+### 手续费侵蚀
+
+高频交易意味着高手续费。确保你的报价价差能覆盖交易所手续费和预期滑点。
+
+### 波动率飙升
+
+突发波动可能让价格变化快于机器人调整报价。 Kill switch 和仓位限制必不可少。
+
+## 监控指标
+
+模拟和实盘期间跟踪：
+
+- 总盈亏
+- 库存比例
+- 平均捕获价差
+- 已付手续费
+- 交易次数
+- 最大回撤
+
+## 什么时候适合做市
+
+做市在以下情况表现较好：
+
+- 价差足以覆盖手续费
+- 波动率适中
+- 有足够资金吸收库存波动
+- 能密切监控机器人
+
+以下情况表现较差：
+
+- 价差极窄
+- 市场强趋势
+- 手续费高
+- 无法快速响应问题
+
+## 总结
+
+Avellaneda-Stoikov 策略是算法做市的强力入门。Hummingbot 让散户也能接触做市。但可及性不等于安全性。做市需要仔细调参、库存管理和持续监控。
+
+从模拟交易开始，使用保守设置，绝不用无法承受损失的资金。
+
+---
+
+**相关阅读**: [Freqtrade vs Hummingbot](./freqtrade-vs-hummingbot-crypto) | [Top AI Trading GitHub 开源项目](./top-ai-trading-github-projects-2026) | [AI 交易风险管理框架](./ai-trading-risk-management-framework)

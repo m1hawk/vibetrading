@@ -1,0 +1,181 @@
+---
+title: "AI-Trader Copy Trading: Beginner's Guide"
+description: "Learn how to register an AI trading agent, publish signals, and copy-trade on AI-Trader's platform using paper trading."
+date: "2026-07-20"
+category: "Tutorials"
+tags: ["ai-trader", "copy trading", "paper trading", "ai agents", "open source", "crypto"]
+readTime: "11 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is AI-Trader?"
+    answer: "AI-Trader is an open-source platform where AI agents can register, publish trading signals, copy-trade each other, and sync trades across brokers."
+  - question: "Do I need real money to start?"
+    answer: "No. AI-Trader offers paper trading with simulated capital, which is the recommended starting point for beginners."
+  - question: "Can I copy other agents?"
+    answer: "Yes. The platform supports copy-trading, allowing you to follow signals published by other agents."
+  - question: "Is AI-Trader safe?"
+    answer: "Paper trading is safe. Real trading carries risk. Always verify an agent's methodology before following it with real capital."
+  - question: "What markets does AI-Trader support?"
+    answer: "Support depends on the latest adapters. Check the project repository for current broker and exchange integrations."
+---
+
+<Disclaimer />
+
+AI-Trader represents an emerging idea: an ecosystem where AI agents publish signals, compete on leaderboards, and copy-trade each other. For beginners, it offers a paper-trading sandbox to experiment without risking real money.
+
+This guide walks you through registering an agent, publishing a signal, and tracking performance on the AI-Trader platform.
+
+## What Is AI-Trader?
+
+AI-Trader is an open-source platform designed around agent-to-agent trading. Instead of a single bot running on your machine, agents operate in a networked environment where they can:
+
+- Publish signals
+- Be copied by other users
+- Sync trades across brokers
+- Compete on performance leaderboards
+
+The project is experimental but interesting for anyone curious about multi-agent trading ecosystems.
+
+## Who Should Use It?
+
+AI-Trader is a good fit if:
+
+- You want to experiment with AI agents in a sandbox
+- You are interested in copy-trading concepts
+- You want to test strategies without real capital
+- You enjoy exploring cutting-edge open-source projects
+
+It is not a mature production platform. Do not deploy significant capital without extensive testing.
+
+## Installation
+
+Start by cloning the repository and following the official setup instructions:
+
+```bash
+git clone https://github.com/HKUDS/AI-Trader.git
+cd AI-Trader
+```
+
+Most setups require Python and Docker. Read the README carefully because the project evolves quickly.
+
+## Registering Your First Agent
+
+After installation, register an agent through the platform interface or CLI:
+
+```bash
+python register_agent.py --name "MyFirstAgent" --strategy "momentum"
+```
+
+Your agent receives an identifier and a paper trading account with simulated capital, often around $100,000.
+
+## Publishing a Signal
+
+A signal is a recommendation to buy, sell, or hold an asset. A minimal signal might include:
+
+- Asset symbol
+- Direction: long, short, or neutral
+- Confidence score
+- Timestamp
+- Reasoning
+
+Example:
+
+```json
+{
+  "agent_id": "my_first_agent",
+  "symbol": "BTC-USDT",
+  "direction": "long",
+  "confidence": 0.65,
+  "reasoning": "Price broke above 20-day EMA on above-average volume."
+}
+```
+
+The platform records the signal and tracks its hypothetical performance.
+
+## Copy-Trading Other Agents
+
+One of the main features of AI-Trader is the ability to copy other agents. Before following an agent:
+
+- Review its historical signals
+- Understand its strategy description
+- Check its drawdown and win rate
+- Start with paper trading
+
+<Alert type="warning">
+  Past performance of an agent does not predict future results. Copy-trading with real capital requires the same diligence as choosing a human trader to follow.
+</Alert>
+
+## Paper Trading First
+
+AI-Trader's paper trading mode lets you test agents and copy-trading without financial risk. Use it to:
+
+- Learn how signals translate into simulated trades
+- Compare multiple agents side by side
+- Understand latency and slippage assumptions
+- Develop your own risk rules
+
+Paper trade for weeks before considering any real deployment.
+
+## Evaluating Agent Performance
+
+Look beyond total return. Important metrics include:
+
+- Sharpe ratio
+- Maximum drawdown
+- Win rate and expectancy
+- Signal frequency
+- Consistency across market conditions
+
+An agent with smooth, modest returns is often better than one with volatile, lottery-like performance.
+
+## Risks and Limitations
+
+- The platform is experimental and may have bugs
+- Live broker integrations may be incomplete
+- Copy-trading does not eliminate strategy risk
+- Leaderboards can be gamed with short-term luck
+- Project documentation may lag behind development
+
+## When to Move to Live Trading
+
+Only consider live trading after:
+
+- Months of successful paper trading
+- Full understanding of the agent's logic
+- Verification of broker integration
+- Defined risk limits and kill switches
+- Allocation of capital you can afford to lose
+
+
+## How to Read an Agent's Track Record
+
+A leaderboard ranked by total return can be misleading. A high return might come from a single lucky trade or excessive leverage. Look for these characteristics instead:
+
+- **Consistency**: Does the agent perform across different market conditions, or only during one rally?
+- **Drawdown control**: A 200% return with an 80% drawdown is riskier than a 30% return with a 10% drawdown.
+- **Signal frequency**: An agent that fires fifty signals per day may be overtrading. An agent that fires once per month may be too slow for your needs.
+- **Reasoning quality**: Read the published reasoning. Does it make sense, or is it vague AI-generated filler?
+
+A good agent should have transparent logic, reasonable risk, and a track record long enough to include at least one market correction.
+
+## Copy-Trading Risk Checklist
+
+Before copying any agent with real capital, confirm:
+
+- [ ] You understand the strategy and the assets it trades.
+- [ ] The agent has been paper traded for at least several weeks.
+- [ ] You have set a maximum allocation and a kill switch.
+- [ ] You know the broker integration status and any latency assumptions.
+- [ ] The capital allocated is money you can afford to lose entirely.
+- [ ] You will continue monitoring performance rather than setting and forgetting.
+
+Copy-trading is not passive income. It is delegated active trading, and the risks remain yours.
+
+## Bottom Line
+
+AI-Trader is a fascinating experiment in agent-based copy trading. For beginners, its greatest value is the paper-trading sandbox. Use it to learn, compare agents, and develop judgment. Treat live trading as a long-term goal, not a quick win.
+
+---
+
+**Related reading**: [TradingAgents Multi-Agent Setup](./tradingagents-multi-agent-setup) | [AI Hedge Fund Walkthrough](./ai-hedge-fund-multi-agent-walkthrough) | [Top AI Trading GitHub Projects](./top-ai-trading-github-projects-2026)

@@ -1,0 +1,167 @@
+---
+title: "AI Earnings Volatility: Trade Without Guessing"
+description: "Learn how to build an AI strategy around earnings announcements using volatility patterns, options data, and post-earnings drift."
+date: "2026-07-22"
+category: "Strategies"
+tags: ["ai trading", "earnings", "volatility", "options", "post-earnings drift", "python"]
+readTime: "12 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is an earnings volatility strategy?"
+    answer: "It is a strategy that trades around earnings announcements, typically using volatility expansion, options straddles, or post-earnings drift patterns."
+  - question: "Can AI predict earnings moves?"
+    answer: "AI can estimate the probability and magnitude of earnings moves based on historical patterns, sentiment, and options pricing. It cannot predict exact results."
+  - question: "What is post-earnings drift?"
+    answer: "Post-earnings drift is the tendency for stocks to continue moving in the direction of the earnings surprise for days or weeks after the announcement."
+  - question: "Do I need options data?"
+    answer: "Options data helps estimate expected move and implied volatility crush. Some strategies can use price and volume data alone."
+---
+
+<Disclaimer />
+
+Earnings announcements create some of the largest and most predictable moves in individual stocks. They also create uncertainty. Traders often try to guess whether a stock will go up or down. A better approach is to build a strategy around volatility and post-earnings drift rather than direction.
+
+Earnings trading is attractive because events are frequent and well-scheduled. Hundreds of companies report every quarter, giving you a large sample size to test and refine your model.
+
+## Why Earnings Are Different
+
+Earnings events concentrate information release into a single announcement. This causes:
+
+- Implied volatility expansion before earnings
+- Large price gaps after earnings
+- Implied volatility crush after the event
+- Sustained drift in the direction of the surprise
+
+These patterns create multiple strategy angles.
+
+## Strategy 1: Pre-Earnings Volatility Expansion
+
+Options become more expensive before earnings because traders expect a big move. Some strategies buy straddles or strangles ahead of earnings, betting that the actual move will exceed the expected move priced into options.
+
+A simple filter:
+
+- Buy a straddle 1-3 days before earnings
+- Close right after the announcement
+- Only trade when implied volatility is not already extreme
+
+The expected move is often approximated as the at-the-money straddle price divided by the stock price. If you believe the actual move will be larger, the trade has positive expected value.
+
+## Strategy 2: Post-Earnings Drift
+
+Research shows that stocks with positive earnings surprises tend to drift higher for weeks, and vice versa. An AI model can predict the direction and magnitude of drift using:
+
+- Earnings surprise vs analyst estimates
+- Guidance changes
+- Management tone from earnings calls
+- Options market implied move
+- Historical post-earnings behavior
+
+## Feature Engineering for Earnings Models
+
+```python
+df['earnings_surprise'] = (df['actual_eps'] - df['estimated_eps']) / df['estimated_eps']
+df['implied_move'] = df['atm_straddle_price'] / df['stock_price']
+df['historical_gap'] = df['gap_after_earnings'].rolling(8).mean()
+df['sentiment_score'] = df['earnings_call_sentiment']
+df['revenue_surprise'] = (df['actual_revenue'] - df['estimated_revenue']) / df['estimated_revenue']
+```
+
+These features combine quantitative surprise metrics with market-implied expectations.
+
+## Building an AI Earnings Model
+
+Train a classifier to predict post-earnings direction:
+
+```python
+from sklearn.ensemble import GradientBoostingClassifier
+
+features = ['earnings_surprise', 'revenue_surprise', 'implied_move', 'historical_gap', 'sentiment_score']
+X = df[features]
+y = df['next_day_direction']
+
+model = GradientBoostingClassifier()
+model.fit(X, y)
+```
+
+Use predicted probabilities to size positions. High-probability setups get larger size. Low-probability setups are skipped.
+
+## Risk Management
+
+Earnings trading is risky because:
+
+- Moves can be much larger than expected
+- Liquidity can be thin around announcements
+- Options can lose value quickly after volatility crush
+- Guidance matters more than headline numbers
+
+Risk rules:
+
+- Risk small amounts per trade
+- Avoid holding through unknown events
+- Use defined-risk options structures
+- Diversify across many earnings events
+
+## Data Sources
+
+- Earnings calendars from Yahoo Finance or Alpha Vantage
+- Options data from Polygon or Cboe
+- Earnings call transcripts for NLP analysis
+- Analyst estimates from financial data providers
+
+## When to Trade Earnings Volatility
+
+This strategy works best when:
+
+- You have clean options and earnings data
+- You can trade a large sample of events
+- You understand implied volatility dynamics
+- You use defined-risk structures
+
+## When to Avoid It
+
+Avoid earnings trading when:
+
+- You rely on guessing direction
+- Options premiums are extremely inflated
+- You cannot tolerate overnight gaps
+- You have limited diversification across events
+
+## Earnings Calendar Workflow
+
+A systematic earnings strategy follows a weekly workflow:
+
+1. **Monday**: Identify companies reporting this week
+2. **Tuesday-Wednesday**: Collect options implied move and recent sentiment
+3. **Before announcement**: Decide whether to enter a volatility or drift trade
+4. **After announcement**: Evaluate the actual move versus expected move
+5. **Next day**: Manage post-earnings drift positions or exit volatility trades
+
+This process keeps you organized and prevents emotional decisions during fast-moving events.
+
+## Options Greeks to Watch
+
+If you trade options around earnings, understand these Greeks:
+
+- **Delta**: Directional exposure to the stock
+- **Vega**: Sensitivity to implied volatility changes
+- **Theta**: Daily time decay
+- **Gamma**: How fast delta changes near the strike
+
+Earnings trades are often dominated by vega and theta. A long straddle profits from a large move but loses daily to theta. A short straddle collects premium but faces gap risk.
+
+## Common Earnings Trading Mistakes
+
+- Trading too few events and relying on small sample results
+- Holding through earnings without understanding implied move
+- Ignoring the volatility crush after the announcement
+- Overestimating how much direction can be predicted
+- Using undefined risk strategies on high-volatility stocks
+
+## Bottom Line
+
+AI earnings strategies work best when they exploit volatility patterns and post-earnings drift rather than trying to predict exact earnings numbers. The key is to use a large sample of events, manage risk tightly, and avoid overconfidence in any single prediction.
+
+---
+
+**Related reading**: [AI News Event Trading](./ai-news-event-trading) | [AI Sentiment Strategy](./ai-social-sentiment-strategy) | [AI Strategy Comparison Framework](./ai-strategy-comparison-framework)

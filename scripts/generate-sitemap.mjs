@@ -39,7 +39,10 @@ function build() {
   const entries = staticRoutes.map((p) => ({
     loc: p === "/" ? `${baseUrl}/` : `${baseUrl}${p}`,
     lastmod: toDay(new Date()),
+    alternates: null,
   }));
+
+  const postSlugs = new Map(); // slug -> { en?: lastmod, zh?: lastmod }
 
   if (fs.existsSync(postsDir)) {
     for (const file of fs
@@ -49,10 +52,33 @@ function build() {
       const isZh = file.endsWith(".zh.mdx");
       const slug = isZh ? file.replace(/\.zh\.mdx$/, "") : file.replace(/\.mdx$/, "");
       const { data } = matter(fs.readFileSync(path.join(postsDir, file), "utf8"));
+      const lastmod = toDay(data.updated || data.date || new Date());
+      const lang = isZh ? "zh" : "en";
+      const loc = `${baseUrl}${isZh ? "/zh/blog" : "/blog"}/${slug}`;
+
+      if (!postSlugs.has(slug)) {
+        postSlugs.set(slug, {});
+      }
+      postSlugs.get(slug)[lang] = { loc, lastmod };
+
       entries.push({
-        loc: `${baseUrl}${isZh ? "/zh/blog" : "/blog"}/${slug}`,
-        lastmod: toDay(data.updated || data.date || new Date()),
+        loc,
+        lastmod,
+        slug,
       });
+    }
+  }
+
+  // Attach alternates for posts that have both languages
+  for (const entry of entries) {
+    if (entry.slug && postSlugs.has(entry.slug)) {
+      const versions = postSlugs.get(entry.slug);
+      if (versions.en && versions.zh) {
+        entry.alternates = [
+          { lang: "en", loc: versions.en.loc },
+          { lang: "zh", loc: versions.zh.loc },
+        ];
+      }
     }
   }
 
@@ -64,18 +90,22 @@ function build() {
     return true;
   });
 
-  // Minimal required tags only (loc + lastmod) for max GSC compatibility
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n` +
     urls
-      .map(
-        (u) =>
+      .map((u) => {
+        let body =
           `  <url>\n` +
-          `    <loc>${u.loc}</loc>\n` +
-          `    <lastmod>${u.lastmod}</lastmod>\n` +
-          `  </url>`
-      )
+          `    <loc>${u.loc}</loc>\n`;
+        if (u.alternates) {
+          for (const alt of u.alternates) {
+            body += `    <xhtml:link rel="alternate" hreflang="${alt.lang}" href="${alt.loc}"/>\n`;
+          }
+        }
+        body += `    <lastmod>${u.lastmod}</lastmod>\n` + `  </url>`;
+        return body;
+      })
       .join("\n") +
     `\n</urlset>\n`;
 

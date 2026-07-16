@@ -1,0 +1,220 @@
+---
+title: "backtrader vs vectorbt：Python 回测该用哪个？"
+description: "本文从设计思路、执行速度、易用性、参数优化与机器学习适配度对比 backtrader 与 vectorbt。帮你选出最适合自己研究风格的 Python 策略回测工具，避免在错误的基础设施上浪费数周时间，是 Python 回测库选型的重要参考。"
+date: "2026-07-17"
+category: "Tools"
+tags: ["ai trading", "python", "backtesting", "backtrader", "vectorbt", "open source"]
+readTime: "11 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "vectorbt 比 backtrader 更好吗？"
+    answer: "vectorbt 更快，更适合大规模参数扫描和向量化研究；backtrader 是事件驱动，更适合初学者理解真实交易引擎的运行方式。"
+  - question: "vectorbt 能实盘交易吗？"
+    answer: "vectorbt 主要是研究和回测库，实盘需要自己搭建执行桥或使用 vectorbt.pro 的付费功能。"
+  - question: "backtrader 还在维护吗？"
+    answer: "核心版本稳定，但新功能开发放缓。因为 API 简洁、生态庞大，仍然被广泛使用。"
+  - question: "哪个更适合机器学习？"
+    answer: "vectorbt 通常更适合 ML，因为它能快速评估成千上万组参数，且与 pandas、NumPy 自然结合。"
+  - question: "两者都要付费吗？"
+    answer: "都有免费开源版本。vectorbt 还提供功能更丰富的 Pro 付费版。"
+---
+
+<Disclaimer />
+
+每个算法交易者都需要回测工具。对 Python 用户来说，backtrader 和 vectorbt 是讨论最多的两个库。两者都很优秀，但解决问题的思路截然相反。
+
+backtrader 是事件驱动的，模拟真实券商处理订单的方式。vectorbt 是向量化的， designed for 快速研究和大规模参数扫描。选错工具可能拖慢进度，甚至掩盖策略里的 bug。
+
+本文对比两者，帮你在投入数周代码前做出正确选择。
+
+## 快速对比
+
+| 特性 | backtrader | vectorbt |
+|---|---|---|
+| **设计思路** | 事件驱动 | 向量化 |
+| **最适合** | 学习和真实模拟 | 研究和参数扫描 |
+| **速度** | 中等 | 很快 |
+| **易用性** | 对初学者友好 | 学习曲线更陡 |
+| **实盘交易** | 可通过集成实现 | 支持有限 |
+| **参数优化** | 内置但较慢 | 极快 |
+| **机器学习** | 需手动集成 | 与 pandas/NumPy 自然结合 |
+| **维护状态** | 缓慢但稳定 | 活跃 |
+| **费用** | 免费 | 免费 / 有 Pro 版 |
+
+如果你是初学者，backtrader 通常是更好的起点。如果你做大规模研究或超参优化，vectorbt 很难被超越。
+
+## backtrader 如何工作
+
+backtrader 逐根 K 线处理数据。在每个时间步，你的策略可以检查指标、生成信号、下单。引擎会像真实券商一样跟踪现金、持仓、手续费和滑点。
+
+### 示例策略
+
+```python
+import backtrader as bt
+
+class SmaCross(bt.Strategy):
+    params = dict(fast=10, slow=30)
+
+    def __init__(self):
+        self.fast_ma = bt.ind.SMA(period=self.p.fast)
+        self.slow_ma = bt.ind.SMA(period=self.p.slow)
+
+    def next(self):
+        if not self.position:
+            if self.fast_ma > self.slow_ma:
+                self.buy()
+        elif self.fast_ma < self.slow_ma:
+            self.sell()
+```
+
+代码读起来像交易规则书。你定义每根 K 线做什么，backtrader 处理其余部分。
+
+### 优势
+
+- 直观的面向对象 API
+- 大量内置指标
+- 真实的事件驱动模拟
+- 适合理解交易引擎原理
+- 有实盘交易集成
+
+### 劣势
+
+- 比向量化方案慢
+- 优化较慢
+- 维护放缓
+- 不太适合大规模参数扫描
+
+## vectorbt 如何工作
+
+vectorbt 把整个价格历史当作矩阵处理。它不是逐根 K 线推进，而是一次性用 NumPy 和 pandas 计算整个数据集的信号和盈亏。
+
+### 示例策略
+
+```python
+import vectorbt as vbt
+import yfinance as yf
+
+price = yf.download("AAPL", start="2020-01-01")["Close"]
+fast_ma = price.rolling(10).mean()
+slow_ma = price.rolling(30).mean()
+entries = fast_ma > slow_ma
+exits = fast_ma < slow_ma
+
+portfolio = vbt.Portfolio.from_signals(price, entries, exits)
+print(portfolio.total_return())
+```
+
+代码紧凑，即使处理多年历史数据也能瞬间运行。
+
+### 优势
+
+- 回测极快
+- 参数优化极强
+- 与 pandas、NumPy 自然结合
+- 适合机器学习特征评估
+- 能快速测试成千上万种策略变体
+
+### 劣势
+
+- 对初学者不够直观
+- 事件驱动细节被抽象
+- 实盘支持有限
+- 部分高级功能需 Pro 版
+
+## 什么时候选 backtrader
+
+- 你正在学习算法交易
+- 你想理解订单执行细节
+- 策略依赖逐根 K 线逻辑
+- 你计划走向事件驱动的实盘模型
+- 你不想写太多数学公式就能用内置指标
+
+## 什么时候选 vectorbt
+
+- 你做跨资产或跨参数的大规模研究
+- 速度比执行真实性更重要
+- 你想集成机器学习预测
+- 你需要优化组合权重或策略参数
+- 你熟悉 pandas 和矩阵运算
+
+## 参数优化
+
+这是 vectorbt 的强项。几秒钟内测试多组参数：
+
+```python
+fast_windows = range(5, 50, 5)
+slow_windows = range(20, 200, 10)
+
+portfolio = vbt.Portfolio.from_signals(
+    price,
+    fast_ma.vbt > slow_ma.vbt,
+    fast_ma.vbt < slow_ma.vbt,
+    param_product=True
+)
+```
+
+同样扫描在 backtrader 中可能需要数分钟到数小时。
+
+## 真实感 vs 速度
+
+backtrader 的事件驱动设计更容易发现以下细节 bug：
+
+- 订单成交时机
+- 保证金追缴
+- 部分成交
+- 指标计算中的未来信息偏差
+
+vectorbt 用抽象换速度。这对研究没问题，但在实盘前，建议把 vectorbt 里表现好的策略放到更真实的引擎里再验证。
+
+## 机器学习集成
+
+如果你的策略用 scikit-learn 或 TensorFlow 模型，vectorbt 通常是更好的研究搭档。你可以用模型生成预测，然后直接把信号矩阵喂给 vectorbt 快速评估。
+
+backtrader 也能跑 ML 策略，但需要在事件循环里管理模型推理，比较麻烦。
+
+## 可以同时用吗
+
+可以，很多交易者就是这样做的。常见工作流：
+
+1. 用 vectorbt 快速筛选成千上万个策略想法
+2. 把表现最好的候选策略搬到 backtrader 做真实验证
+3.  surviving strategies 进入模拟盘，再到实盘
+
+两阶段方法兼顾了向量化研究的速度和执行层面的真实性。
+
+## 同策略代码对比
+
+### backtrader 版
+
+```python
+cerebro = bt.Cerebro()
+cerebro.addstrategy(SmaCross)
+cerebro.adddata(bt.feeds.YahooFinanceData(dataname="AAPL", fromdate=datetime(2020,1,1)))
+cerebro.run()
+cerebro.plot()
+```
+
+### vectorbt 版
+
+```python
+price = yf.download("AAPL", start="2020-01-01")["Close"]
+portfolio = vbt.Portfolio.from_signals(
+    price,
+    price.rolling(10).mean() > price.rolling(30).mean(),
+    price.rolling(10).mean() < price.rolling(30).mean()
+)
+portfolio.plot().show()
+```
+
+两者会画出类似的资金曲线，但开发体验差异很大。
+
+## 总结
+
+backtrader 和 vectorbt 不是直接竞争对手，它们解决策略开发 pipeline 中不同阶段的问题。
+
+想理解算法交易系统如何运转，从 **backtrader** 开始。需要大规模研究和优化时，转向 **vectorbt**。最有效的量化交易者知道什么时候切换工具。
+
+---
+
+**相关阅读**: [Backtrader 回测基础](./backtrader-backtesting-basics) | [如何回测而不自欺欺人](./how-to-backtest-without-overfitting) | [QuantConnect vs Backtrader vs Alpaca vs MQL5](./quantconnect-vs-backtrader-vs-alpaca-vs-mql5)

@@ -1,9 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "风险声明",
-  description:
-    "vibetrading.fun 的重要风险声明。交易涉及重大亏损风险。",
+  title: "风险声明 - VibeTrading.fun",
+  description: "vibetrading.fun 的重要风险声明。交易与 AI 交易机器人涉及重大亏损风险，过往表现不代表未来结果。本站所有内容仅供教育参考，不构成任何投资建议、买卖建议或收益承诺。",
 
   alternates: {
     canonical: "/zh/disclaimer",

@@ -1,0 +1,181 @@
+---
+title: "OpenBB + Alpaca 实时数据管道：搭建免费量化栈"
+description: "本文学习如何组合 OpenBB 与 Alpaca，为 Python 交易机器人与研究搭建免费的实时数据管道。涵盖账户设置、历史与实时数据获取、OpenBB 分析集成，以及喂给机器人的最佳实践与限制，是免费量化数据栈的搭建教程，并讨论免费数据管道的稳定性、延迟与合规注意事项。"
+date: "2026-07-20"
+category: "Tutorials"
+tags: ["openbb", "alpaca", "market data", "python", "quant research", "open source"]
+readTime: "12 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "OpenBB + Alpaca 能获取免费实时行情吗？"
+    answer: "Alpaca 为模拟和实盘账户提供免费的美股实时和历史数据。OpenBB 可通过 Python SDK 拉取这些数据。"
+  - question: "需要入金的 Alpaca 账户吗？"
+    answer: "不需要。免费 Alpaca 模拟账户即可获取行情数据。"
+  - question: "这个管道覆盖哪些市场？"
+    answer: "主要聚焦美股和 ETF。加密和外汇需要不同数据源。"
+  - question: "数据准确度够实盘吗？"
+    answer: "对大多数散户策略足够。高频或对延迟敏感的策略需要付费数据流。"
+  - question: "能用于期权数据吗？"
+    answer: "Alpaca 免费期权数据有限。严肃的期权研究可考虑 Polygon 等付费提供商。"
+---
+
+<Disclaimer />
+
+数据是构建交易系统最难的部分。在训练模型或运行回测前，你需要干净可靠的市场数据。OpenBB 和 Alpaca 共同为美股提供了免费、合法的实时数据获取方式。
+
+本教程展示如何将它们组合成可用于研究和模拟交易的工作流。
+
+## 你会完成什么
+
+读完本教程后，你将拥有：
+
+- Alpaca 模拟账户
+- OpenBB Python 环境
+- 获取实时和历史数据的脚本
+- 可复用的交易机器人数据管道
+
+## 第一步：创建 Alpaca 账户
+
+在 alpaca.markets 注册，选择模拟账户。模拟账户免费并提供实时行情。
+
+在 Alpaca 后台生成 API key。你需要：
+
+- API Key ID
+- Secret Key
+- 模拟交易端点 URL
+
+安全存储，切勿提交到版本控制。
+
+## 第二步：安装 OpenBB 和 Alpaca SDK
+
+创建虚拟环境并安装所需包：
+
+```bash
+python -m venv quant-stack
+source quant-stack/bin/activate
+pip install openbb
+pip install alpaca-py
+```
+
+## 第三步：用 OpenBB 获取历史数据
+
+OpenBB 可从多个来源拉取历史价格。对 Alpaca 数据，可用 OpenBB SDK 的股票价格函数或直接调用 Alpaca。
+
+```python
+from openbb import obb
+
+# 使用 OpenBB 默认 Yahoo Finance 连接器
+data = obb.equity.price.historical("AAPL", start_date="2023-01-01", provider="yfinance")
+df = data.to_df()
+print(df.head())
+```
+
+Alpaca 专用数据：
+
+```python
+from alpaca.data.historical import StockHistoricalDataClient
+from alpaca.data.requests import StockBarsRequest
+from alpaca.data.timeframe import TimeFrame
+from datetime import datetime
+
+client = StockHistoricalDataClient("API_KEY", "SECRET_KEY")
+
+request = StockBarsRequest(
+    symbol_or_symbols=["AAPL", "MSFT"],
+    timeframe=TimeFrame.Day,
+    start=datetime(2023, 1, 1)
+)
+
+bars = client.get_stock_bars(request)
+df = bars.df
+print(df.head())
+```
+
+## 第四步：获取实时数据
+
+实时或近期数据用 Alpaca 实时 API：
+
+```python
+from alpaca.data.live import StockDataClient
+
+live_client = StockDataClient("API_KEY", "SECRET_KEY")
+# 根据需求订阅报价或成交
+```
+
+大多数散户策略不需要真正的 websocket 流。每分钟或每小时拉取最新 K 线通常足够。
+
+## 第五步：OpenBB 分析 + Alpaca 数据
+
+拿到数据后，用 OpenBB 分析：
+
+```python
+import pandas as pd
+
+# 计算收益和简单指标
+df['returns'] = df['close'].pct_change()
+df['sma20'] = df['close'].rolling(20).mean()
+df['sma50'] = df['close'].rolling(50).mean()
+
+# 用 OpenBB 获取基本面或新闻
+fundamentals = obb.equity.fundamental.income("AAPL", provider="yfinance")
+print(fundamentals.to_df().head())
+```
+
+这种组合给你强大的免费研究栈。
+
+## 第六步：喂给交易机器人
+
+管道可 feeding 简单信号生成器：
+
+```python
+def generate_signal(df):
+    if df['sma20'].iloc[-1] > df['sma50'].iloc[-1]:
+        return "buy"
+    return "sell"
+
+signal = generate_signal(df)
+print(f"Signal: {signal}")
+```
+
+模拟交易时把信号发给 Alpaca：
+
+```python
+from alpaca.trading.client import TradingClient
+from alpaca.trading.requests import MarketOrderRequest
+from alpaca.trading.enums import OrderSide, TimeInForce
+
+trading_client = TradingClient("API_KEY", "SECRET_KEY", paper=True)
+
+order = MarketOrderRequest(
+    symbol="AAPL",
+    qty=1,
+    side=OrderSide.BUY,
+    time_in_force=TimeInForce.DAY
+)
+
+trading_client.submit_order(order)
+```
+
+## 最佳实践
+
+- 用环境变量存储 API key
+- 优雅处理缺失数据和 API 错误
+- 缓存历史数据避免重复调用
+- 记录每次数据获取和交易
+- 按调度或触发运行，而非持续轮询
+
+## 限制
+
+- Alpaca 数据以美国市场为主
+- 免费数据有速率限制
+- 免费期权数据有限
+- 不适合高频策略
+
+## 总结
+
+OpenBB + Alpaca 为散户交易者提供了免费、合法且能力足够的美股数据管道。它足以构建、回测和模拟交易多种策略。国际资产或高级数据集最终需要付费提供商，但这个栈是极佳起点。
+
+---
+
+**相关阅读**: [OpenBB Python 量化研究栈](./openbb-python-quant-research-stack) | [第一个 AI 交易机器人：Alpaca EMA 交叉](./first-ai-trading-bot-ema-cross-alpaca) | [免费 vs 付费市场数据](./free-vs-paid-market-data)

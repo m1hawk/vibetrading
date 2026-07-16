@@ -1,9 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "联盟披露",
-  description:
-    "vibetrading.fun 的联盟披露。我们只推荐亲自测试或研究过的工具。",
+  title: "联盟披露 - VibeTrading.fun",
+  description: "VibeTrading.fun 的联盟披露：我们只推荐亲自测试、深入研究或确实能为散户交易者创造真实价值的 AI 交易工具与平台。透明、诚实、始终把用户利益放在第一位。",
 
   alternates: {
     canonical: "/zh/affiliate",

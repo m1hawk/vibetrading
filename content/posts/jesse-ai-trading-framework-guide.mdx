@@ -1,0 +1,191 @@
+---
+title: "Jesse Framework: Beginner Crypto Bot Guide"
+description: "Learn how to use Jesse, a Python crypto algo trading framework with advanced backtesting, machine learning, and live trading features."
+date: "2026-07-18"
+category: "Tutorials"
+tags: ["jesse", "crypto", "algo trading", "python", "backtesting", "open source"]
+readTime: "11 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is Jesse?"
+    answer: "Jesse is an advanced Python algorithmic trading framework focused on cryptocurrency. It offers high-performance backtesting, machine-learning integration, and live trading capabilities."
+  - question: "Is Jesse free?"
+    answer: "Jesse has an open-source core and a paid premium version called Jesse Trade with additional features such as cloud optimization and advanced dashboards."
+  - question: "Does Jesse support machine learning?"
+    answer: "Yes. Jesse includes features for training and deploying ML models as part of your trading strategies."
+  - question: "Which exchanges does Jesse support?"
+    answer: "Jesse supports major crypto exchanges including Binance, Bybit, and FTX data through community adapters. Check the latest documentation for current exchange support."
+  - question: "Is Jesse good for beginners?"
+    answer: "Jesse is more advanced than freqtrade. Beginners may find freqtrade easier, but Jesse offers more power for traders who want production-grade features."
+---
+
+<Disclaimer />
+
+freqtrade is the most popular open-source crypto bot, but it is not the only one. Jesse is a newer framework that targets traders who want more advanced backtesting, cleaner code architecture, and machine-learning integration. It is particularly popular among crypto traders who have outgrown simpler tools.
+
+This guide introduces Jesse's core concepts and walks through a first strategy setup.
+
+## What Is Jesse?
+
+Jesse is a Python framework for designing, backtesting, and deploying algorithmic trading strategies on cryptocurrency markets. It emphasizes:
+
+- **Performance**: Backtest engine optimized for speed and accuracy.
+- **Machine learning**: Built-in support for ML-driven strategies.
+- **Modularity**: Clean separation between routes, strategies, and research tools.
+- **Live trading**: Direct exchange integration for automated execution.
+
+Jesse is often compared to freqtrade, but it targets a slightly more advanced user base.
+
+## Quick Comparison: Jesse vs freqtrade
+
+| Feature | Jesse | freqtrade |
+|---|---|---|
+| **Primary focus** | Advanced crypto algo trading | General crypto bot automation |
+| **Ease of use** | Moderate | Beginner-friendly |
+| **Backtesting speed** | Fast | Moderate |
+| **Machine learning** | Strong built-in support | FreqAI module |
+| **Web UI** | Premium dashboard | Built-in free UI |
+| **Exchange support** | Major CEXs via adapters | 100+ via CCXT |
+| **Community** | Growing | Very large |
+
+If you want a simple bot with lots of community strategies, freqtrade is probably better. If you want a clean, modern framework with strong ML support, Jesse is worth exploring.
+
+## Installation
+
+Jesse is installed via pip. It is recommended to use a dedicated Python environment.
+
+```bash
+python -m venv jesse-env
+source jesse-env/bin/activate
+pip install jesse
+```
+
+After installation, create a new project:
+
+```bash
+jesse make-project my-trading-project
+cd my-trading-project
+```
+
+This scaffolds the directory structure with config, strategies, storage, and research folders.
+
+## Project Structure
+
+A typical Jesse project looks like this:
+
+```
+my-trading-project/
+├── config.py
+├── routes.py
+├── strategies/
+│   └── MyStrategy.py
+├── storage/
+└── research/
+```
+
+- **config.py**: Exchange API keys, symbols, timeframes, and backtest settings.
+- **routes.py**: Maps symbols to strategies.
+- **strategies/**: Contains your strategy classes.
+- **storage/**: Holds imported historical data.
+- **research/**: Notebooks and experiments.
+
+## A Simple Strategy
+
+Here is a basic trend-following strategy in Jesse:
+
+```python
+from jesse.strategies import Strategy
+
+class TrendFollowing(Strategy):
+    def should_long(self):
+        return self.close > self.sma(50)
+
+    def should_short(self):
+        return False
+
+    def go_long(self):
+        qty = self.capital / self.close
+        self.buy = qty, self.close
+
+    def update_position(self):
+        if self.close < self.sma(50):
+            self.liquidate()
+```
+
+Jesse strategies read like a set of rules. The framework handles execution, logging, and reporting.
+
+## Backtesting
+
+To run a backtest, first import historical data:
+
+```bash
+jesse import-candles Binance BTC-USDT 1d
+```
+
+Then run the backtest:
+
+```bash
+jesse backtest
+```
+
+Jesse provides detailed reports including equity curve, drawdown, trades, and metrics such as Sharpe ratio and win rate.
+
+## Machine Learning Integration
+
+Jesse supports ML strategies through its research module. A typical workflow is:
+
+1. Extract features from historical data.
+2. Train a model using scikit-learn, XGBoost, or a neural network.
+3. Save the model and load it inside the strategy.
+4. Use model predictions as signals.
+
+This integration is more native than in many other frameworks, making Jesse attractive for ML-curious traders.
+
+## Live Trading
+
+Jesse supports live trading through exchange adapters. Before going live:
+
+- Test extensively in backtest and paper modes.
+- Use API keys with restricted permissions.
+- Set up monitoring and alerts.
+- Start with small position sizes.
+
+<Alert type="warning">
+  Live crypto trading carries significant risk. Bugs, exchange downtime, and volatile moves can cause large losses quickly.
+</Alert>
+
+## When to Choose Jesse
+
+Choose Jesse if:
+
+- You want a modern Python framework with clean architecture
+- Machine learning is central to your strategy
+- You value backtesting performance
+- You are comfortable with a smaller but growing community
+
+## When to Choose freqtrade Instead
+
+Choose freqtrade if:
+
+- You want the largest community and most public strategies
+- You prefer a built-in web UI
+- You want broader exchange support through CCXT
+- You are newer to algorithmic trading
+
+## Common Pitfalls
+
+- **Over-optimizing ML models**: Financial data is noisy. A model that backtests well often fails live.
+- **Ignoring fees**: Crypto exchange fees vary widely and can erase edges.
+- **Over-leverage**: Futures strategies can produce large losses fast.
+- **Data gaps**: Incomplete historical data leads to unrealistic backtests.
+
+## Bottom Line
+
+Jesse is a powerful alternative to freqtrade for traders who want advanced backtesting and machine-learning support in a clean Python framework. It requires more setup and learning than beginner tools, but the payoff is a more flexible and performant platform.
+
+If you are already comfortable with Python and want to level up your crypto algo trading, Jesse deserves a serious look.
+
+---
+
+**Related reading**: [Freqtrade Beginner Guide](./freqtrade-beginner-guide-crypto-bot) | [Freqtrade vs Hummingbot](./freqtrade-vs-hummingbot-crypto) | [Top AI Trading GitHub Projects](./top-ai-trading-github-projects-2026)

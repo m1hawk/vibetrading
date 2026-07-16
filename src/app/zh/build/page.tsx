@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { HubPage } from "@/components/HubPage";
 import { getAllPosts } from "@/lib/posts";
 
-export const metadata: Metadata = { title: "用 AI 构建", description: "用 AI 构建无代码工作流、TradingView 策略、Python Bot、回测和交易 Agent。" ,
+export const metadata: Metadata = { title: "用 AI 构建交易工作流", description: "用 AI 构建无代码工作流、TradingView 策略、Python 交易机器人、回测和交易 Agent。从想法到可验证的自动化交易流程，适合没有量化背景但希望系统学习的交易者。",
   alternates: {
     canonical: "/zh/build",
   }};

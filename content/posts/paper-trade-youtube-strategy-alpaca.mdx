@@ -1,0 +1,213 @@
+---
+title: "Paper Trade a YouTube AI Trading Strategy on Alpaca"
+description: "Take an AI trading strategy from YouTube and paper trade it safely on Alpaca. Setup, data, order logic, tracking, and Python snippets included."
+date: "2026-07-16"
+category: "Tutorials"
+tags: ["ai trading", "youtube", "alpaca", "paper trading", "tutorial"]
+readTime: "10 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "Is Alpaca paper trading free?"
+    answer: "Yes. Alpaca offers a free paper trading account with the same API as live trading, so you can test strategies with simulated money."
+  - question: "Can I paper trade any YouTube strategy on Alpaca?"
+    answer: "Only if the strategy trades US stocks or ETFs that Alpaca supports. Crypto, forex, and international stocks require different brokers."
+  - question: "How long should I paper trade before going live?"
+    answer: "Paper trade long enough to see different market conditions, usually at least one to three months, and only consider live trading with capital you can afford to lose."
+  - question: "What is the difference between paper and live trading results?"
+    answer: "Paper trading ignores slippage, partial fills, and emotional pressure. Live results are almost always worse, so build in conservative assumptions."
+---
+
+<Disclaimer />
+
+You found an AI trading strategy on YouTube that actually makes sense. The creator explained the rules clearly, showed some code, and did not promise guaranteed riches. The next safe step is not live trading. It is paper trading. This tutorial shows you how to take that YouTube strategy and run it on Alpaca's free paper trading environment.
+
+Paper trading lets you test execution logic, catch bugs, and see how a strategy behaves under realistic market conditions without risking capital. It is not a perfect simulator, but it is far better than trusting a backtest or a video thumbnail. If you are completely new to this workflow, our [AI trading for beginners](./ai-trading-for-beginners) guide is a good place to start.
+
+## What You Will Need
+
+Before writing code, gather the basics:
+
+| Requirement | Recommended Option | Why |
+|-------------|-------------------|-----|
+| Broker account | Alpaca paper account | Free, API-first, US equities |
+| API keys | Generated in Alpaca dashboard | Required for automated order submission |
+| Python environment | 3.10 or newer | Modern SDK support |
+| Data source | Alpaca market data | Matches execution venue |
+| Trade journal | Spreadsheet or notebook | Critical for tracking decisions |
+
+Install the required packages in a virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install alpaca-py pandas python-dotenv
+```
+
+Create a `.env` file for your keys and add `.env` to `.gitignore`:
+
+```
+ALPACA_API_KEY=your_key_here
+ALPACA_SECRET_KEY=your_secret_here
+```
+
+Never commit API keys to version control. Even paper trading keys should be treated carefully because they can reveal account information.
+
+## Step 1: Define the Strategy Clearly
+
+Assume the YouTube strategy is a simple momentum breakout:
+
+- Watch the first 30 minutes of the trading day.
+- If price breaks above the 30-minute high, enter long.
+- Stop loss at the 30-minute low.
+- Close position at market close.
+
+This is just an example. Substitute whatever rules the video actually describes. The important part is that every rule is precise enough to code.
+
+## Step 2: Fetch Intraday Data
+
+Alpaca provides historical and live bars. Here is how to fetch recent 5-minute bars:
+
+```python
+import os
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+from alpaca.data.historical import StockHistoricalDataClient
+from alpaca.data.requests import StockBarsRequest
+from alpaca.data.timeframe import TimeFrame
+
+load_dotenv()
+
+client = StockHistoricalDataClient(
+    os.getenv("ALPACA_API_KEY"),
+    os.getenv("ALPACA_SECRET_KEY"),
+)
+
+request = StockBarsRequest(
+    symbol_or_symbols="AAPL",
+    timeframe=TimeFrame.Minute,
+    start=datetime.now() - timedelta(days=30),
+    end=datetime.now(),
+)
+
+bars = client.get_stock_bars(request)
+df = bars.df.reset_index()
+print(df.head())
+```
+
+Run this code and inspect the output. Make sure timestamps, open, high, low, close, and volume are all present before moving to order logic.
+
+## Step 3: Build the Signal Generator
+
+Now convert the strategy rules into a function. This function returns a target position for each bar:
+
+```python
+def generate_signals(df):
+    df = df.copy()
+    df['date'] = df['timestamp'].dt.date
+    
+    # Identify first 6 bars of the day (5-min bars -> 30 minutes)
+    df['bar_of_day'] = df.groupby('date').cumcount() + 1
+    morning = df[df['bar_of_day'] <= 6].copy()
+    
+    # Calculate morning high and low per day
+    morning_high = morning.groupby('date')['high'].max().rename('morning_high')
+    morning_low = morning.groupby('date')['low'].min().rename('morning_low')
+    df = df.merge(morning_high, on='date').merge(morning_low, on='date')
+    
+    # Signal: long after morning breakout
+    df['signal'] = 0
+    df.loc[df['close'] > df['morning_high'], 'signal'] = 1
+    df.loc[df['close'] < df['morning_low'], 'signal'] = 0  # exit rule placeholder
+    
+    return df
+```
+
+This code is intentionally simple. In a real system you would add more rules, handle stop losses, and manage position sizing. The goal here is to show the pattern.
+
+## Step 4: Submit Paper Orders
+
+Once you have a signal, submit orders to the Alpaca paper account:
+
+```python
+from alpaca.trading.client import TradingClient
+from alpaca.trading.requests import MarketOrderRequest
+from alpaca.trading.enums import OrderSide, TimeInForce
+
+trading_client = TradingClient(
+    os.getenv("ALPACA_API_KEY"),
+    os.getenv("ALPACA_SECRET_KEY"),
+    paper=True,
+)
+
+def submit_paper_order(symbol, qty, side):
+    order = trading_client.submit_order(
+        order_data=MarketOrderRequest(
+            symbol=symbol,
+            qty=qty,
+            side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
+            time_in_force=TimeInForce.DAY,
+        )
+    )
+    return order
+```
+
+Call this function only when your signal changes. A common mistake is sending an order on every bar. The bot should trade when its target position changes, not every five minutes.
+
+## Step 5: Track Every Trade
+
+A paper trade journal is essential. Record at least these fields:
+
+| Field | Example | Why It Matters |
+|-------|---------|----------------|
+| Date | 2026-07-16 | Identifies market regime |
+| Symbol | AAPL | Tracks which assets you trade |
+| Signal reason | Morning breakout | Keeps strategy honest |
+| Entry price | 225.50 | Compare to backtest assumptions |
+| Exit price | 227.10 | Computes actual PnL |
+| Quantity | 10 | Position sizing data |
+| Slippage estimate | 0.02 | Adjust backtest later |
+| Notes | Late entry due to gap | Explains deviations |
+
+At the end of each week, compare your paper journal to your backtest. If live paper results are consistently worse, your backtest assumptions are too optimistic. Read our guide on the [backtest vs live PnL gap](./backtest-vs-live-pnl-gap) for common reasons.
+
+## Step 6: Add Risk Rules Before Live Trading
+
+Paper trading is safe, but it can create false confidence. Before moving to live capital, enforce these rules:
+
+- Maximum risk per trade: 1% to 2% of capital
+- Daily loss limit: stop trading after losing 3% in a day
+- Maximum open positions: avoid overconcentration
+- No overnight risk unless the strategy specifically requires it
+- Review every losing week before increasing size
+
+These rules protect you from yourself. Automated execution does not remove the need for discipline.
+
+## Common Mistakes in Paper Trading
+
+| Mistake | Why It Hurts | Fix |
+|---------|--------------|-----|
+| Ignoring slippage | Paper fills are unrealistic | Add slippage assumptions to results |
+| Trading too often | Fees and noise eat edges | Limit trades to clear signals |
+| Changing rules mid-test | Invalidates the experiment | Define rules before the first trade |
+| Using unrealistic size | Distorts psychology | Match paper size to planned live size |
+| Quitting too early | One week is not a regime | Paper trade across multiple conditions |
+
+## Moving from Paper to Live
+
+If your paper results are stable and realistic, you might consider a tiny live account. Increase size gradually:
+
+1. Trade 10% of planned live size for one month.
+2. Compare live PnL to paper PnL weekly.
+3. Only scale up if the live edge remains after costs.
+4. Keep a reserve for drawdowns.
+
+For help building the full bot, see our [first AI trading bot with EMA crossover and Alpaca paper trading](./first-ai-trading-bot-ema-cross-alpaca) tutorial.
+
+## Bottom Line
+
+Paper trading a YouTube strategy on Alpaca is the responsible next step after watching a promising video. It turns vague inspiration into measurable execution. Most strategies will look worse on paper than in the video, and that is valuable information. The goal is not to confirm the video was right. The goal is to find out whether the idea survives contact with reality.
+
+---
+
+**Related reading:** [Convert YouTube Strategy to Python Backtest](./convert-youtube-strategy-to-backtest), [Backtest vs Live PnL Gap](./backtest-vs-live-pnl-gap), [First AI Trading Bot with Alpaca](./first-ai-trading-bot-ema-cross-alpaca)

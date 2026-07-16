@@ -1,0 +1,170 @@
+---
+title: "AI Pairs Trading: Build a Mean Reversion Bot"
+description: "Learn how to use AI and statistics to find cointegrated pairs and build a pairs trading strategy that bets on convergence."
+date: "2026-07-21"
+category: "Strategies"
+tags: ["ai trading", "pairs trading", "cointegration", "mean reversion", "python", "statistics"]
+readTime: "14 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is pairs trading?"
+    answer: "Pairs trading involves finding two assets whose prices move together and trading the spread. When the spread deviates, you bet on convergence."
+  - question: "What is cointegration?"
+    answer: "Cointegration means two non-stationary price series have a stable long-term relationship. It is stronger than simple correlation."
+  - question: "Does pairs trading still work?"
+    answer: "It works in some markets but is competitive. Success depends on pair selection, execution costs, and avoiding structural breaks."
+  - question: "How does AI help pairs trading?"
+    answer: "AI can screen thousands of pairs, detect regime changes, and predict spread reversion probability."
+---
+
+<Disclaimer />
+
+Pairs trading is a classic market-neutral strategy. Instead of betting on the direction of a single asset, you bet on the relationship between two assets. When that relationship breaks down temporarily, you trade the spread, expecting it to converge.
+
+AI can make pairs trading more scalable by screening large universes and predicting when a spread is likely to revert.
+
+## The Idea Behind Pairs Trading
+
+Find two assets whose prices historically move together. When their price ratio or spread deviates significantly from the mean:
+
+- Buy the underperforming asset
+- Sell the outperforming asset
+- Close the trade when the spread converges
+
+This is a market-neutral approach because profit comes from the relative movement, not the overall market direction.
+
+## Correlation vs Cointegration
+
+Correlation measures how two assets move together over a period. Cointegration tests whether a linear combination of the two assets is stationary, meaning the spread tends to return to a long-term mean.
+
+Cointegration is more important than correlation for pairs trading. Two assets can be highly correlated but not cointegrated, making the spread unstable.
+
+## Finding Cointegrated Pairs
+
+Use the Augmented Dickey-Fuller test on the spread. In Python:
+
+```python
+import statsmodels.api as sm
+from statsmodels.tsa.stattools import adfuller
+
+def test_cointegration(x, y):
+    x = sm.add_constant(x)
+    model = sm.OLS(y, x).fit()
+    residuals = model.resid
+    adf_result = adfuller(residuals)
+    return adf_result[1]  # p-value
+
+p_value = test_cointegration(prices['AAPL'], prices['MSFT'])
+```
+
+A low p-value, typically below 0.05, suggests cointegration.
+
+## Building the Spread
+
+The spread is usually defined as the residuals from an OLS regression:
+
+```python
+def calculate_spread(x, y):
+    x = sm.add_constant(x)
+    model = sm.OLS(y, x).fit()
+    return model.resid
+
+spread = calculate_spread(prices['AAPL'], prices['MSFT'])
+```
+
+When the spread is far from its mean, a trading opportunity may exist.
+
+## Entry and Exit Signals
+
+A common approach:
+
+- Enter when the z-score of the spread exceeds ±2
+- Exit when the z-score returns to 0
+- Stop out if the spread continues to diverge beyond ±3
+
+```python
+spread_mean = spread.mean()
+spread_std = spread.std()
+z_score = (spread - spread_mean) / spread_std
+```
+
+## How AI Improves Pair Selection
+
+Instead of manually testing every pair, AI can:
+
+- Screen thousands of pairs for cointegration and correlation
+- Cluster assets by sector and behavior
+- Detect regime changes that break historical relationships
+- Predict the probability of spread convergence
+
+A machine-learning model might use features such as:
+
+- Cointegration p-value
+- Half-life of mean reversion
+- Volatility ratio
+- Recent divergence magnitude
+- Sector similarity
+
+## Risk Management
+
+Pairs trading is not risk-free. Key risks include:
+
+- **Structural break**: One company changes fundamentally, destroying the historical relationship
+- **Execution risk**: Slippage on two legs can eliminate profits
+- **Liquidity risk**: One asset may be hard to short
+- **Overfitting**: Pairs found by mining data may not work in the future
+
+Risk rules:
+
+- Test pairs on multiple time periods
+- Avoid pairs without an economic link
+- Use position limits
+- Monitor for structural breaks
+
+## Example Workflow
+
+1. Download price data for a universe of stocks
+2. Test cointegration for all pairs
+3. Filter pairs with low p-values and economic rationale
+4. Calculate spread and z-score
+5. Backtest entry and exit rules
+6. Paper trade before live deployment
+
+
+## Worked Example: A Pairs Trade Walkthrough
+
+Suppose over the past year Pepsi and Coca-Cola have moved together with an ADF test p-value of 0.02. The current spread is 2.3 standard deviations above the mean. Coca-Cola has outperformed Pepsi by 4.5% over the last ten trading days.
+
+A pairs trader might:
+
+1. Short Coca-Cola with $5,000 notional.
+2. Buy Pepsi with $5,000 notional.
+3. Set a profit target when the z-score returns to 0.
+4. Set a stop loss when the z-score reaches 3.5.
+
+If the spread reverts, the trade captures the relative convergence. If a structural break occurs, such as a takeover rumor in one company, the stop loss exits the trade before the relationship completely breaks down.
+
+## When Pairs Trading Works Best
+
+Pairs trading tends to perform well when:
+
+- The two assets have a clear economic link, such as competitors in the same industry.
+- Volatility is moderate, not spiking in one direction.
+- Short availability is reliable and borrow costs are low.
+- The portfolio contains many pairs so no single failure is catastrophic.
+
+## Common Pairs Trading Mistakes
+
+- **Mining too many pairs**: Testing every combination in a 500-stock universe will find spurious relationships.
+- **Ignoring earnings calendars**: A single earnings report can destroy a historical relationship overnight.
+- **Equal notional sizing**: Pairs should be sized by volatility or beta, not by dollar amount.
+- **No stop loss**: Mean reversion is not guaranteed. Define a point where the trade is wrong.
+
+## Bottom Line
+
+Pairs trading is a market-neutral strategy that relies on statistical relationships rather than market direction. AI makes it possible to screen large universes and adapt to changing conditions. However, the strategy requires careful pair selection, execution discipline, and ongoing monitoring for structural breaks.
+
+---
+
+**Related reading**: [AI Trend Following vs Mean Reversion](./ai-trend-following-vs-mean-reversion) | [AI Breakout Strategy Setup](./ai-breakout-strategy-setup) | [AI Strategy Comparison Framework](./ai-strategy-comparison-framework)

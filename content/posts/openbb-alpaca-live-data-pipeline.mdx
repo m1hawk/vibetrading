@@ -1,0 +1,215 @@
+---
+title: "OpenBB + Alpaca Live Data Pipeline for Retail"
+description: "Learn how to combine OpenBB and Alpaca to build a free, live data pipeline for your Python trading bots and research."
+date: "2026-07-20"
+category: "Tutorials"
+tags: ["openbb", "alpaca", "market data", "python", "quant research", "open source"]
+readTime: "12 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "Can I get free live market data with OpenBB and Alpaca?"
+    answer: "Alpaca provides free real-time and historical US stock data for paper and live accounts. OpenBB can pull this data through its Python SDK."
+  - question: "Do I need a funded Alpaca account?"
+    answer: "No. You can sign up for a free Alpaca paper trading account and access market data."
+  - question: "What markets does this pipeline cover?"
+    answer: "US equities and ETFs are the primary focus. Crypto and forex require different data sources."
+  - question: "Is the data accurate enough for live trading?"
+    answer: "For most retail strategies, yes. High-frequency or latency-sensitive strategies may need premium data feeds."
+  - question: "Can I use this for options data?"
+    answer: "Alpaca's free options data is limited. For serious options research, consider Polygon or a paid provider."
+---
+
+<Disclaimer />
+
+Data is the hardest part of building a trading system. Before you can train a model or run a backtest, you need clean, reliable market data. OpenBB and Alpaca together provide a free, legal way to build a live data pipeline for US equities.
+
+This tutorial shows how to combine them into a workflow you can use for research and paper trading.
+
+## What You Will Build
+
+By the end of this guide, you will have:
+
+- An Alpaca paper trading account
+- An OpenBB Python environment
+- A script that fetches live and historical data
+- A reusable pipeline for your trading bots
+
+## Step 1: Create an Alpaca Account
+
+Sign up at alpaca.markets. Choose a paper trading account. Paper accounts are free and provide access to real-time market data.
+
+Generate API keys from the Alpaca dashboard. You will need:
+
+- API Key ID
+- Secret Key
+- Paper trading endpoint URL
+
+Store these securely. Never commit them to version control.
+
+## Step 2: Install OpenBB and Alpaca SDK
+
+Create a virtual environment and install the required packages:
+
+```bash
+python -m venv quant-stack
+source quant-stack/bin/activate
+pip install openbb
+pip install alpaca-py
+```
+
+## Step 3: Fetch Historical Data with OpenBB
+
+OpenBB can pull historical prices from multiple sources. For Alpaca data, you can use the OpenBB SDK's equity price functions or call Alpaca directly.
+
+```python
+from openbb import obb
+
+# Using OpenBB's default Yahoo Finance connector
+data = obb.equity.price.historical("AAPL", start_date="2023-01-01", provider="yfinance")
+df = data.to_df()
+print(df.head())
+```
+
+For Alpaca-specific data:
+
+```python
+from alpaca.data.historical import StockHistoricalDataClient
+from alpaca.data.requests import StockBarsRequest
+from alpaca.data.timeframe import TimeFrame
+from datetime import datetime
+
+client = StockHistoricalDataClient("API_KEY", "SECRET_KEY")
+
+request = StockBarsRequest(
+    symbol_or_symbols=["AAPL", "MSFT"],
+    timeframe=TimeFrame.Day,
+    start=datetime(2023, 1, 1)
+)
+
+bars = client.get_stock_bars(request)
+df = bars.df
+print(df.head())
+```
+
+## Step 4: Fetch Live Data
+
+For live or recent data, use Alpaca's real-time API:
+
+```python
+from alpaca.data.live import StockDataClient
+
+live_client = StockDataClient("API_KEY", "SECRET_KEY")
+# Subscribe to quotes or trades based on your needs
+```
+
+Most retail strategies do not need true websocket streaming. Pulling recent bars every minute or hour is often enough.
+
+## Step 5: Combine OpenBB Analytics with Alpaca Data
+
+Once you have data, use OpenBB for analysis:
+
+```python
+import pandas as pd
+
+# Calculate returns and simple indicators
+df['returns'] = df['close'].pct_change()
+df['sma20'] = df['close'].rolling(20).mean()
+df['sma50'] = df['close'].rolling(50).mean()
+
+# Use OpenBB to fetch fundamentals or news
+fundamentals = obb.equity.fundamental.income("AAPL", provider="yfinance")
+print(fundamentals.to_df().head())
+```
+
+This combination gives you a powerful, free research stack.
+
+## Step 6: Feed Data into a Trading Bot
+
+Your pipeline can feed a simple signal generator:
+
+```python
+def generate_signal(df):
+    if df['sma20'].iloc[-1] > df['sma50'].iloc[-1]:
+        return "buy"
+    return "sell"
+
+signal = generate_signal(df)
+print(f"Signal: {signal}")
+```
+
+For paper trading, send the signal to Alpaca:
+
+```python
+from alpaca.trading.client import TradingClient
+from alpaca.trading.requests import MarketOrderRequest
+from alpaca.trading.enums import OrderSide, TimeInForce
+
+trading_client = TradingClient("API_KEY", "SECRET_KEY", paper=True)
+
+order = MarketOrderRequest(
+    symbol="AAPL",
+    qty=1,
+    side=OrderSide.BUY,
+    time_in_force=TimeInForce.DAY
+)
+
+trading_client.submit_order(order)
+```
+
+## Best Practices
+
+- Use environment variables for API keys
+- Handle missing data and API errors gracefully
+- Cache historical data to avoid repeated API calls
+- Log every data fetch and trade
+- Run on a schedule or trigger rather than polling continuously
+
+## Limitations
+
+- Alpaca data is US-centric
+- Free data may have rate limits
+- Free options data is limited
+- Not suitable for high-frequency strategies
+
+
+## Text-Based Architecture Overview
+
+Your final pipeline has three layers:
+
+1. **Ingestion**: Alpaca provides real-time and historical price bars.
+2. **Analytics**: OpenBB enriches prices with fundamentals, news, and macro data.
+3. **Execution**: Alpaca paper or live trading endpoints turn signals into orders.
+
+A simple scheduler, such as a cron job or a Python loop with `schedule`, pulls fresh data, runs the analytics layer, and decides whether to trade. Keep the scheduler lightweight. The heavy lifting happens inside your strategy module.
+
+## Scheduling the Pipeline
+
+Most retail strategies do not need websocket streaming. Pulling recent bars every minute, hour, or day is enough. A daily equity strategy might run at 9:30 AM Eastern and again after market close. A higher-frequency crypto strategy might run every five minutes.
+
+Avoid polling APIs aggressively. Alpaca rate limits are generous but not infinite. Cache historical data locally and only request what has changed since the last run.
+
+## Error Handling Pattern
+
+Live pipelines fail. Build resilience from the start:
+
+```python
+import logging
+from tenacity import retry, stop_after_attempt, wait_fixed
+
+@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+def fetch_bars(client, request):
+    return client.get_stock_bars(request)
+
+logging.basicConfig(level=logging.INFO)
+```
+
+Log every data fetch, signal, and order. When something breaks, logs are the only way to reconstruct what happened. For a step-by-step first bot, see the guide on [building your first AI trading bot with Alpaca](./first-ai-trading-bot-ema-cross-alpaca).
+
+## Bottom Line
+
+OpenBB plus Alpaca gives retail traders a free, legal, and capable data pipeline for US equities. It is enough to build, backtest, and paper trade a wide range of strategies. For international assets or premium datasets, you will eventually need paid providers, but this stack is an excellent starting point.
+
+---
+
+**Related reading**: [OpenBB Python Quant Research Stack](./openbb-python-quant-research-stack) | [First AI Trading Bot EMA Cross Alpaca](./first-ai-trading-bot-ema-cross-alpaca) | [Free vs Paid Market Data](./free-vs-paid-market-data)

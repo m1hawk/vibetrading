@@ -1,12 +1,21 @@
 ---
-title: "Build a 24/7 AI Trading Agent with Claude Code and Alpaca"
-description: "Step-by-step tutorial to build an autonomous trading agent using Claude Code Routines and the Alpaca API. Includes complete code, guardrails, and deployment tips."
+title: "Build an AI Trading Agent with Claude Code"
+description: "Build a Claude trading bot step-by-step using Claude Code Routines and the Alpaca API. Includes complete code, risk guardrails, and deployment tips."
 date: "2026-07-03"
 category: "Claude"
 tags: ["tutorial", "agent", "alpaca", "python"]
 readTime: "18 min read"
 featured: true
 lang: "en"
+faq:
+  - question: "Do I need coding experience to build this agent?"
+    answer: "Some familiarity with JavaScript or Python helps, but Claude Code can generate most of the code. You still need to understand how the strategy and risk checks work."
+  - question: "Can this bot run 24/7 on my laptop?"
+    answer: "A laptop is not reliable for 24/7 operation. Use a cloud server or scheduled task platform for consistent uptime."
+  - question: "Is Alpaca paper trading free?"
+    answer: "Yes. Alpaca offers a free paper trading API with simulated money, which is ideal for testing before risking real capital."
+  - question: "How do I stop the bot if it loses money?"
+    answer: "Implement a daily loss limit, a maximum position size, and a kill switch that halts trading when any guardrail is breached."
 ---
 
 <Disclaimer />
@@ -300,4 +309,6 @@ Now that you have the skeleton, you can extend it:
 - Build a dashboard to visualize journal entries.
 - Run backtests before deploying any strategy live.
 
+---
 
+**Related reading**: [Top AI Trading GitHub Projects](./top-ai-trading-github-projects-2026) | [AI Trading for Beginners](./ai-trading-for-beginners) | [How to Backtest Without Overfitting](./how-to-backtest-without-overfitting)

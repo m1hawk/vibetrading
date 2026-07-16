@@ -1,12 +1,21 @@
 ---
 title: "用 Claude Code 和 Alpaca 构建 24/7 AI 交易 Agent"
-description: "使用 Claude Code Routines 和 Alpaca API 构建自主交易 Agent 的分步教程。包含完整代码、护栏和部署技巧。"
+description: "本文是使用 Claude Code Routines 与 Alpaca 免费模拟交易 API 构建自主交易 Agent 的分步教程。涵盖研究、决策、执行、记录循环与完整代码护栏，助你部署一个安全、可解释、可自动运行的交易 Agent，是 2026 年 Agent 化交易的实践指南。"
 date: "2026-07-03"
 category: "Claude"
 tags: ["tutorial", "agent", "alpaca", "python"]
 readTime: "18 min read"
 featured: true
 lang: "zh"
+faq:
+  - question: "构建这个 Agent 需要编程经验吗？"
+    answer: "具备一些 JavaScript 或 Python 基础会有帮助，但 Claude Code 可以生成大部分代码。你仍需理解策略和风险检查的逻辑。"
+  - question: "这个机器人能在笔记本电脑上 24/7 运行吗？"
+    answer: "笔记本电脑不适合 7×24 运行。应使用云服务器或定时任务平台来保证稳定在线。"
+  - question: "Alpaca 模拟交易免费吗？"
+    answer: "是的。Alpaca 提供免费的模拟交易 API，使用虚拟资金，非常适合在冒真金白银风险之前测试策略。"
+  - question: "如果机器人亏损该怎么停止它？"
+    answer: "设置每日亏损限额、最大仓位和 kill switch，当任何护栏被触发时立即停止交易。"
 ---
 
 <Disclaimer />
@@ -298,4 +307,6 @@ Description: Run one full trading cycle
 - 构建一个仪表板来可视化日志条目。
 - 在实盘部署任何策略之前运行回测。
 
+---
 
+**相关阅读**: [Top AI Trading GitHub Projects](./top-ai-trading-github-projects-2026) | [AI Trading for Beginners](./ai-trading-for-beginners) | [How to Backtest Without Overfitting](./how-to-backtest-without-overfitting)

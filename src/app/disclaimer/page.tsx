@@ -3,7 +3,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Risk Disclaimer",
   description:
-    "Important risk disclaimer for vibetrading.fun. Trading involves substantial risk of loss.",
+    "Important risk disclaimer for VibeTrading.fun. Trading and AI trading bots involve substantial risk of loss. Nothing on this site is financial advice.",
 
   alternates: {
     canonical: "/disclaimer",

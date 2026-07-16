@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "隐私政策",
-  description: "vibetrading.fun 的隐私政策。",
+  title: "隐私政策 - VibeTrading.fun",
+  description: "vibetrading.fun 的隐私政策。了解我们收集哪些数据、如何使用这些数据，以及我们如何保护您在浏览 AI 交易教育内容、使用工具和参与社区讨论时的个人隐私安全。",
 
   alternates: {
     canonical: "/zh/privacy",

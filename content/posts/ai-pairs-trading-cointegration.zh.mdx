@@ -1,0 +1,140 @@
+---
+title: "AI 配对交易：寻找协整配对并构建均值回归机器人"
+description: "本文学习如何用 AI 与统计学方法寻找协整配对、构建价差序列、设定入场出场信号，并管理风险以构建稳健的市场中性配对交易策略。内容详解相关性 vs 协整、ADF 检验、价差均值回归特性与止损设计，是入门配对交易的完整工作流，并提供 Python 代码示例用于配对筛选与价差监控。"
+date: "2026-07-21"
+category: "Strategies"
+tags: ["ai trading", "pairs trading", "cointegration", "mean reversion", "python", "statistics"]
+readTime: "14 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "什么是配对交易？"
+    answer: "配对交易找到两只价格联动资产，交易其价差。价差偏离时押注收敛。"
+  - question: "什么是协整？"
+    answer: "协整指两个非平稳价格序列存在稳定的长期关系，比简单相关性强。"
+  - question: "配对交易还有效吗？"
+    answer: "在某些市场仍有效，但竞争激烈。成功取决于配对选择、执行成本和避免结构性断裂。"
+  - question: "AI 如何帮助配对交易？"
+    answer: "AI 可筛选成千上万对配对、检测机制变化、预测价差收敛概率。"
+---
+
+<Disclaimer />
+
+配对交易是经典的市场中性策略。你不是押注单一资产方向，而是押注两只资产之间的关系。当关系暂时破裂时，你交易价差，预期它会收敛。
+
+AI 可通过筛选大资产池和预测价差何时 revert，让配对交易更具可扩展性。
+
+## 配对交易的核心思想
+
+找到历史上价格联动的两只资产。当它们的价格比率或价差显著偏离均值时：
+
+- 买入表现差的资产
+- 卖出表现好的资产
+- 价差收敛时平仓
+
+这是市场中性方法，因为利润来自相对运动，而非整体市场方向。
+
+## 相关性与协整
+
+相关性衡量一段时间内两只资产如何共同移动。协整检验两个资产的线性组合是否平稳，即价差倾向于回归长期均值。
+
+对配对交易，协整比相关性更重要。两只资产可能高度相关但不协整，导致价差不稳定。
+
+## 寻找协整配对
+
+对价差做 ADF 检验：
+
+```python
+import statsmodels.api as sm
+from statsmodels.tsa.stattools import adfuller
+
+def test_cointegration(x, y):
+    x = sm.add_constant(x)
+    model = sm.OLS(y, x).fit()
+    residuals = model.resid
+    adf_result = adfuller(residuals)
+    return adf_result[1]  # p-value
+
+p_value = test_cointegration(prices['AAPL'], prices['MSFT'])
+```
+
+低 p 值（通常 < 0.05）暗示协整。
+
+## 构建价差
+
+价差通常定义为 OLS 回归残差：
+
+```python
+def calculate_spread(x, y):
+    x = sm.add_constant(x)
+    model = sm.OLS(y, x).fit()
+    return model.resid
+
+spread = calculate_spread(prices['AAPL'], prices['MSFT'])
+```
+
+价差远离均值时可能存在交易机会。
+
+## 入场和出场信号
+
+常用方法：
+
+- 价差 z-score 超过 ±2 时入场
+- z-score 回到 0 时出场
+- 价差继续 diverge 超过 ±3 时止损
+
+```python
+spread_mean = spread.mean()
+spread_std = spread.std()
+z_score = (spread - spread_mean) / spread_std
+```
+
+## AI 如何改进配对选择
+
+AI 可：
+
+- 对成千上万对进行协整和相关性筛选
+- 按行业和 behavior 聚类资产
+- 检测破坏历史关系的机制变化
+- 预测价差收敛概率
+
+ML 模型可能使用：
+
+- 协整 p 值
+- 均值回归半衰期
+- 波动率比率
+- 近期偏离幅度
+- 行业相似度
+
+## 风险管理
+
+配对交易并非无风险。关键风险：
+
+- **结构性断裂**：一家公司基本面变化，破坏历史关系
+- **执行风险**：两腿滑点可能抹掉利润
+- **流动性风险**：某资产难以做空
+- **过拟合**：数据挖掘找到的配对未来可能失效
+
+风险规则：
+
+- 多时间段测试配对
+- 避免无经济联系的配对
+- 使用仓位限制
+- 监控结构性断裂
+
+## 示例工作流
+
+1. 下载股票池价格数据
+2. 测试所有配对的协整性
+3. 筛选低 p 值且有经济逻辑的配对
+4. 计算价差和 z-score
+5. 回测入场出场规则
+6. 实盘前先用模拟盘
+
+## 总结
+
+配对交易是一种依赖统计关系而非市场方向的市场中性策略。AI 使其能够筛选大资产池并适应变化。但该策略需要谨慎选择配对、执行纪律和持续监控结构性断裂。
+
+---
+
+**相关阅读**: [AI 趋势跟踪 vs 均值回归](./ai-trend-following-vs-mean-reversion) | [AI 突破策略设置](./ai-breakout-strategy-setup) | [AI 策略对比框架](./ai-strategy-comparison-framework)

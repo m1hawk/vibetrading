@@ -2,7 +2,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "Privacy policy for vibetrading.fun.",
+  description:
+    "Privacy policy for VibeTrading.fun. Learn what data we collect, how we use it, and how we protect your privacy while browsing our AI trading education content.",
 
   alternates: {
     canonical: "/privacy",

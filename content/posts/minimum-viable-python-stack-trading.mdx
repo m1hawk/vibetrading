@@ -1,0 +1,267 @@
+---
+title: "The Minimum Viable Python Stack for AI Trading"
+description: "The minimum viable Python stack for AI trading: pandas, yfinance, Alpaca, TA-Lib, backtrader, vectorbt, scikit-learn, and how to use them together."
+date: "2026-07-25"
+category: "Guides"
+tags: ["python", "algo trading", "beginners", "tools", "data", "backtesting"]
+readTime: "11 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "Do I need to be a Python expert to build trading bots?"
+    answer: "No. You can start with basic Python and a few key libraries. Complexity grows as your strategies grow."
+  - question: "What is the most important library?"
+    answer: "pandas is the most important for data manipulation. Almost every Python trading workflow uses it."
+  - question: "Should I use Jupyter notebooks?"
+    answer: "Yes for research and prototyping. Move to scripts for production or automation."
+  - question: "Do I need a GPU?"
+    answer: "No for most retail strategies. A GPU helps only for large deep-learning models."
+---
+
+<Disclaimer />
+
+Python has become the default language for retail algorithmic trading. The ecosystem is huge, which can overwhelm beginners. This article cuts through the noise and presents the minimum viable stack for building AI trading strategies.
+
+The goal is not to install every popular library. It is to have the smallest set of tools that lets you go from idea to backtest to live paper trading.
+
+## Data Handling
+
+### pandas
+
+pandas is the foundation. It handles time series data, calculations, and transformations.
+
+```python
+import pandas as pd
+
+df = pd.read_csv("prices.csv", parse_dates=["date"], index_col="date")
+df["sma20"] = df["close"].rolling(20).mean()
+```
+
+### NumPy
+
+NumPy provides fast numerical operations. pandas builds on it.
+
+```python
+import numpy as np
+
+returns = np.log(df["close"] / df["close"].shift(1))
+```
+
+## Data Sources
+
+### yfinance
+
+Free historical stock and ETF data.
+
+```python
+import yfinance as yf
+
+data = yf.download("AAPL", start="2020-01-01")
+```
+
+### Alpaca API
+
+Free paper trading and market data for US stocks.
+
+```python
+from alpaca.data.historical import StockHistoricalDataClient
+```
+
+### OpenBB
+
+Unified financial data access for stocks, crypto, macro, and more.
+
+```python
+from openbb import obb
+```
+
+## Technical Analysis
+
+### TA-Lib
+
+Industry-standard technical indicators.
+
+```python
+import talib
+
+rsi = talib.RSI(df["close"], timeperiod=14)
+```
+
+### pandas-ta
+
+A pure Python alternative with more indicators.
+
+```python
+import pandas_ta as ta
+
+df.ta.rsi(length=14, append=True)
+```
+
+## Backtesting
+
+### backtrader
+
+Event-driven backtesting with built-in indicators.
+
+```python
+import backtrader as bt
+```
+
+For a deeper introduction, see [backtrader Backtesting Basics](./backtrader-backtesting-basics).
+
+### vectorbt
+
+Fast vectorized backtesting and parameter optimization.
+
+```python
+import vectorbt as vbt
+```
+
+## Machine Learning
+
+### scikit-learn
+
+Classic machine learning for classification and regression.
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+```
+
+### XGBoost / LightGBM
+
+Gradient boosting for tabular financial data.
+
+```python
+from xgboost import XGBClassifier
+```
+
+### PyTorch / TensorFlow
+
+For deep learning and neural networks.
+
+## Reinforcement Learning
+
+### Stable Baselines 3
+
+General-purpose reinforcement learning library.
+
+```python
+from stable_baselines3 import PPO
+```
+
+### FinRL
+
+Financial reinforcement learning framework built on top of Stable Baselines 3.
+
+## Environment and Deployment
+
+### conda or venv
+
+Isolate project dependencies.
+
+```bash
+python -m venv trading-env
+```
+
+### Docker
+
+Containerize your bot for consistent deployment.
+
+### cron or cloud schedulers
+
+Run scripts on a schedule.
+
+## Recommended Starting Stack
+
+For a beginner, start with:
+
+- pandas + NumPy for data
+- yfinance or Alpaca for data
+- TA-Lib or pandas-ta for indicators
+- backtrader or vectorbt for backtesting
+- scikit-learn or LightGBM for ML
+- Jupyter for research
+
+This stack is enough to build and test your first strategies without unnecessary complexity.
+
+## What to Avoid Early On
+
+- Distributed computing
+- Complex deep learning
+- High-frequency infrastructure
+- Multiple languages
+- Over-engineering before validating ideas
+
+## When to Add More Tools
+
+Add complexity only when you have a clear reason:
+
+- Move to paid data when free data limits your strategy
+- Add GPU computing when deep learning becomes necessary
+- Use Docker when you deploy to a server
+- Add databases when you manage large datasets
+
+## Sample Project Structure
+
+A clean project layout helps you grow without chaos:
+
+```
+trading-bot/
+├── data/
+│   ├── raw/
+│   └── processed/
+├── notebooks/
+│   └── research.ipynb
+├── src/
+│   ├── data.py
+│   ├── features.py
+│   ├── strategy.py
+│   ├── backtest.py
+│   └── execution.py
+├── config.yaml
+├── requirements.txt
+└── README.md
+```
+
+Keep research notebooks separate from production scripts. Reproducibility matters more than clever code.
+
+## Learning Path
+
+Here is a suggested order for learning the stack:
+
+1. Master pandas and NumPy
+2. Download data with yfinance or Alpaca
+3. Compute basic indicators
+4. Run a simple backtest in vectorbt
+5. Add a machine-learning signal
+6. Paper trade before going live
+
+Do not try to learn everything at once. Each step builds on the previous one.
+
+## Common Beginner Mistakes
+
+- Installing too many libraries at once
+- Skipping environment management
+- Writing all code in one notebook
+- Using deep learning before understanding simple models
+- Confusing research code with production code
+
+## Testing Your Setup
+
+Before building a strategy, verify that your environment works end to end:
+
+1. Create a virtual environment and install pandas, yfinance, and vectorbt
+2. Download one year of daily data for a stock
+3. Calculate a 20-day moving average
+4. Run a simple backtest
+5. Export the results to a CSV
+
+If you can complete these steps, your stack is ready. If something breaks, fix it now before adding more complexity. A working simple stack is far more valuable than a broken advanced one.
+
+## Bottom Line
+
+You do not need every library on GitHub to start. The minimum viable Python stack for AI trading is small: data handling, a data source, indicators, a backtester, and a machine-learning library. Master those before adding complexity.
+
+---
+
+**Related reading**: [First AI Trading Bot EMA Cross Alpaca](./first-ai-trading-bot-ema-cross-alpaca) | [backtrader vs vectorbt](./backtrader-vs-vectorbt-python) | [OpenBB Python Quant Research Stack](./openbb-python-quant-research-stack)

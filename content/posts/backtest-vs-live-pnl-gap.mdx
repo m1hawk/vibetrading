@@ -1,0 +1,143 @@
+---
+title: "Backtest vs Live PnL: Why Bots Lose Live"
+description: "Understand why backtest returns often do not match live trading results and how to close the gap with realistic modeling."
+date: "2026-07-25"
+category: "Guides"
+tags: ["backtesting", "live trading", "slippage", "overfitting", "execution", "risk"]
+readTime: "12 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "Why do backtests outperform live trading?"
+    answer: "Backtests often ignore slippage, fees, liquidity, partial fills, and market impact. They may also suffer from overfitting and look-ahead bias."
+  - question: "What is slippage?"
+    answer: "Slippage is the difference between the expected price of a trade and the actual executed price. It is common in fast or low-liquidity markets."
+  - question: "Can a backtest ever match live results?"
+    answer: "Not exactly, but a well-constructed backtest with realistic assumptions can be close enough to identify robust strategies."
+  - question: "How do I reduce the backtest-live gap?"
+    answer: "Use realistic fees, slippage, and fill assumptions. Validate with paper trading and walk-forward analysis."
+---
+
+<Disclaimer />
+
+Every algorithmic trader eventually faces the same disappointment: a strategy that looked amazing in backtesting loses money in live trading. This gap between backtest and live profit and loss is one of the hardest problems in quantitative trading. Understanding the causes is the first step toward closing it.
+
+## Why Backtests Lie
+
+Backtests are simulations. They make assumptions about the past. When those assumptions are too optimistic, the backtest becomes a fantasy. Common issues include:
+
+- **Look-ahead bias**: Using information that would not have been available at the time
+- **Overfitting**: Optimizing too closely to historical noise
+- **Survivorship bias**: Testing only on companies that still exist
+- **Missing costs**: Ignoring commissions, fees, and slippage
+- **Perfect fills**: Assuming orders execute at the desired price
+
+## The Biggest Causes of the Live Gap
+
+### Slippage and Market Impact
+
+In a backtest, you might assume you buy at the closing price. In reality, your order moves the market, especially for larger sizes or less liquid assets. Slippage can turn a profitable edge into a losing one.
+
+### Liquidity
+
+Backtests often assume infinite liquidity. In live trading, there may not be enough volume at the quoted price. This leads to partial fills and worse prices.
+
+### Fees and Commissions
+
+Retail traders pay spreads, commissions, and sometimes data fees. Crypto traders pay exchange fees and withdrawal costs. These add up quickly for high-frequency strategies.
+
+### Latency
+
+Even a few milliseconds of delay can matter for short-term strategies. Retail traders are at a disadvantage against co-located servers.
+
+### Overfitting
+
+A strategy that was curve-fitted to historical data will almost always underperform live. The market never repeats exactly.
+
+## How to Build More Realistic Backtests
+
+### Add Slippage
+
+Estimate slippage as a percentage of price or a fixed amount per trade:
+
+```python
+slippage = 0.001  # 0.1%
+execution_price = target_price * (1 + slippage)
+```
+
+### Include All Costs
+
+Add commissions, exchange fees, borrowing costs for shorts, and data costs.
+
+### Use Limit Orders Realistically
+
+If your strategy uses limit orders, model the probability of fill rather than assuming all limits are hit.
+
+### Avoid Look-Ahead Bias
+
+Strictly separate training and testing data. Never use future information at the time of a decision.
+
+### Test on Multiple Assets and Periods
+
+A robust strategy should work on more than one symbol and more than one historical period.
+
+## The Paper Trading Bridge
+
+Paper trading is the middle step between backtest and live trading. It uses real market data but simulated money. While not perfect, it catches many issues such as:
+
+- API errors
+- Delayed data
+- Order type mismatches
+- Unexpected exchange behavior
+
+Run paper trading for weeks or months before risking capital.
+
+## When the Gap Is Acceptable
+
+A small backtest-live gap is normal. The goal is not zero gap but a gap small enough that the strategy remains profitable after realistic costs.
+
+
+## Quantifying the Gap: A Realistic Example
+
+Consider a strategy that backtests at 18% annual return with a 1.2 Sharpe ratio. A trader deploys it live and sees 9% return with a 0.6 Sharpe. Where did the other half go?
+
+| Assumption | Backtest | Live Reality | Drag |
+|---|---|---|---|
+| Slippage | 0.0% | 0.08% per trade | ~3% annual |
+| Commission | Ignored | $0.001 per share | ~1% annual |
+| Spread | Mid-price | Full bid-ask | ~2% annual |
+| Partial fills | None | 5% of orders | ~1% annual |
+| Latency | Instant | 200 ms | ~1% annual |
+| Overfitting | None | Present | ~1% annual |
+
+The total drag can easily consume half of the theoretical edge. Traders who model realistic costs from the start are far less disappointed later.
+
+## Hidden Costs Checklist
+
+When building a backtest, include every cost that live trading will incur:
+
+- [ ] Broker commissions per share or per trade.
+- [ ] Exchange and regulatory fees.
+- [ ] Bid-ask spread, especially for limit orders that do not fill at mid.
+- [ ] Borrow costs for short positions.
+- [ ] Data subscription fees.
+- [ ] Slippage scaled by order size relative to average volume.
+- [ ] Taxes, if the strategy has high turnover.
+
+## When to Trust a Backtest
+
+A backtest becomes trustworthy when it survives:
+
+- Out-of-sample testing on unseen data.
+- Stress testing with higher fees and slippage.
+- Walk-forward optimization.
+- Paper trading confirmation.
+- A smaller-than-planned live allocation.
+
+## Bottom Line
+
+The backtest-live gap is not a bug. It is a natural consequence of modeling uncertainty. The best traders close the gap by building realistic simulations, validating rigorously, and scaling into live trading gradually. Assume your live results will be worse than your backtest, and design strategies that can survive that reality.
+
+---
+
+**Related reading**: [How to Backtest Without Overfitting](./how-to-backtest-without-overfitting) | [Overfitting vs Robustness Trading](./overfitting-vs-robustness-trading) | [Paper to Live Trading Checklist](./paper-to-live-trading-checklist)

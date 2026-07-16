@@ -1,0 +1,111 @@
+---
+title: "AI Trading Data Pipeline: Ingestion to Validation"
+description: "Understand the full AI trading data pipeline: ingestion, cleaning, feature engineering, storage, validation, and common data quality issues, with Python code."
+date: "2026-07-16"
+category: "Tutorials"
+tags: ["ai trading", "data pipeline", "python", "feature engineering"]
+readTime: "10 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is a data pipeline in AI trading?"
+    answer: "It is the sequence of steps that moves raw market data into a clean, validated format that a model can use for training or live inference."
+  - question: "Which data sources are common?"
+    answer: "Price and volume from broker APIs or yfinance, fundamental data from OpenBB, alternative data like news sentiment, and macroeconomic indicators."
+  - question: "How do you avoid look-ahead bias?"
+    answer: "Use point-in-time data, calculate features with only information available at the target timestamp, and avoid future-derived labels in training."
+  - question: "What storage format should I use?"
+    answer: "Parquet is efficient for columnar time series. SQLite works for small projects, while cloud object storage scales for larger datasets."
+---
+
+<Disclaimer />
+
+Every AI trading strategy starts with data. No matter how sophisticated your model is, garbage data will produce garbage signals. A well-designed data pipeline separates reliable strategies from backtests that look great on paper and collapse in live trading.
+
+In this tutorial we walk through the full AI trading data pipeline — ingestion, cleaning, feature engineering, storage, and validation — and provide a Python snippet you can adapt for your own research.
+
+## Data Ingestion
+
+Ingestion is the process of pulling raw data into your system. For retail traders, the most common sources are free price APIs such as yfinance, broker APIs like Alpaca, and quant platforms such as OpenBB. Some strategies also use alternative data: earnings calendars, news sentiment, social-media activity, or on-chain metrics.
+
+The key decision is granularity. A long-term equity strategy may only need daily bars, while a high-frequency crypto strategy needs tick or order-book data. Higher frequency increases storage and cleaning costs, so match your data to your holding period.
+
+If you are building your first stack, our [minimum viable Python stack trading](./minimum-viable-python-stack-trading) guide lists the libraries you will need.
+
+## Data Cleaning
+
+Raw market data is rarely clean. You will encounter missing bars from exchange outages, duplicated timestamps, suspicious spikes from bad ticks, and adjusted prices that do not match corporate actions. Cleaning means fixing these issues before they reach your model.
+
+A simple cleaning checklist includes removing duplicate timestamps, forward-filling only when it makes economic sense, and flagging outliers that exceed a reasonable number of standard deviations. Never blindly interpolate price data, because a missing bar may carry information about liquidity.
+
+## Feature Engineering
+
+Feature engineering turns raw prices into signals a model can interpret. Common examples include moving averages, returns over different horizons, volatility estimates, volume ratios, and technical indicators such as RSI or MACD.
+
+The most important rule is causality. Every feature must be computable at the moment the decision is made. If you use the closing price of the current bar to predict the same bar's return, you have introduced look-ahead bias. Shift your target forward or compute features from the previous bar.
+
+## Storage
+
+Efficient storage keeps iteration fast. For small projects, CSV files or SQLite are fine. As you scale, columnar formats like Parquet reduce both disk usage and load times. Partition your data by symbol and date so you can load only what you need.
+
+For live trading, your storage layer must support both historical batch queries and low-latency updates. Many retail systems use a hybrid: Parquet for research and an in-memory cache for the latest bars.
+
+## Validation
+
+Validation is the quality gate. Before any model sees the data, verify that timestamps are monotonic, symbols are complete, price columns are positive, and feature distributions look reasonable. Automated assertions catch silent bugs early.
+
+A robust pipeline also includes out-of-sample splits and walk-forward checks. Training on 2020-2023 and testing on 2024 is better than random shuffling, because markets have memory and regime shifts.
+
+## A Simple Python Pipeline
+
+```python
+import yfinance as yf
+import pandas as pd
+
+# 1. Ingestion
+raw = yf.download("AAPL", start="2020-01-01", end="2024-01-01")
+
+# 2. Cleaning
+df = raw.copy()
+df = df.dropna()
+df = df[~df.index.duplicated(keep="last")]
+
+# 3. Feature engineering
+df["returns"] = df["Close"].pct_change()
+df["sma_20"] = df["Close"].rolling(window=20).mean()
+df["volatility"] = df["returns"].rolling(window=20).std()
+df["target"] = (df["Close"].shift(-5) > df["Close"]).astype(int)
+
+# 4. Validation
+assert df["Close"].isnull().sum() == 0
+assert df.index.is_monotonic_increasing
+assert (df["Close"] > 0).all()
+
+# 5. Storage
+df.to_parquet("aapl_features.parquet")
+```
+
+This snippet downloads daily Apple data, removes missing and duplicate rows, builds a small feature set, validates the result, and writes it to Parquet. It is not production-grade — there is no logging, schema enforcement, or unit testing — but it captures the core idea.
+
+## Common Data Quality Issues
+
+Even experienced builders run into the same problems. Here is a quick reference.
+
+| Issue | Symptom | Fix |
+|-------|---------|-----|
+| Look-ahead bias | Backtest returns that are too good to be true | Use point-in-time features and shifted targets |
+| Survivorship bias | Strategy looks great because delisted losers are missing | Include historical constituents |
+| Duplicate timestamps | Mysterious jumps in backtest equity | Deduplicate and assert monotonicity |
+| Bad ticks | Spurious price spikes | Filter outliers by standard deviation or exchange flags |
+| Corporate actions | Prices look inconsistent | Use split- and dividend-adjusted data consistently |
+| Missing bars | Gaps during market stress | Flag rather than blindly fill |
+
+## Bottom Line
+
+A clean data pipeline is the unsung hero of AI trading. It protects you from look-ahead bias, survivorship bias, and silent data bugs that would otherwise poison your model. Invest in ingestion, cleaning, feature engineering, storage, and validation before you worry about model architecture. The best model in the world cannot save bad data.
+
+Once your pipeline is solid, the next step is to wire it into a simple bot. Our [first AI trading bot EMA cross Alpaca](./first-ai-trading-bot-ema-cross-alpaca) guide shows how to do that with paper trading.
+
+---
+
+**Related reading**: [Minimum Viable Python Stack Trading](./minimum-viable-python-stack-trading) | [First AI Trading Bot EMA Cross Alpaca](./first-ai-trading-bot-ema-cross-alpaca) | [Backtrader Backtesting Basics](./backtrader-backtesting-basics)

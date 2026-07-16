@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { HubPage } from "@/components/HubPage";
 
-export const metadata: Metadata = { title: "Vibe Trading 实验室", description: "公开规则、现实成本、模拟盘过程和失败结果的透明 AI 交易实验。" ,
+export const metadata: Metadata = { title: "Vibe Trading 实验室", description: "公开规则、现实成本、模拟盘过程和失败结果的透明 AI 交易实验。让每个有吸引力的想法都面对不方便但真实的证据，帮助散户交易者理性评估策略的真实可行性。",
   alternates: {
     canonical: "/zh/lab",
   }};

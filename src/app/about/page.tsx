@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About",
-  description: "Why VibeTrading.fun exists, how we build and test, and what we will never sell.",
+  title: "About VibeTrading.fun",
+  description:
+    "Learn why VibeTrading.fun exists, how we test AI trading tools and strategies, and our commitment to honest, evidence-based education for retail traders.",
 
   alternates: {
     canonical: "/about",

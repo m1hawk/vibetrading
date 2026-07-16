@@ -9,6 +9,7 @@
     "dev": "next dev",
     "build": "node scripts/generate-sitemap.mjs && next build",
     "sitemap": "node scripts/generate-sitemap.mjs",
+    "seo-check": "node scripts/seo-health-check.mjs",
     "start": "next start",
     "lint": "eslint"
   },

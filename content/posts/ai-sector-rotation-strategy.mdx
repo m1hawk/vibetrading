@@ -1,0 +1,168 @@
+---
+title: "AI Sector Rotation: Auto-Rotate Into Strong Sectors"
+description: "Build an AI sector rotation strategy that moves capital into sectors showing relative strength while avoiding weakening sectors."
+date: "2026-07-22"
+category: "Strategies"
+tags: ["ai trading", "sector rotation", "relative strength", "etf", "python", "strategy"]
+readTime: "12 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is sector rotation?"
+    answer: "Sector rotation is the practice of shifting investment capital from one industry sector to another based on economic cycles or relative strength."
+  - question: "Can AI predict sector rotation?"
+    answer: "AI can rank sectors by relative strength, momentum, and macro sensitivity. It cannot perfectly time rotations but can improve systematic allocation."
+  - question: "What ETFs work best for sector rotation?"
+    answer: "Select Sector SPDR ETFs such as XLF, XLK, XLE, XLI, and XLU are commonly used for US sector rotation strategies."
+  - question: "How often should I rotate?"
+    answer: "Most sector rotation strategies rebalance monthly. More frequent rotation increases costs and noise."
+---
+
+<Disclaimer />
+
+Sector rotation is the idea that different parts of the economy perform better at different stages of the business cycle. Technology may lead in expansion. Utilities and consumer staples may hold up in recessions. Energy may surge during inflation. An AI sector rotation strategy automates the process of identifying which sectors are currently strong.
+
+This style is popular because it applies macro thinking in a systematic way. Instead of forecasting the economy, you let price and momentum tell you where strength is appearing.
+
+## What Is Sector Rotation?
+
+Sector rotation means moving capital between industry sectors based on expected relative performance. Instead of picking individual stocks, you trade sector ETFs or baskets of sector leaders.
+
+Common cycle relationships include:
+
+- Early cycle: financials, consumer discretionary, technology
+- Mid cycle: technology, industrials, materials
+- Late cycle: energy, commodities, staples
+- Recession: utilities, healthcare, consumer staples
+
+## Why Use AI?
+
+Traditional sector rotation uses economic indicators and simple relative strength. AI can process more signals simultaneously:
+
+- Price momentum across sectors
+- Relative strength vs the broad market
+- Macroeconomic data such as yields, inflation, and employment
+- Sentiment from news and earnings
+- Cross-asset signals such as commodity prices and currencies
+
+## Building the Strategy
+
+### Step 1: Choose Sector ETFs
+
+Start with a diversified set of sector ETFs. For the US market:
+
+```python
+sectors = {
+    "XLK": "Technology",
+    "XLF": "Financials",
+    "XLE": "Energy",
+    "XLI": "Industrials",
+    "XLU": "Utilities",
+    "XLP": "Consumer Staples",
+    "XLY": "Consumer Discretionary",
+    "XLB": "Materials",
+    "XBI": "Biotech"
+}
+```
+
+### Step 2: Compute Relative Strength
+
+Rank each sector by momentum and relative strength:
+
+```python
+def sector_score(prices):
+    returns_1m = prices.pct_change(21)
+    returns_3m = prices.pct_change(63)
+    relative_to_spy = prices.div(spy_prices, axis=0).pct_change(63)
+    score = 0.5 * returns_3m + 0.3 * relative_to_spy + 0.2 * returns_1m
+    return score
+```
+
+### Step 3: Select Top Sectors
+
+Each month, invest in the top 2 or 3 sectors by score.
+
+```python
+top_sectors = sector_scores.iloc[-1].sort_values(ascending=False).head(3).index
+```
+
+### Step 4: Add Risk Filter
+
+Avoid rotating into sectors with extreme volatility or negative macro trends. Use a simple filter such as avoiding any sector below its 200-day moving average.
+
+## AI Enhancements
+
+Once the basic model works, add:
+
+- Macro regime classifier to adjust sector preferences
+- Machine-learning model predicting next-month sector returns
+- Sentiment features from earnings calls and news
+- Risk parity weighting instead of equal weight
+
+## Risk Management
+
+- Limit concentration to 2-4 sectors
+- Use a cash filter during broad market weakness
+- Rebalance monthly, not daily
+- Track drawdown relative to buy-and-hold
+
+## Common Pitfalls
+
+- **Chasing last month's winner**: Momentum can reverse quickly.
+- **High turnover**: Frequent rotation increases costs.
+- **Ignoring macro context**: A strong sector can still fall in a broad crash.
+- **Small sample**: Sector cycles are slow. Years of data are needed to validate.
+
+## When Sector Rotation Works Best
+
+This strategy works well when:
+
+- Sector leadership is clear and persistent
+- You can hold positions for at least a month
+- Transaction costs are low
+- You use a risk filter to avoid bear markets
+
+## When to Avoid It
+
+Avoid sector rotation when:
+
+- The market is in a strong, narrow rally led by one sector
+- Rotation signals conflict with broad market trends
+- Costs would consume expected gains
+- You do not have enough historical data to validate
+
+## Macro Features for Sector Models
+
+AI sector rotation can incorporate macroeconomic signals:
+
+- **Interest rates**: Rising rates hurt growth sectors, help financials
+- **Dollar strength**: Impacts exporters and commodities
+- **Credit spreads**: Tightening spreads favor cyclicals
+- **Inflation expectations**: Help energy and materials, hurt staples
+
+These features do not need perfect forecasts. They just need to shift probabilities in the right direction over many rotations.
+
+## Performance Evaluation
+
+Evaluate a sector rotation strategy against buy-and-hold:
+
+- Did it beat the market on a risk-adjusted basis?
+- Were drawdowns smaller?
+- Was turnover low enough to keep costs reasonable?
+- Did it avoid major bear markets?
+
+A sector rotation strategy does not need to beat the market every year. It needs to deliver smoother, more consistent returns over a full cycle.
+
+## Historical Example
+
+In 2022, rising interest rates hurt technology while energy and utilities outperformed. A simple sector rotation model that tracked relative strength would have reduced technology exposure and increased energy exposure as the year progressed. No macro forecast was required. The model followed price strength.
+
+This example illustrates the power of systematic rotation. You do not need to predict the future. You only need to respond to what the market is already showing you.
+
+## Bottom Line
+
+AI sector rotation is a practical way to apply systematic macro thinking without requiring deep economic forecasting. By ranking sectors on momentum, relative strength, and macro signals, you can build a strategy that adapts to changing market leadership. Start simple, validate over a long history, and keep costs low.
+
+---
+
+**Related reading**: [AI Momentum Strategy Python](./ai-momentum-strategy-python) | [AI Long-Short Equity Strategy](./ai-long-short-equity-strategy) | [AI Strategy Comparison Framework](./ai-strategy-comparison-framework)

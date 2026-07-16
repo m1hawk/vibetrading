@@ -1,0 +1,194 @@
+---
+title: "Lumibot: Backtest Stocks and Options Strategies"
+description: "Get started with Lumibot, a Python framework for backtesting and live trading stocks and options with realistic broker simulation."
+date: "2026-07-19"
+category: "Tutorials"
+tags: ["lumibot", "python", "backtesting", "options", "stocks", "open source"]
+readTime: "11 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is Lumibot?"
+    answer: "Lumibot is a Python algorithmic trading framework designed for backtesting and live trading stocks and options with realistic broker simulation."
+  - question: "Does Lumibot support options?"
+    answer: "Yes. Lumibot has strong options support including chain handling, greeks, and options-specific order types."
+  - question: "Is Lumibot free?"
+    answer: "Yes, Lumibot is open-source and free. Some data sources such as Polygon require paid API keys."
+  - question: "Which brokers does Lumibot support?"
+    answer: "Lumibot supports brokers such as Alpaca and Interactive Brokers for live trading."
+  - question: "Is Lumibot good for beginners?"
+    answer: "Lumibot is beginner-friendly compared to institutional frameworks, but options trading knowledge is required for options strategies."
+---
+
+<Disclaimer />
+
+Most open-source trading frameworks focus on crypto or futures. Lumibot is different. It is built specifically for stocks and options, making it a valuable tool for equity traders who want to automate and backtest strategies.
+
+This guide introduces Lumibot to beginners and walks through a simple backtest.
+
+## What Is Lumibot?
+
+Lumibot is a Python framework for algorithmic trading of stocks and options. It provides:
+
+- Event-driven backtesting
+- Realistic broker simulation
+- Live trading through supported brokers
+- Options chain support
+- Scheduling and lifecycle management
+
+It is particularly useful for traders who want to test options strategies without paying for expensive institutional software.
+
+## Quick Comparison
+
+| Feature | Lumibot | backtrader | QuantConnect Lean |
+|---|---|---|---|
+| **Asset focus** | Stocks, options | General | Multi-asset |
+| **Options support** | Strong | Limited | Good |
+| **Ease of use** | Beginner-friendly | Moderate | Steep |
+| **Live trading** | Yes | Via integrations | Yes |
+| **Data sources** | Yahoo, Polygon, Alpaca | Yahoo | QuantConnect data |
+
+## Installation
+
+Install Lumibot in a virtual environment:
+
+```bash
+python -m venv lumibot-env
+source lumibot-env/bin/activate
+pip install lumibot
+```
+
+For options data, you may want a Polygon API key. Free data from Yahoo Finance works for basic stock backtests.
+
+## A Simple Stock Strategy
+
+Here is a moving-average crossover strategy in Lumibot:
+
+```python
+from lumibot.strategies import Strategy
+from lumibot.traders import Trader
+from lumibot.backtesting import YahooDataBacktesting
+from datetime import datetime
+
+class SmaCross(Strategy):
+    def initialize(self):
+        self.symbols = ["AAPL"]
+        self.sleeptime = "1D"
+
+    def on_trading_iteration(self):
+        symbol = self.symbols[0]
+        historical_prices = self.get_historical_prices(symbol, 30, "day")
+        prices = historical_prices.df["close"]
+        sma20 = prices.rolling(20).mean().iloc[-1]
+        sma50 = prices.rolling(50).mean().iloc[-1]
+
+        if sma20 > sma50 and not self.get_position(symbol):
+            self.buy_stock(symbol)
+        elif sma20 < sma50 and self.get_position(symbol):
+            self.sell_all()
+```
+
+The code is readable and the lifecycle methods are clearly separated.
+
+## Backtesting
+
+Run a backtest with historical data:
+
+```python
+backtesting_start = datetime(2020, 1, 1)
+backtesting_end = datetime(2023, 1, 1)
+
+strategy = SmaCross
+result = strategy.backtest(
+    YahooDataBacktesting,
+    backtesting_start,
+    backtesting_end,
+    parameters={}
+)
+```
+
+Lumibot generates a report with returns, drawdown, and trade history.
+
+## Options Strategies
+
+Lumibot shines for options. You can:
+
+- Load option chains
+- Filter by expiration and strike
+- Buy calls, puts, and spreads
+- Handle assignment and exercise
+
+Options backtesting requires careful attention to data quality. Free data may not include complete option chains, so serious options research usually requires a paid data provider such as Polygon.
+
+## Live Trading
+
+Lumibot connects to brokers such as Alpaca and Interactive Brokers. The same strategy code used in backtesting can run live with minimal changes.
+
+Before going live:
+
+- Validate extensively in backtest
+- Run paper trading if your broker supports it
+- Set position size limits
+- Monitor logs and broker statements
+
+## When to Use Lumibot
+
+Use Lumibot if:
+
+- You trade US stocks or options
+- You want a beginner-friendly Python framework
+- You need options-specific features
+- You prefer event-driven simulation
+
+## Limitations
+
+- Crypto and forex support is limited
+- Free options data is incomplete
+- Performance is fine for retail but not competitive with institutional platforms
+- Advanced execution features are limited
+
+
+## Step-by-Step Setup Checklist
+
+Before running your first Lumibot backtest, complete these steps:
+
+- [ ] Create a Python virtual environment to avoid dependency conflicts.
+- [ ] Install Lumibot with `pip install lumibot`.
+- [ ] Choose a data source: Yahoo Finance for free stock data, Polygon for options and higher quality data.
+- [ ] Write a minimal strategy that inherits from `Strategy`.
+- [ ] Set start and end dates that include at least one market stress period.
+- [ ] Add slippage and commission assumptions in the backtest configuration.
+- [ ] Run the backtest and inspect the trade log for errors.
+- [ ] Compare results to a buy-and-hold benchmark.
+
+Skipping this checklist often leads to unrealistic results and avoidable bugs.
+
+## Extending the SMA Strategy
+
+The simple moving-average crossover is a starting point, not a finished system. Useful extensions include:
+
+- Adding a volatility filter, such as avoiding entries when the VIX is above 30.
+- Using a regime filter, such as only taking long signals when the 200-day moving average is rising.
+- Adding a trailing stop to protect profits.
+- Running the strategy on multiple uncorrelated symbols.
+
+Each extension should be tested individually so you can measure its true contribution.
+
+## When Lumibot Is Not the Right Tool
+
+Lumibot is not ideal when:
+
+- You need high-frequency execution or sub-second latency.
+- Your strategy trades crypto or forex as the primary asset.
+- You require advanced order types beyond market, limit, and stop.
+- You want built-in machine-learning pipelines.
+
+For those cases, consider QuantConnect Lean or a custom event-driven framework instead.
+
+## Bottom Line
+
+Lumibot fills an important gap for retail traders who want to backtest and automate stock and options strategies in Python. It is easier to learn than institutional frameworks while still providing realistic simulation. If your focus is US equities and options, Lumibot is one of the best open-source starting points.
+
+---
+
+**Related reading**: [First AI Trading Bot EMA Cross Alpaca](./first-ai-trading-bot-ema-cross-alpaca) | [backtrader vs vectorbt](./backtrader-vs-vectorbt-python) | [Top AI Trading GitHub Projects](./top-ai-trading-github-projects-2026)

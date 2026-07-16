@@ -1,0 +1,149 @@
+---
+title: "AI Risk Parity: Build a Risk-Balanced Portfolio"
+description: "Learn how to build a risk parity portfolio where each asset contributes equally to total portfolio risk using AI-driven volatility forecasts."
+date: "2026-07-23"
+category: "Strategies"
+tags: ["ai trading", "risk parity", "portfolio allocation", "volatility", "python"]
+readTime: "12 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is risk parity?"
+    answer: "Risk parity is an allocation approach where each asset contributes equally to the portfolio's total risk, rather than each asset receiving equal capital."
+  - question: "Why allocate by risk instead of dollars?"
+    answer: "Because equal dollar allocations give more volatile assets outsized influence on portfolio outcomes."
+  - question: "Does risk parity improve returns?"
+    answer: "It improves risk-adjusted returns and diversification but does not guarantee higher absolute returns."
+  - question: "How does AI improve risk parity?"
+    answer: "AI can forecast volatility and correlations more dynamically than simple historical estimates."
+---
+
+<Disclaimer />
+
+Equal dollar weighting seems fair, but it is not. A portfolio with 50% in stocks and 50% in bonds is not balanced because stocks contribute almost all the risk. Risk parity fixes this by allocating capital so that each asset contributes equally to total portfolio risk.
+
+This approach became famous through Bridgewater's All Weather fund, but the core idea is accessible to retail traders with a few lines of Python. The key insight is that capital and risk are not the same thing. Until you measure risk contribution, you are probably concentrating exposure in the most volatile holdings.
+
+## The Problem With Equal Weighting
+
+Consider two assets:
+
+- Stock ETF with 20% annual volatility
+- Bond ETF with 5% annual volatility
+
+An equal dollar split means stocks drive roughly 94% of the portfolio's risk. The bond allocation barely matters. If stocks fall 30%, the portfolio falls about 15%. The bond allocation provides almost no offset in terms of risk contribution.
+
+This matters because many portfolios that look diversified are not. A 60/40 stock-bond portfolio is still dominated by equity risk. Risk parity is one way to build a portfolio where diversification actually shows up when you need it.
+
+## How Risk Parity Works
+
+Risk parity allocates more capital to low-volatility assets and less to high-volatility assets. The formula for a two-asset inverse-volatility allocation is simple:
+
+```python
+import numpy as np
+
+vol_stock = 0.20
+vol_bond = 0.05
+
+inv_vol_stock = 1 / vol_stock
+inv_vol_bond = 1 / vol_bond
+total = inv_vol_stock + inv_vol_bond
+
+w_stock = inv_vol_stock / total
+w_bond = inv_vol_bond / total
+```
+
+This gives bonds about 80% and stocks about 20%. Both assets now contribute roughly equally to portfolio volatility, assuming zero correlation.
+
+A concrete example helps. Suppose you have a $100,000 portfolio:
+
+| Asset | Volatility | Risk Parity Weight | Dollar Amount |
+|---|---|---|---|
+| Stock ETF | 20% | 20% | $20,000 |
+| Bond ETF | 5% | 80% | $80,000 |
+
+The stock position is much smaller, but its risk contribution is now similar to the bond position. The portfolio is more balanced in terms of what actually drives outcomes.
+
+## Adding AI Forecasts
+
+Historical volatility is a starting point, but AI can improve estimates:
+
+- **GARCH models**: Capture volatility clustering
+- **Machine learning**: Forecast volatility from market microstructure and sentiment
+- **Regime detection**: Use different volatility estimates for different market conditions
+
+An AI-enhanced risk parity model updates volatility forecasts weekly or monthly and rebalances accordingly. For example, a model might predict that equity volatility will rise from 15% to 25% over the next month. The risk parity allocator would reduce stock exposure before the spike fully materializes.
+
+## Incorporating Correlations
+
+True risk parity considers correlations, not just individual volatilities. Highly correlated assets should receive less combined weight. This requires solving an optimization problem:
+
+```python
+import cvxpy as cp
+
+def risk_parity_weights(cov_matrix):
+    n = cov_matrix.shape[0]
+    w = cp.Variable(n)
+    risk = cp.quad_form(w, cov_matrix)
+    objective = cp.Minimize(cp.sum_squares(cp.multiply(w, cov_matrix @ w) - risk / n))
+    constraints = [w >= 0, cp.sum(w) == 1]
+    prob = cp.Problem(objective, constraints)
+    prob.solve()
+    return w.value
+```
+
+If two assets are highly correlated, the optimizer reduces their combined allocation and increases weights to assets that diversify the portfolio. This is especially important during crises, when correlations often spike toward one.
+
+## Rebalancing Frequency
+
+Monthly rebalancing is typical. More frequent rebalancing can improve responsiveness but increases transaction costs and turnover.
+
+A practical checklist for rebalancing:
+
+1. Update volatility and correlation forecasts
+2. Solve for new risk parity weights
+3. Check if weight changes exceed a minimum threshold such as 2%
+4. Execute only trades that justify the cost
+5. Record the rebalance for performance attribution
+
+## When to Use Risk Parity
+
+Risk parity works well when:
+
+- You hold assets with very different volatilities
+- You want a smoother equity curve than traditional allocations
+- You can forecast volatility better than direction
+- You rebalance systematically rather than emotionally
+
+## When Not to Use Risk Parity
+
+Risk parity is less suitable when:
+
+- All your assets have similar volatility
+- Transaction costs are high relative to portfolio size
+- You cannot estimate correlations reliably
+- You need maximum absolute return and can tolerate large drawdowns
+
+## Risk Management
+
+- Cap maximum weight per asset
+- Use a volatility target to scale overall exposure
+- Include a cash buffer during high uncertainty
+- Monitor correlation breakdowns during crises
+- Use leverage carefully if targeting a specific return level
+
+## Common Mistakes
+
+- Using simple inverse volatility without considering correlations
+- Rebalancing too often and eating returns with fees
+- Ignoring the fact that correlations rise in crashes
+- Assuming historical volatility predicts future volatility perfectly
+- Forgetting that risk parity improves risk-adjusted returns, not guaranteed returns
+
+## Bottom Line
+
+Risk parity is a powerful framework for building diversified portfolios. AI enhances it by producing better volatility and correlation forecasts. The result is a portfolio where risk is genuinely spread across assets rather than concentrated in the most volatile ones.
+
+---
+
+**Related reading**: [AI Kelly Criterion Position Sizing](./ai-kelly-criterion-position-sizing) | [AI Correlation Hedging](./ai-correlation-hedging) | [AI Multi-Factor Ranking](./ai-multi-factor-ranking)

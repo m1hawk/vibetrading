@@ -1,0 +1,225 @@
+---
+title: "Lean CLI: Build Your First Python Factor Strategy"
+description: "Deploy a factor-based trading strategy locally using QuantConnect Lean CLI and Python. A step-by-step tutorial for retail quants."
+date: "2026-07-19"
+category: "Tutorials"
+tags: ["quantconnect", "lean", "python", "factor strategy", "algo trading", "open source"]
+readTime: "13 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "What is QuantConnect Lean CLI?"
+    answer: "Lean CLI is a command-line interface for running the QuantConnect Lean algorithmic trading engine locally on your own machine."
+  - question: "Do I need a QuantConnect cloud subscription?"
+    answer: "No. Lean CLI lets you run backtests locally for free. Cloud features and premium data require a subscription."
+  - question: "What is a factor strategy?"
+    answer: "A factor strategy selects assets based on measurable characteristics such as value, momentum, quality, or volatility."
+  - question: "Can I live trade with Lean CLI?"
+    answer: "Yes, with supported broker integrations. Most beginners should start with local backtesting and paper trading."
+  - question: "What Python version does Lean use?"
+    answer: "Lean uses Python 3.11 in its current releases. Check the documentation for the latest supported version."
+---
+
+<Disclaimer />
+
+QuantConnect Lean is one of the most capable open-source algorithmic trading engines. The Lean CLI makes it possible to run this engine locally without paying for cloud access. For retail quants who want institutional-grade backtesting and factor research, this is a powerful combination.
+
+This tutorial walks you through building a simple factor strategy in Python using Lean CLI.
+
+## What You Will Build
+
+By the end of this tutorial, you will have:
+
+- Lean CLI installed and configured
+- A Python strategy that ranks stocks by momentum
+- A local backtest with realistic brokerage simulation
+- A results report with returns, drawdown, and risk metrics
+
+## Prerequisites
+
+Before starting, you need:
+
+- Docker installed
+- Basic Python knowledge
+- A QuantConnect account (free)
+- Some familiarity with factor investing concepts
+
+## Step 1: Install Lean CLI
+
+Install the Lean CLI using pip:
+
+```bash
+pip install lean
+```
+
+Log in with your QuantConnect credentials:
+
+```bash
+lean login
+```
+
+## Step 2: Create a New Project
+
+Create a new project directory:
+
+```bash
+lean create-project "FactorMomentum"
+cd FactorMomentum
+```
+
+This creates a skeleton strategy with `main.py` and a configuration file.
+
+## Step 3: Understand the Strategy Structure
+
+A basic QuantConnect algorithm inherits from `QCAlgorithm`. Key methods include:
+
+- `Initialize`: set start date, capital, universe, and indicators
+- `OnData`: handle market data and make trading decisions
+- `OnSecuritiesChanged`: react to universe changes
+
+## Step 4: Write the Factor Strategy
+
+We will build a momentum factor strategy that rebalances monthly. Each month, we rank stocks by their 12-month return minus the last month, then hold the top 10.
+
+```python
+from AlgorithmImports import *
+
+class FactorMomentum(QCAlgorithm):
+    def Initialize(self):
+        self.SetStartDate(2020, 1, 1)
+        self.SetEndDate(2024, 1, 1)
+        self.SetCash(100000)
+
+        self.UniverseSettings.Resolution = Resolution.Daily
+        self.AddUniverse(self.CoarseSelectionFunction)
+
+        self.rebalance_flag = True
+        self.month = -1
+
+    def CoarseSelectionFunction(self, coarse):
+        if self.rebalance_flag:
+            sorted_by_dollar_volume = sorted(coarse, key=lambda x: x.DollarVolume, reverse=True)
+            return [x.Symbol for x in sorted_by_dollar_volume[:100]]
+        return Universe.Unchanged
+
+    def FineSelectionFunction(self, fine):
+        return [x.Symbol for x in fine]
+
+    def OnData(self, data):
+        if self.Time.month == self.month:
+            return
+        self.month = self.Time.month
+        self.rebalance_flag = True
+
+        symbols = list(self.ActiveSecurities.Keys)
+        if len(symbols) < 10:
+            return
+
+        momentum_scores = {}
+        for symbol in symbols:
+            history = self.History(symbol, 253, Resolution.Daily)
+            if len(history) < 252:
+                continue
+            prices = history["close"]
+            momentum = prices[-21] / prices[-252] - 1
+            momentum_scores[symbol] = momentum
+
+        ranked = sorted(momentum_scores.items(), key=lambda x: x[1], reverse=True)
+        top_symbols = [x[0] for x in ranked[:10]]
+
+        self.Liquidate()
+        for symbol in top_symbols:
+            self.SetHoldings(symbol, 0.1)
+```
+
+This is a simplified example. Real factor strategies include risk controls, transaction-cost models, and sector neutrality.
+
+## Step 5: Run the Backtest
+
+Run the backtest locally:
+
+```bash
+lean backtest FactorMomentum
+```
+
+Lean will download a Docker image, fetch data, and run the simulation. The first run may take several minutes as Docker images and data are downloaded.
+
+## Step 6: Analyze Results
+
+After the backtest completes, Lean opens a local results page showing:
+
+- Equity curve
+- Drawdown
+- Annual return
+- Sharpe ratio
+- Win rate
+- Trade list
+
+Use these metrics to evaluate whether the factor is worth refining.
+
+## Step 7: Iterate
+
+Try variations such as:
+
+- Adding a value or quality factor
+- Using sector-neutral ranking
+- Changing the rebalance frequency
+- Adding risk parity position sizing
+
+## Common Issues
+
+### Data Not Found
+
+Lean needs market data to backtest. Local data is limited. For more history, you may need to use QuantConnect cloud data or purchase data subscriptions.
+
+### Docker Errors
+
+Make sure Docker is running and has enough resources allocated. Lean CLI is Docker-based.
+
+### Slow Performance
+
+Large universes and long histories can be slow. Start with a smaller universe and shorter date range.
+
+## When Lean CLI Makes Sense
+
+Use Lean CLI when:
+
+- You want institutional-grade backtesting locally
+- You are building multi-factor equity strategies
+- You need realistic brokerage and slippage models
+- You plan to eventually deploy through QuantConnect cloud
+
+
+## Factor Research Workflow in Lean CLI
+
+A disciplined factor research workflow looks like this:
+
+1. **Hypothesis**: Define why the factor should work, such as "stocks with strong momentum tend to continue outperforming."
+2. **Universe selection**: Choose a liquid, investable universe to avoid survivorship bias.
+3. **Signal construction**: Compute the factor using only point-in-time data.
+4. **Neutralization**: Remove sector or market exposure so returns come from the factor, not beta.
+5. **Backtest**: Run in Lean CLI with realistic costs and slippage.
+6. **Diagnostics**: Analyze turnover, drawdown, and factor decay.
+7. **Paper trading**: Confirm the signal behaves as expected with live data.
+
+Skipping any step increases the chance of building a strategy that looks good in backtests but fails in practice.
+
+## Adding a Second Factor
+
+Once momentum works in a single-factor backtest, consider adding value or quality. For example, rank stocks by momentum but require a minimum return-on-equity threshold. This creates a multi-factor screen that may be more robust than either factor alone.
+
+In Lean, you can compute both factors inside `CoarseSelectionFunction` or `FineSelectionFunction` and combine them into a single score. Rebalance monthly and track how the second factor changes sector exposure and turnover.
+
+## When to Move Beyond Lean CLI
+
+Lean CLI is excellent for research, but it has limits. Large universe backtests can be slow locally, premium data requires cloud access, and live broker integrations are not as broad as some retail-focused frameworks. Plan to migrate to QuantConnect cloud or a custom infrastructure only after you have validated your factors locally.
+
+## Bottom Line
+
+QuantConnect Lean CLI brings professional-grade algorithmic trading infrastructure to your local machine. The learning curve is steeper than simpler frameworks, but the depth of features and realism is unmatched in the open-source world for equity factor strategies.
+
+Start with a simple momentum factor, validate it rigorously, and expand complexity only when the basics work.
+
+---
+
+**Related reading**: [QuantConnect Lean First Algo](./quantconnect-lean-first-algo) | [FinRL vs Stable Baselines 3](./finrl-vs-stable-baselines3-trading) | [Top AI Trading GitHub Projects](./top-ai-trading-github-projects-2026)

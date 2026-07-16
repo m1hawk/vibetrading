@@ -1,0 +1,166 @@
+---
+title: "AI Kelly 公式仓位管理：下注正确金额"
+description: "本文学习如何用 Kelly 准则与 AI 增强的胜率、赔率估计来优化仓位大小，避免账户爆仓。内容覆盖完整 Kelly、分数 Kelly、多仓位同时持仓处理，以及用蒙特卡洛模拟评估不同仓位方案对长期财富增长的影响，帮助交易者在优势与风险之间找到平衡。"
+date: "2026-07-23"
+category: "Strategies"
+tags: ["ai trading", "kelly criterion", "position sizing", "risk management", "python"]
+readTime: "11 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "什么是 Kelly 准则？"
+    answer: "Kelly 准则是根据胜率和赔率计算应下注资本最优比例的公式。"
+  - question: "完整 Kelly 风险太大吗？"
+    answer: "是。完整 Kelly 可能产生极端回撤。多数交易者使用半 Kelly 或四分之一 Kelly。"
+  - question: "AI 如何改进 Kelly 仓位？"
+    answer: "AI 可根据市场状况动态估计胜率和赔率，而非使用固定历史均值。"
+  - question: "新手应该用 Kelly 吗？"
+    answer: "新手应理解概念，但从固定比例风险如每笔 1% 开始。"
+---
+
+<Disclaimer />
+
+仓位管理往往比入场时机更重要。好的策略配糟糕仓位会爆仓，平庸策略配优秀仓位能存活并复利。Kelly 准则是仓位管理最著名的框架之一。
+
+## Kelly 公式
+
+对简单二元下注：
+
+```
+f* = (p * b - q) / b
+```
+
+其中：
+
+- `f*` = 应下注资本比例
+- `p` = 胜率
+- `q` = 败率 = 1 - p
+- `b` = 平均盈利 / 平均亏损
+
+示例：胜率 60%，赔率 2:1：
+
+```python
+p = 0.60
+b = 2.0
+f = (p * b - (1 - p)) / b
+print(f)  # 0.40
+```
+
+完整 Kelly 建议下注 40%。这几乎总是太激进。
+
+## 分数 Kelly
+
+多数交易者用分数 Kelly 降低波动：
+
+- 半 Kelly：上例中 20%
+- 四分之一 Kelly：10%
+- 很多系统化交易者用更低
+
+分数 Kelly 牺牲部分理论增长换取更平滑的资金曲线。
+
+## 用 AI 估计输入
+
+Kelly 难点在于估计 `p` 和 `b`。历史均值常过时。AI 可动态估计：
+
+- 从当前市场特征预测胜率
+- 从波动率和近期价格行为估计预期赔率
+- 根据机制变化调整
+
+例如，模型可能预测当前条件下某突破 setup 胜率 55%、赔率 1.8:1。
+
+## 实用实现
+
+```python
+def kelly_size(capital, win_prob, payoff_ratio, fraction=0.25):
+    kelly = (win_prob * payoff_ratio - (1 - win_prob)) / payoff_ratio
+    kelly = max(0, kelly)  # 不下负注
+    return capital * kelly * fraction
+
+position = kelly_size(100000, 0.55, 1.8, fraction=0.25)
+```
+
+这给出基于当前交易估计优势的保守仓位。
+
+## 多仓位同时持仓的 Kelly
+
+当多个仓位同时持有时，Kelly 公式需要扩展。简单地把每笔交易的 Kelly 结果相加会高估总风险，因为：
+
+- 不同标的之间可能存在相关性
+- 同一板块的多头仓位会放大行业风险
+- 多策略同时运行可能暴露于相同的市场因子
+
+实务中更安全的做法是：
+
+1. 计算组合层面的总风险预算。
+2. 把单个仓位的 Kelly 结果按相关性打折。
+3. 设置组合最大回撤和单日最大亏损的硬限制。
+
+例如，如果两个策略的相关系数为 0.6，实际组合风险远高于各自风险之和，仓位应相应降低。
+
+## 用蒙特卡洛模拟评估
+
+在把 Kelly 应用到实盘前，可以用蒙特卡洛模拟测试不同分数 Kelly 下的资金曲线：
+
+```python
+import numpy as np
+
+def simulate_kelly(capital, win_prob, payoff, fraction, trades=1000, runs=1000):
+    final = []
+    for _ in range(runs):
+        equity = capital
+        for _ in range(trades):
+            kelly = max(0, (win_prob * payoff - (1 - win_prob)) / payoff)
+            stake = equity * kelly * fraction
+            if np.random.random() < win_prob:
+                equity += stake * payoff
+            else:
+                equity -= stake
+        final.append(equity)
+    return np.percentile(final, [5, 50, 95])
+
+# 胜率 55%，赔率 1.8:1，四分之一 Kelly，1000 次交易
+print(simulate_kelly(100000, 0.55, 1.8, 0.25))
+```
+
+模拟能揭示：即使在正期望策略下，不同分数 Kelly 仍可能经历严重回撤。
+
+## 实战案例
+
+假设账户 10 万美元，某 AI 模型对当前 breakout setup 的预测：
+
+- 胜率 `p = 0.52`
+- 赔率 `b = 2.0`
+- 使用半 Kelly
+
+```python
+p, b, fraction = 0.52, 2.0, 0.5
+kelly = (p * b - (1 - p)) / b  # 0.07
+position = 100000 * kelly * fraction  # 3500
+```
+
+该头寸约为账户的 3.5%。如果模型对胜率的估计存在 5% 的误差，仓位应进一步降低，因为 Kelly 对输入误差非常敏感。
+
+## Kelly vs 固定比例
+
+固定比例风险如每笔 1% 更简单且通常更安全。Kelly 在以下情况最有用：
+
+- 有大量相似交易
+- 不同 setup 的优势差异显著
+- 能准确估计概率
+
+如果概率估计错误，Kelly 仓位会放大亏损。
+
+## 常见错误
+
+- 使用完整 Kelly
+- 忽略同时交易的相关性
+- 从回测高估胜率
+- 将 Kelly 应用于收益分布偏斜的策略
+
+## 总结
+
+Kelly 准则是思考仓位大小的有力工具，但不是魔法公式。使用分数 Kelly、样本外验证你的优势估计、绝不让单笔交易威胁账户。
+
+---
+
+**相关阅读**: [AI 风险平价组合](./ai-risk-parity-portfolio) | [AI 动态 ATR 止损](./ai-stop-loss-dynamic-atr) | [AI 交易风险管理框架](./ai-trading-risk-management-framework)

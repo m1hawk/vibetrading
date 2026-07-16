@@ -1,0 +1,87 @@
+---
+title: "AI Trading Risk Management: Protect Capital First"
+description: "Understand AI trading risks and build a practical risk management framework with position sizing, stop losses, drawdown limits, kill switches, and leverage rules."
+date: "2026-07-16"
+category: "Guides"
+tags: ["ai trading", "risk management", "position sizing", "kill switch"]
+readTime: "10 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "How much should I risk per trade?"
+    answer: "A common retail rule is 1% to 2% of capital per trade, though the exact number depends on your edge, volatility, and strategy correlation."
+  - question: "What is a kill switch?"
+    answer: "A kill switch is an automated rule that stops trading when losses, drawdown, or anomalous behavior exceed a predefined threshold."
+  - question: "Why does correlation risk matter?"
+    answer: "Correlated strategies tend to lose together. Diversifying across uncorrelated edges reduces the chance of a large drawdown."
+  - question: "Is leverage dangerous in AI trading?"
+    answer: "Leverage amplifies both returns and losses. It can turn a manageable drawdown into account destruction, especially when models overfit."
+---
+
+<Disclaimer />
+
+Risk management is the part of AI trading that decides whether you survive long enough to profit. A model can have a genuine edge and still blow up if position sizes are too large, stop losses are missing, or leverage is used carelessly. This guide presents a practical risk management framework for retail AI traders who want to protect capital first and optimize returns second.
+
+## Why Risk Management Beats a Better Model
+
+New traders often spend months tuning a model and only hours thinking about risk. That is backwards. Markets are noisy, models degrade, and unexpected events happen. A robust risk framework keeps losses small during bad periods so that good periods can compound.
+
+Think of your trading capital as inventory. If you lose half of it, you need a 100% return just to break even. The math is merciless, so the primary job of risk management is to avoid ruin.
+
+## Position Sizing
+
+Position sizing answers the question: how many shares or contracts should I trade? Fixed-dollar sizing ignores account size, while fixed-fractional sizing risks a set percentage of equity per trade. The Kelly criterion offers a more sophisticated answer based on win rate and payoff, but full Kelly is usually too aggressive for live trading.
+
+A practical starting point is to risk 1% of account equity per trade. If your account is $10,000 and your stop loss is 5% away from entry, your position size is roughly $2,000. This keeps a single loss at $100. You can explore advanced sizing in our [AI Kelly criterion position sizing](./ai-kelly-criterion-position-sizing) guide.
+
+## Stop Losses
+
+A stop loss is a predefined price at which you exit a losing trade. It removes emotion from the decision and caps the damage from a bad signal. Common types include fixed-percentage stops, volatility-based ATR stops, and time stops that exit after a holding period.
+
+Set your stop before you enter the trade, not after the position moves against you. And remember that a stop loss is not a guarantee in fast markets — slippage can push the fill past your desired level.
+
+## Maximum Drawdown
+
+Maximum drawdown measures the peak-to-trough decline in your equity curve. It tells you how painful the strategy would have been historically. A 50% drawdown is not just a number; it is a psychological event that often causes traders to abandon a sound strategy at the worst time.
+
+Set a max drawdown limit for live trading — for example, 15% of peak equity. If you hit it, reduce size, stop trading, and review the model and market conditions before restarting.
+
+## Kill Switches
+
+A kill switch is an automatic rule that halts trading when something goes wrong. Triggers can include daily loss limits, drawdown thresholds, consecutive losing trades, abnormal latency, or model predictions that drift outside historical ranges.
+
+Kill switches are especially important for AI systems because models can behave unexpectedly. A sudden distribution shift, a broken data feed, or a bug in feature computation can generate a wave of bad orders in seconds. A hard stop prevents a bad afternoon from becoming a catastrophic week.
+
+## Correlation Risk
+
+Correlation risk appears when multiple strategies or positions move together. You may feel diversified because you trade ten stocks, but if they all load on the same factor — momentum, for example — a single macro shock can hit all of them.
+
+Measure pairwise correlations and factor exposures. If your AI strategies are highly correlated, reduce overlap or cap total exposure to that theme. Diversification across truly independent edges is one of the few free lunches in trading.
+
+## Leverage
+
+Leverage lets you control a larger position with less capital. It also magnifies drawdowns and increases the chance of ruin. Retail AI traders should be especially cautious because backtests often underestimate tail risk and slippage.
+
+If you use leverage, treat it as a risk multiplier, not a return amplifier. A good rule is to size as if you had no leverage, then apply leverage only to free up capital for uncorrelated opportunities — never to chase larger gains on the same trade.
+
+## Risk Management Checklist
+
+Use this checklist before going live with any AI trading strategy.
+
+| Check | Question | Action If No |
+|-------|----------|--------------|
+| Position size | Am I risking ≤ 2% of equity per trade? | Reduce size or tighten stop |
+| Stop loss | Is my stop defined before entry? | Do not take the trade |
+| Drawdown limit | Do I have a max drawdown trigger? | Set one and automate it |
+| Kill switch | Will the system halt on anomalies? | Add hard daily and circuit-breaker rules |
+| Correlation | Are my positions truly diversified? | Drop overlapping assets or strategies |
+| Leverage | Is leverage ≤ my stress-tested maximum? | Lower leverage or increase margin buffer |
+| Backtest realism | Did I include costs, slippage, and tail events? | Re-run with realistic assumptions |
+
+## Bottom Line
+
+No AI model removes the need for risk management. Position sizing, stop losses, drawdown limits, kill switches, correlation awareness, and prudent leverage are the infrastructure that keeps you in the game. Build the risk framework first, then let the model add edge on top of it. For more on sizing, see our guide on [AI Kelly criterion position sizing](./ai-kelly-criterion-position-sizing).
+
+---
+
+**Related reading**: [AI Kelly Criterion Position Sizing](./ai-kelly-criterion-position-sizing) | [How to Backtest Without Overfitting](./how-to-backtest-without-overfitting) | [AI Trading for Beginners](./ai-trading-for-beginners)

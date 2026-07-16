@@ -1,0 +1,154 @@
+---
+title: "Lumibot 新手指南：回测股票与期权策略"
+description: "本文入门 Lumibot，一个专为股票与期权算法交易设计的 Python 框架，支持事件驱动回测、实盘交易与真实券商模拟。演示简单股票策略与期权策略的回测流程，以及何时使用 Lumibot，是股票期权自动化交易者的重要工具指南，并介绍如何将回测结果与实盘券商模拟对接。"
+date: "2026-07-19"
+category: "Tutorials"
+tags: ["lumibot", "python", "backtesting", "options", "stocks", "open source"]
+readTime: "11 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "Lumibot 是什么？"
+    answer: "Lumibot 是一个 Python 算法交易框架，专为股票和期权的回测与实盘交易设计，提供真实券商模拟。"
+  - question: "Lumibot 支持期权吗？"
+    answer: "支持。Lumibot 有很强的期权功能，包括期权链处理、希腊字母和期权专用订单类型。"
+  - question: "Lumibot 免费吗？"
+    answer: "是，Lumibot 开源免费。部分数据源如 Polygon 需要付费 API key。"
+  - question: "支持哪些券商？"
+    answer: "Lumibot 支持 Alpaca、Interactive Brokers 等券商进行实盘交易。"
+  - question: "Lumibot 适合新手吗？"
+    answer: "相比机构框架，Lumibot 对新手较友好。但期权策略需要期权交易知识。"
+---
+
+<Disclaimer />
+
+大多数开源交易框架聚焦加密或期货。Lumibot 不同，它专为股票和期权构建，是想要自动化和回测股票期权策略的股票交易者的宝贵工具。
+
+本文向新手介绍 Lumibot 并演示一次简单回测。
+
+## Lumibot 是什么
+
+Lumibot 是一个用于股票和期权算法交易的 Python 框架。它提供：
+
+- 事件驱动回测
+- 真实券商模拟
+- 支持券商的实盘交易
+- 期权链支持
+- 调度和生命周期管理
+
+它对想要测试期权策略又不想购买昂贵机构软件的交易者特别有用。
+
+## 快速对比
+
+| 特性 | Lumibot | backtrader | QuantConnect Lean |
+|---|---|---|---|
+| **资产重点** | 股票、期权 | 通用 | 多资产 |
+| **期权支持** | 强 | 有限 | 好 |
+| **易用性** | 新手友好 | 中等 | 陡峭 |
+| **实盘交易** | 支持 | 通过集成 | 支持 |
+| **数据源** | Yahoo、Polygon、Alpaca | Yahoo | QuantConnect 数据 |
+
+## 安装
+
+在虚拟环境中安装 Lumibot：
+
+```bash
+python -m venv lumibot-env
+source lumibot-env/bin/activate
+pip install lumibot
+```
+
+期权数据你可能需要 Polygon API key。基础股票回测可用 Yahoo Finance 免费数据。
+
+## 简单股票策略
+
+下面是一个 Lumibot 均线交叉策略：
+
+```python
+from lumibot.strategies import Strategy
+from lumibot.traders import Trader
+from lumibot.backtesting import YahooDataBacktesting
+from datetime import datetime
+
+class SmaCross(Strategy):
+    def initialize(self):
+        self.symbols = ["AAPL"]
+        self.sleeptime = "1D"
+
+    def on_trading_iteration(self):
+        symbol = self.symbols[0]
+        historical_prices = self.get_historical_prices(symbol, 30, "day")
+        prices = historical_prices.df["close"]
+        sma20 = prices.rolling(20).mean().iloc[-1]
+        sma50 = prices.rolling(50).mean().iloc[-1]
+
+        if sma20 > sma50 and not self.get_position(symbol):
+            self.buy_stock(symbol)
+        elif sma20 < sma50 and self.get_position(symbol):
+            self.sell_all()
+```
+
+代码可读性强，生命周期方法清晰分离。
+
+## 回测
+
+用历史数据运行回测：
+
+```python
+backtesting_start = datetime(2020, 1, 1)
+backtesting_end = datetime(2023, 1, 1)
+
+strategy = SmaCross
+result = strategy.backtest(
+    YahooDataBacktesting,
+    backtesting_start,
+    backtesting_end,
+    parameters={}
+)
+```
+
+Lumibot 生成包含收益、回撤和交易历史的报告。
+
+## 期权策略
+
+Lumibot 在期权方面表现出色。你可以：
+
+- 加载期权链
+- 按到期日和行权价筛选
+- 买入看涨、看跌和价差
+- 处理行权和指派
+
+期权回测需要特别注意数据质量。免费数据通常不包含完整期权链，严肃的期权研究一般需要 Polygon 等付费数据商。
+
+## 实盘交易
+
+Lumibot 可连接 Alpaca、Interactive Brokers 等券商。回测中使用的策略代码只需少量改动即可实盘。
+
+实盘前：
+
+- 充分回测验证
+- 如券商支持，先模拟交易
+- 设置仓位大小限制
+- 监控日志和券商对账单
+
+## 什么时候用 Lumibot
+
+- 你交易美股或期权
+- 想要新手友好的 Python 框架
+- 需要期权专用功能
+- 偏好事件驱动模拟
+
+## 限制
+
+- 加密和外汇支持有限
+- 免费期权数据不完整
+- 性能对散户足够，但不如机构平台
+- 高级执行功能有限
+
+## 总结
+
+Lumibot 填补了散户交易者用 Python 回测和自动化股票期权策略的重要空白。它比机构框架更易学，同时提供真实模拟。如果你聚焦美股和期权，Lumibot 是最好的开源起点之一。
+
+---
+
+**相关阅读**: [第一个 AI 交易机器人：Alpaca EMA 交叉](./first-ai-trading-bot-ema-cross-alpaca) | [backtrader vs vectorbt](./backtrader-vs-vectorbt-python) | [Top AI Trading GitHub 开源项目](./top-ai-trading-github-projects-2026)

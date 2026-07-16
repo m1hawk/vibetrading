@@ -1,0 +1,187 @@
+---
+title: "Jesse AI 交易框架新手指南：生产级加密货币机器人"
+description: "本文学习使用 Jesse，一个支持高级回测、机器学习集成与实盘交易的 Python 加密货币算法交易框架。涵盖安装、项目结构、策略编写、回测流程，以及何时选择 Jesse 而非 freqtrade，是进阶加密交易者的框架选型参考，并提供最小可用策略示例帮助读者快速上手。"
+date: "2026-07-18"
+category: "Tutorials"
+tags: ["jesse", "crypto", "algo trading", "python", "backtesting", "open source"]
+readTime: "11 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "Jesse 是什么？"
+    answer: "Jesse 是一个专注加密货币的高级 Python 算法交易框架，提供高性能回测、机器学习和实盘交易功能。"
+  - question: "Jesse 免费吗？"
+    answer: "Jesse 有开源核心，也有付费高级版 Jesse Trade，提供云优化和高级面板等附加功能。"
+  - question: "Jesse 支持机器学习吗？"
+    answer: "支持。Jesse 包含训练和在策略中部署 ML 模型的功能。"
+  - question: "支持哪些交易所？"
+    answer: "Jesse 支持币安、Bybit 等主要中心化交易所，部分通过社区适配器。请查看最新文档了解当前支持的交易所。"
+  - question: "Jesse 适合新手吗？"
+    answer: "Jesse 比 freqtrade 更高级。新手可能觉得 freqtrade 更容易，但 Jesse 为想要生产级功能的交易者提供更多能力。"
+---
+
+<Disclaimer />
+
+freqtrade 是最流行的开源加密货币机器人，但不是唯一选择。Jesse 是一个较新的框架，面向需要更高级回测、更 clean 代码架构和机器学习集成的交易者。它在超越简单工具的加密交易者中尤其受欢迎。
+
+本文介绍 Jesse 的核心概念并演示第一个策略设置。
+
+## Jesse 是什么
+
+Jesse 是一个用于设计、回测和部署加密货币算法交易策略的 Python 框架。它强调：
+
+- **性能**：优化的回测引擎，兼顾速度和准确性
+- **机器学习**：内置 ML 驱动策略支持
+- **模块化**：routes、strategies 和研究工具 cleanly 分离
+- **实盘交易**：直接对接交易所自动执行
+
+Jesse 常与 freqtrade 对比，但它面向的用户群稍微更高级。
+
+## 快速对比：Jesse vs freqtrade
+
+| 特性 | Jesse | freqtrade |
+|---|---|---|
+| **主要定位** | 高级加密算法交易 | 通用加密机器人自动化 |
+| **易用性** | 中等 | 对新手友好 |
+| **回测速度** | 快 | 中等 |
+| **机器学习** | 内置支持强 | FreqAI 模块 |
+| **Web UI** | 付费面板 | 内置免费 UI |
+| **交易所支持** | 主流 CEX 适配器 | CCXT 支持 100+ 家 |
+| **社区** | 成长中 | 非常大 |
+
+如果你想要简单机器人和大量社区策略，freqtrade 可能更好。如果你想要 clean、现代、ML 支持强的框架，Jesse 值得探索。
+
+## 安装
+
+Jesse 通过 pip 安装。建议使用独立 Python 环境。
+
+```bash
+python -m venv jesse-env
+source jesse-env/bin/activate
+pip install jesse
+```
+
+安装后创建新项目：
+
+```bash
+jesse make-project my-trading-project
+cd my-trading-project
+```
+
+这会生成包含 config、strategies、storage 和 research 文件夹的目录结构。
+
+## 项目结构
+
+典型的 Jesse 项目长这样：
+
+```
+my-trading-project/
+├── config.py
+├── routes.py
+├── strategies/
+│   └── MyStrategy.py
+├── storage/
+└── research/
+```
+
+- **config.py**：交易所 API key、交易对、时间周期、回测设置
+- **routes.py**：把交易对映射到策略
+- **strategies/**：存放策略类
+- **storage/**：存放导入的历史数据
+- **research/**：notebook 和实验
+
+## 简单策略
+
+下面是一个 Jesse 基础趋势跟踪策略：
+
+```python
+from jesse.strategies import Strategy
+
+class TrendFollowing(Strategy):
+    def should_long(self):
+        return self.close > self.sma(50)
+
+    def should_short(self):
+        return False
+
+    def go_long(self):
+        qty = self.capital / self.close
+        self.buy = qty, self.close
+
+    def update_position(self):
+        if self.close < self.sma(50):
+            self.liquidate()
+```
+
+Jesse 策略读起来像一套规则。框架负责执行、日志和报告。
+
+## 回测
+
+运行回测前先导入历史数据：
+
+```bash
+jesse import-candles Binance BTC-USDT 1d
+```
+
+然后运行回测：
+
+```bash
+jesse backtest
+```
+
+Jesse 提供包含资金曲线、回撤、交易记录、夏普比率、胜率等指标的详细报告。
+
+## 机器学习集成
+
+Jesse 通过研究模块支持 ML 策略。典型工作流：
+
+1. 从历史数据中提取特征
+2. 用 scikit-learn、XGBoost 或神经网络训练模型
+3. 保存模型并在策略中加载
+4. 用模型预测作为信号
+
+这种集成比其他框架更原生，因此对 ML 感兴趣的交易者有吸引力。
+
+## 实盘交易
+
+Jesse 通过交易所适配器支持实盘。实盘前：
+
+- 在回测和模拟模式下充分测试
+- 使用权限受限的 API key
+- 设置监控和提醒
+- 从小仓位开始
+
+<Alert type="warning">
+  加密货币实盘交易风险很高。程序 bug、交易所宕机和剧烈波动都可能在短时间内造成大额亏损。
+</Alert>
+
+## 什么时候选 Jesse
+
+- 你想要现代 Python 框架和 clean 架构
+- 机器学习是策略核心
+- 你看重回测性能
+- 你愿意接受较小但成长中的社区
+
+## 什么时候选 freqtrade
+
+- 你想要最大社区和最多公开策略
+- 你偏好内置 Web UI
+- 你想要 CCXT 带来的广泛交易所支持
+- 你是算法交易新手
+
+## 常见陷阱
+
+- **过度优化 ML 模型**：金融数据噪声大，回测好的模型实盘常失效
+- **忽略手续费**：不同交易所手续费差异大，可能吃掉优势
+- **过度杠杆**：合约策略可能快速产生大额亏损
+- **数据缺口**：不完整的历史数据会导致不真实的回测
+
+## 总结
+
+Jesse 是 freqtrade 的有力替代，面向希望获得高级回测和机器学习支持的 clean Python 框架的交易者。它比入门工具需要更多设置和学习，但回报是更灵活、更高性能的平台。
+
+如果你已熟悉 Python 并想提升加密货币算法交易水平，Jesse 值得认真考虑。
+
+---
+
+**相关阅读**: [Freqtrade 新手指南](./freqtrade-beginner-guide-crypto-bot) | [Freqtrade vs Hummingbot](./freqtrade-vs-hummingbot-crypto) | [Top AI Trading GitHub 开源项目](./top-ai-trading-github-projects-2026)

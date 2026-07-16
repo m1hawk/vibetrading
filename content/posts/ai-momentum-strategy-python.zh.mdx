@@ -1,0 +1,169 @@
+---
+title: "Python AI 动量策略：构建基于排名的交易机器人"
+description: "本文一步步教你用 Python 构建 AI 动量策略：从获取价格数据、计算动量分数、按排名选择资产，到加入波动率过滤、进行完整回测与绩效评估。适合想用代码验证经典动量效应并建立可重复研究流程的散户交易者，无需复杂机器学习即可起步，文中提供可直接运行的 Python 代码片段与回测评估思路。"
+date: "2026-07-21"
+category: "Strategies"
+tags: ["ai trading", "momentum", "python", "ranking", "backtesting", "strategy"]
+readTime: "14 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "什么是动量策略？"
+    answer: "动量策略买入近期表现好的资产，卖出或回避表现差的资产，押注近期趋势会延续。"
+  - question: "散户做动量能盈利吗？"
+    answer: "动量是金融文献中记录最充分的异象之一。在多个市场有效，但需要纪律、多元化和风险管理。"
+  - question: "该用什么时间周期？"
+    answer: "常见动量回看周期 3 到 12 个月。短周期捕捉更快波动但也更嘈杂。"
+  - question: "AI 如何改进动量？"
+    answer: "AI 可用多种动量度量排名资产、检测机制变化、动态优化仓位。"
+---
+
+<Disclaimer />
+
+动量是投资中最古老、最稳健的理念之一：近期上涨的资产倾向于继续上涨一段时间。用 Python 和几个库，你就能构建一个按动量排名资产并定期再平衡的机器人。
+
+本教程带你从数据获取到回测，构建一个 AI 增强动量策略。
+
+## 你会完成什么
+
+读完本教程后，你将拥有：
+
+- 获取价格数据的 Python 脚本
+- 动量打分函数
+- 基于排名的组合再平衡器
+- 带基础风险指标的回测
+
+## 核心思想
+
+传统动量按过去收益排名。AI 增强动量增加：
+
+- 风险调整动量
+- 成交量确认动量
+- 跨资产动量
+- 机制检测
+
+本文从简单但可扩展的版本开始。
+
+## 第一步：获取数据
+
+用 yfinance 或 Alpaca 下载资产池历史价格。
+
+```python
+import yfinance as yf
+import pandas as pd
+
+tickers = ["AAPL", "MSFT", "AMZN", "GOOGL", "META", "NVDA", "TSLA"]
+data = yf.download(tickers, start="2020-01-01", end="2024-01-01")["Adj Close"]
+```
+
+## 第二步：计算动量分数
+
+计算多周期收益并组合。
+
+```python
+def compute_momentum_scores(prices):
+    returns_1m = prices.pct_change(21)
+    returns_3m = prices.pct_change(63)
+    returns_6m = prices.pct_change(126)
+    returns_12m = prices.pct_change(252)
+
+    score = 0.4 * returns_12m + 0.3 * returns_6m + 0.2 * returns_3m + 0.1 * returns_1m
+    return score
+
+momentum_scores = compute_momentum_scores(data)
+```
+
+## 第三步：排名并选择
+
+每月按动量分数排名，选前 N 名。
+
+```python
+def select_top_assets(scores, n=3):
+    latest_scores = scores.iloc[-1]
+    ranked = latest_scores.sort_values(ascending=False)
+    return ranked.head(n).index.tolist()
+
+top_assets = select_top_assets(momentum_scores, n=3)
+```
+
+## 第四步：加入波动率过滤
+
+避开极端波动资产。
+
+```python
+def volatility_filter(prices, max_vol=0.03):
+    daily_returns = prices.pct_change()
+    volatility = daily_returns.rolling(63).std().iloc[-1]
+    return volatility[volatility < max_vol].index.tolist()
+
+allowed = volatility_filter(data)
+top_assets = [a for a in top_assets if a in allowed]
+```
+
+## 第五步：回测策略
+
+简单月度再平衡回测：
+
+```python
+import numpy as np
+
+portfolio_value = 1.0
+portfolio_values = [portfolio_value]
+rebalance_dates = data.resample("ME").last().index
+
+for i in range(1, len(rebalance_dates)):
+    start_date = rebalance_dates[i-1]
+    end_date = rebalance_dates[i]
+
+    period_data = data.loc[start_date:end_date]
+    period_returns = period_data.pct_change().iloc[-1]
+
+    scores = momentum_scores.loc[start_date]
+    top_assets = scores.rank(ascending=False) <= 3
+    selected = scores[top_assets].index.tolist()
+
+    if len(selected) == 0:
+        portfolio_values.append(portfolio_value)
+        continue
+
+    equal_weight_return = period_returns[selected].mean()
+    portfolio_value *= (1 + equal_weight_return)
+    portfolio_values.append(portfolio_value)
+```
+
+## 第六步：评估表现
+
+```python
+returns_series = pd.Series(portfolio_values).pct_change().dropna()
+sharpe = returns_series.mean() / returns_series.std() * np.sqrt(12)
+max_dd = (pd.Series(portfolio_values) / pd.Series(portfolio_values).cummax() - 1).min()
+
+print(f"夏普: {sharpe:.2f}")
+print(f"最大回撤: {max_dd:.2%}")
+```
+
+## AI 增强方向
+
+基础版本跑通后，可加入：
+
+- **机器学习排名**：训练模型预测下月收益
+- **机制检测**：用聚类识别趋势/震荡期
+- **动态仓位**：动量强时加仓、回撤时减仓
+- **行业中性**：避免单一行业过度集中
+
+## 常见陷阱
+
+- **未来信息偏差**：不要用未来数据计算当前信号
+- **幸存者偏差**：使用 point-in-time 的股票池数据
+- **交易成本**：月度再平衡对小账户可能侵蚀收益
+- **过度集中**：只持有 2-3 个资产风险高
+
+## 总结
+
+动量是一个简单、强大、易于用 Python 实现的概念。AI 增强可改善排名和风险管理，但基础相同：买入趋势中的资产、砍掉输家、纪律再平衡。
+
+从简单版本开始，诚实验证，核心思想有效后再增加复杂度。
+
+---
+
+**相关阅读**: [AI 趋势跟踪 vs 均值回归](./ai-trend-following-vs-mean-reversion) | [AI 多因子排名](./ai-multi-factor-ranking) | [如何回测而不自欺欺人](./how-to-backtest-without-overfitting)

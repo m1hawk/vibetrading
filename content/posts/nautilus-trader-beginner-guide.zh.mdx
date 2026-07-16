@@ -1,0 +1,161 @@
+---
+title: "Nautilus Trader 新手指南：高性能事件驱动交易引擎"
+description: "本文入门 Nautilus Trader，一个用 Rust 核心与 Python 接口构建的高性能事件驱动回测与实盘交易平台。涵盖安装、核心概念、最小策略示例、回测工作流，以及何时应该选择 Nautilus Trader，是严肃量化开发者的现代平台指南。"
+date: "2026-07-18"
+category: "Tutorials"
+tags: ["nautilus trader", "python", "rust", "algo trading", "backtesting", "open source"]
+readTime: "12 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "Nautilus Trader 是什么？"
+    answer: "Nautilus Trader 是一个用 Rust 编写核心、Python 作为接口的高性能事件驱动算法交易平台，支持回测和跨资产类别的实盘交易。"
+  - question: "需要懂 Rust 吗？"
+    answer: "不需要。用户层 API 是 Python。Rust 负责性能关键的核心。部分高级定制可能需要 Rust 知识。"
+  - question: "Nautilus Trader 免费吗？"
+    answer: "是，它以宽松许可证开源。部分企业级功能和支持可能收费。"
+  - question: "支持哪些资产？"
+    answer: "通过适配器支持股票、期货、外汇和加密货币。"
+  - question: "和 backtrader 比怎么样？"
+    answer: "Nautilus Trader 更快、更模块化、面向生产。backtrader 更简单，更适合学习。"
+---
+
+<Disclaimer />
+
+backtrader 非常适合学习，但当策略需要毫秒级执行、复杂订单类型或多资产组合时，它会显得吃力。Nautilus Trader 正是为这种场景而生。
+
+Nautilus Trader 是一个现代算法交易平台，Rust 核心 + Python API。它是事件驱动的、模块化的，面向需要研究速度和生产可靠性的严肃量化开发者。
+
+本文向新手介绍 Nautilus Trader 并演示最小可用设置。
+
+## Nautilus Trader 有什么不同
+
+大多数 Python 回测器完全用 Python 编写。Nautilus Trader 用 Rust 处理执行核心，通过 Python 接口开发策略。这种设计带来几个优势：
+
+- **速度**：Rust 核心处理订单撮合和事件处理比纯 Python 快得多
+- **模块化**：适配器、策略、风控引擎等组件 cleanly 分离
+- **真实性**：同一事件驱动模型同时用于回测和实盘
+- **多资产**：从底层设计就支持股票、期货、外汇和加密
+
+## 快速对比
+
+| 特性 | Nautilus Trader | backtrader | QuantConnect Lean |
+|---|---|---|---|
+| **核心语言** | Rust + Python | Python | C# + Python |
+| **速度** | 很快 | 中等 | 快 |
+| **实盘交易** | 支持 | 通过集成 | 支持 |
+| **多资产** | 支持 | 有限 | 支持 |
+| **学习曲线** | 陡峭 | 平缓 | 陡峭 |
+| **最适合** | 生产量化 | 学习 | 机构研究 |
+
+## 安装
+
+Nautilus Trader 可通过 PyPI 安装。建议使用虚拟环境。
+
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install nautilus_trader
+```
+
+安装可能需要几分钟，因为包内包含编译好的 Rust 扩展。请确认 Python 版本受项目文档支持。
+
+## 核心概念
+
+写策略前先理解这些 building blocks：
+
+- **Actor**：响应事件的组件，如策略或风控经理
+- **Strategy**：包含交易逻辑并发出订单
+- **Instrument**：可交易标的，包含 tick size、保证金等规格
+- **Order**：买入或卖出标的的指令
+- **Position**：成交订单的结果
+- **Adapter**：连接平台与券商或数据源的适配器
+
+## 最小策略示例
+
+下面是一个简化的 Nautilus Trader EMA 交叉策略：
+
+```python
+from nautilus_trader.model.data import Bar
+from nautilus_trader.trading.strategy import Strategy
+from nautilus_trader.model.identifiers import InstrumentId
+from nautilus_trader.indicators.average.ema import ExponentialMovingAverage
+
+class EmaCrossStrategy(Strategy):
+    def __init__(self, instrument_id: InstrumentId):
+        super().__init__()
+        self.instrument_id = instrument_id
+        self.fast_ema = ExponentialMovingAverage(10)
+        self.slow_ema = ExponentialMovingAverage(30)
+
+    def on_bar(self, bar: Bar):
+        self.fast_ema.handle_bar(bar)
+        self.slow_ema.handle_bar(bar)
+
+        if not self.fast_ema.initialized:
+            return
+
+        if self.fast_ema.value > self.slow_ema.value:
+            self.buy(self.instrument_id)
+        elif self.fast_ema.value < self.slow_ema.value:
+            self.sell(self.instrument_id)
+```
+
+代码比 backtrader 更冗长，因为 Nautilus Trader 暴露了更多底层机制。这种冗长换来的是灵活性和速度。
+
+## 回测工作流
+
+1. 用 tick size、保证金和货币信息**定义 instrument**
+2. 从 CSV、Parquet 或数据库**加载历史数据**
+3. 用初始资金和交易所设置**配置回测引擎**
+4. **添加策略**以及风控或执行模块
+5. **运行回测**并分析结果
+
+```python
+from nautilus_trader.backtest.engine import BacktestEngine
+
+engine = BacktestEngine()
+# ... 添加场所、instrument、数据、策略
+engine.run()
+engine.dispose()
+```
+
+## 实盘交易
+
+Nautilus Trader 通过适配器支持实盘。架构与回测相同，缩小了研究与生产之间的差距。但实盘需要：
+
+- 受支持的券商适配器
+- 健壮的错误处理
+- 实时数据源
+- 监控和日志基础设施
+
+实盘前先用模拟或纸面交易测试。
+
+## 什么时候用 Nautilus Trader
+
+- 你需要事件驱动精度做日内策略
+- 交易多资产类别
+- 希望同一平台同时回测和实盘
+- 性能和模块化比易用性更重要
+
+## 什么时候不用
+
+- 你只是学习算法交易
+- 策略运行在日度或周度周期
+- 你偏好带内置指标的简单 API
+- 不需要生产级执行
+
+## 新手常见错误
+
+- **跳过文档**：Nautilus Trader 学习曲线陡峭，文档是必需的
+- **忽略 instrument 定义**：tick size 和保证金细节影响真实成交
+- **第一个策略过于复杂**：从简单策略开始，逐步增加复杂度
+- **过快实盘**：先在纸面交易中长期测试
+
+## 总结
+
+Nautilus Trader 是成长型交易者的强大平台。它把 Rust 性能和 Python 易用性结合，同时面向研究和生产。新手应先掌握 backtrader 或 vectorbt，当速度和模块化成为瓶颈时再迁移到 Nautilus Trader。
+
+---
+
+**相关阅读**: [QuantConnect Lean 第一个算法](./quantconnect-lean-first-algo) | [backtrader vs vectorbt](./backtrader-vs-vectorbt-python) | [Top AI Trading GitHub 开源项目](./top-ai-trading-github-projects-2026)

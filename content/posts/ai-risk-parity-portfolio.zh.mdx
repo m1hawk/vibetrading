@@ -1,0 +1,99 @@
+---
+title: "AI 风险平价组合：按风险而非金额分配资本"
+description: "本文学习构建风险平价组合，使每类资产对组合总风险贡献相等，避免股票主导组合波动。结合 AI 波动率预测与相关性估计进行动态调整，实现真正平衡的配置、更稳健的尾部表现与更可控的长期收益，适合追求风险分散的资产配置者，文中还对比风险平价与等权配置在不同市场环境下的表现。"
+date: "2026-07-23"
+category: "Strategies"
+tags: ["ai trading", "risk parity", "portfolio allocation", "volatility", "python"]
+readTime: "12 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "什么是风险平价？"
+    answer: "风险平价是一种配置方法，每类资产对组合总风险贡献相等，而不是每类资产获得等额资本。"
+  - question: "为什么按风险而非金额分配？"
+    answer: "因为等额资金配置会让高波动资产对组合结果产生过大影响。"
+  - question: "风险平价能提高收益吗？"
+    answer: "它能改善风险调整后收益和分散化，但不保证更高绝对收益。"
+  - question: "AI 如何改进风险平价？"
+    answer: "AI 可动态预测波动率和相关性，优于简单历史估计。"
+---
+
+<Disclaimer />
+
+等额资金加权看似公平，其实不然。一个 50% 股票 + 50% 债券的组合并不平衡，因为股票贡献了几乎所有风险。风险平价通过配置资本使每类资产对组合总风险贡献相等来解决这个问题。
+
+## 等额加权的问题
+
+考虑两类资产：
+
+- 股票 ETF，年化波动率 20%
+- 债券 ETF，年化波动率 5%
+
+等额资金分配意味着股票驱动约 94% 的组合风险，债券配置几乎无关紧要。
+
+## 风险平价如何工作
+
+风险平价给低波动资产更多资本，给高波动资产更少资本。两资产反波动率分配公式很简单：
+
+```python
+import numpy as np
+
+vol_stock = 0.20
+vol_bond = 0.05
+
+inv_vol_stock = 1 / vol_stock
+inv_vol_bond = 1 / vol_bond
+total = inv_vol_stock + inv_vol_bond
+
+w_stock = inv_vol_stock / total
+w_bond = inv_vol_bond / total
+```
+
+这给出债券约 80%、股票约 20%。假设相关性为零，两类资产对组合波动贡献大致相等。
+
+## 加入 AI 预测
+
+历史波动率是起点，但 AI 可改善估计：
+
+- **GARCH 模型**：捕捉波动率聚类
+- **机器学习**：从市场微观结构和情绪预测波动率
+- **机制检测**：不同市场状况使用不同波动率估计
+
+AI 增强风险平价模型每周或每月更新波动率预测并相应再平衡。
+
+## 纳入相关性
+
+真正风险平价考虑相关性，而非仅单个波动率。高度相关资产应获得较少合计权重。这需要求解优化问题：
+
+```python
+import cvxpy as cp
+
+def risk_parity_weights(cov_matrix):
+    n = cov_matrix.shape[0]
+    w = cp.Variable(n)
+    risk = cp.quad_form(w, cov_matrix)
+    objective = cp.Minimize(cp.sum_squares(cp.multiply(w, cov_matrix @ w) - risk / n))
+    constraints = [w >= 0, cp.sum(w) == 1]
+    prob = cp.Problem(objective, constraints)
+    prob.solve()
+    return w.value
+```
+
+## 再平衡频率
+
+通常每月再平衡。更频繁可提高响应速度，但增加交易成本和换手。
+
+## 风险管理
+
+- 单资产最大权重限制
+- 使用波动率目标调整整体敞口
+- 高不确定性时保留现金缓冲
+- 危机期间监控相关性崩溃
+
+## 总结
+
+风险平价是构建分散化组合的有力框架。AI 通过提供更好的波动率和相关性预测来增强它。结果是风险真正分散在不同资产间，而非集中在最波动资产上。
+
+---
+
+**相关阅读**: [AI Kelly 公式仓位管理](./ai-kelly-criterion-position-sizing) | [AI 动态 ATR 止损](./ai-stop-loss-dynamic-atr) | [AI 交易风险管理框架](./ai-trading-risk-management-framework)

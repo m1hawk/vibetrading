@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { HubPage } from "@/components/HubPage";
 import { getPostsByCategory } from "@/lib/posts";
 
-export const metadata: Metadata = { title: "AI Trading Tools", description: "Independent guides to AI models, trading platforms, APIs, and automation tools for vibe trading." ,
+export const metadata: Metadata = {
+  title: "AI Trading Tools",
+  description:
+    "Independent guides to AI trading tools, models, platforms, APIs, and automation workflows. Compare options by workflow, limits, and real retail use cases.",
   alternates: {
     canonical: "/tools",
   }};

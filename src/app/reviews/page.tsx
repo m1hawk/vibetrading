@@ -3,9 +3,9 @@ import { getPostsByCategory } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
 
 export const metadata: Metadata = {
-  title: "Reviews",
+  title: "AI Trading Reviews",
   description:
-    "Honest, hands-on reviews of AI trading bots and software. We test each tool and publish the real results.",
+    "Honest, hands-on reviews of AI trading bots, platforms, and software. We test each tool and publish real results, limits, and who it is best for.",
 
   alternates: {
     canonical: "/reviews",

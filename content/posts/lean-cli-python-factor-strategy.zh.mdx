@@ -1,0 +1,198 @@
+---
+title: "QuantConnect Lean CLI：用 Python 构建第一个因子策略"
+description: "本文是在本地使用 QuantConnect Lean CLI 与 Python 部署基于因子的交易策略的逐步教程。面向散户量化投资者，涵盖安装、项目创建、策略结构、回测运行、结果分析与何时选择本地 Lean 工作流，是机构级回测引擎的入门实践。"
+date: "2026-07-19"
+category: "Tutorials"
+tags: ["quantconnect", "lean", "python", "factor strategy", "algo trading", "open source"]
+readTime: "13 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "QuantConnect Lean CLI 是什么？"
+    answer: "Lean CLI 是一个命令行工具，让你在自己电脑上本地运行 QuantConnect Lean 算法交易引擎。"
+  - question: "需要 QuantConnect 云订阅吗？"
+    answer: "不需要。Lean CLI 可免费本地回测。云功能和高级数据需要订阅。"
+  - question: "什么是因子策略？"
+    answer: "因子策略根据可测量特征选择资产，如价值、动量、质量或波动率。"
+  - question: "Lean CLI 能实盘交易吗？"
+    answer: "可以，通过支持的券商集成。大多数新手应从本地回测和模拟交易开始。"
+  - question: "Lean 使用哪个 Python 版本？"
+    answer: "当前版本使用 Python 3.11。请查看文档了解最新支持版本。"
+---
+
+<Disclaimer />
+
+QuantConnect Lean 是功能最强的开源算法交易引擎之一。Lean CLI 让你无需付费云访问即可在本地运行该引擎。对想要机构级回测和因子研究的散户量化者来说，这是强力组合。
+
+本教程带你用 Lean CLI 构建一个 Python 因子策略。
+
+## 你会完成什么
+
+读完本教程后，你将拥有：
+
+- 安装配置好的 Lean CLI
+- 一个按动量排序股票的 Python 策略
+- 带真实券商模拟的本地回测
+- 包含收益、回撤和风险指标的结果报告
+
+## 前置条件
+
+开始前需要：
+
+- 已安装 Docker
+- 基础 Python 知识
+- 免费 QuantConnect 账户
+- 了解一些因子投资概念
+
+## 第一步：安装 Lean CLI
+
+用 pip 安装 Lean CLI：
+
+```bash
+pip install lean
+```
+
+用 QuantConnect 账号登录：
+
+```bash
+lean login
+```
+
+## 第二步：创建新项目
+
+创建新项目目录：
+
+```bash
+lean create-project "FactorMomentum"
+cd FactorMomentum
+```
+
+这会生成包含 `main.py` 和配置文件的策略骨架。
+
+## 第三步：理解策略结构
+
+基础 QuantConnect 算法继承自 `QCAlgorithm`。关键方法包括：
+
+- `Initialize`：设置开始日期、资金、股票池和指标
+- `OnData`：处理行情数据并做交易决策
+- `OnSecuritiesChanged`：响应股票池变化
+
+## 第四步：编写因子策略
+
+我们构建一个月度再平衡的动量因子策略。每月按 12 个月收益减去最近 1 个月收益排序，持有前 10 名。
+
+```python
+from AlgorithmImports import *
+
+class FactorMomentum(QCAlgorithm):
+    def Initialize(self):
+        self.SetStartDate(2020, 1, 1)
+        self.SetEndDate(2024, 1, 1)
+        self.SetCash(100000)
+
+        self.UniverseSettings.Resolution = Resolution.Daily
+        self.AddUniverse(self.CoarseSelectionFunction)
+
+        self.rebalance_flag = True
+        self.month = -1
+
+    def CoarseSelectionFunction(self, coarse):
+        if self.rebalance_flag:
+            sorted_by_dollar_volume = sorted(coarse, key=lambda x: x.DollarVolume, reverse=True)
+            return [x.Symbol for x in sorted_by_dollar_volume[:100]]
+        return Universe.Unchanged
+
+    def FineSelectionFunction(self, fine):
+        return [x.Symbol for x in fine]
+
+    def OnData(self, data):
+        if self.Time.month == self.month:
+            return
+        self.month = self.Time.month
+        self.rebalance_flag = True
+
+        symbols = list(self.ActiveSecurities.Keys)
+        if len(symbols) < 10:
+            return
+
+        momentum_scores = {}
+        for symbol in symbols:
+            history = self.History(symbol, 253, Resolution.Daily)
+            if len(history) < 252:
+                continue
+            prices = history["close"]
+            momentum = prices[-21] / prices[-252] - 1
+            momentum_scores[symbol] = momentum
+
+        ranked = sorted(momentum_scores.items(), key=lambda x: x[1], reverse=True)
+        top_symbols = [x[0] for x in ranked[:10]]
+
+        self.Liquidate()
+        for symbol in top_symbols:
+            self.SetHoldings(symbol, 0.1)
+```
+
+这是简化示例。真实因子策略还包括风控、交易成本模型和行业中性。
+
+## 第五步：运行回测
+
+本地运行回测：
+
+```bash
+lean backtest FactorMomentum
+```
+
+Lean 会下载 Docker 镜像、获取数据并运行模拟。首次运行可能需要几分钟，因为要下载镜像和数据。
+
+## 第六步：分析结果
+
+回测完成后，Lean 会打开本地结果页面，展示：
+
+- 资金曲线
+- 回撤
+- 年化收益
+- 夏普比率
+- 胜率
+- 交易列表
+
+用这些指标评估该因子是否值得继续优化。
+
+## 第七步：迭代
+
+尝试以下变体：
+
+- 添加价值或质量因子
+- 使用行业中性排序
+- 改变再平衡频率
+- 添加风险平价仓位管理
+
+## 常见问题
+
+### 找不到数据
+
+Lean 需要市场数据才能回测。本地数据有限。更多历史数据可能需要 QuantConnect 云数据或购买数据订阅。
+
+### Docker 错误
+
+确保 Docker 正在运行并有足够资源。Lean CLI 基于 Docker。
+
+### 性能慢
+
+大股票池和长历史会慢。先从小股票池和短日期范围开始。
+
+## 什么时候用 Lean CLI
+
+- 你想要本地机构级回测
+- 构建多因子股票策略
+- 需要真实券商和滑点模型
+- 计划最终通过 QuantConnect 云部署
+
+## 总结
+
+QuantConnect Lean CLI 把专业级算法交易基础设施带到你的本地机器。学习曲线比简单框架陡峭，但在开源世界中，其功能深度和真实性对股票因子策略无与伦比。
+
+从简单动量因子开始，严格验证，只有在基础工作后再增加复杂度。
+
+---
+
+**相关阅读**: [QuantConnect Lean 第一个算法](./quantconnect-lean-first-algo) | [FinRL vs Stable Baselines 3](./finrl-vs-stable-baselines3-trading) | [Top AI Trading GitHub 开源项目](./top-ai-trading-github-projects-2026)

@@ -1,0 +1,149 @@
+---
+title: "Convert YouTube Trading Strategies to Backtests"
+description: "Learn how to turn an AI trading strategy you saw on YouTube into a real Python backtest. Step-by-step workflow, common traps, and code included."
+date: "2026-07-16"
+category: "Tutorials"
+tags: ["ai trading", "youtube", "backtest", "python", "tutorial"]
+readTime: "10 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "Can I trust a backtest of a strategy I saw on YouTube?"
+    answer: "Only if you build it yourself with clean data, realistic assumptions, and out-of-sample validation. A strategy that looks perfect in a video is usually cherry-picked."
+  - question: "What is the biggest mistake when converting a video strategy to code?"
+    answer: "Lookahead bias is the most common error. Make sure your signal only uses information that would have been available at the exact moment of the trade."
+  - question: "What is repainting and why does it matter?"
+    answer: "Repainting happens when a signal changes after the bar closes. It makes historical results look better than live results would be because you are using future information."
+  - question: "Which Python library should I use for backtesting?"
+    answer: "Backtrader and vectorbt are popular for beginners. For more control, use a custom pandas loop. The library matters less than the assumptions behind your test."
+---
+
+<Disclaimer />
+
+You just watched a YouTube video where a creator claimed their AI trading strategy returned 300% last year. The chart looked perfect, the code was briefly shown, and the comments were full of people asking for the source. Before you copy it blindly, you should turn that vague idea into a reproducible backtest. This post shows you how.
+
+Converting a video strategy into code is one of the most valuable skills a retail trader can build. It forces you to make every assumption explicit, and it exposes the traps that make strategies look amazing in hindsight. We will walk through a step-by-step workflow, highlight common mistakes, and provide a working Python example.
+
+## Step 1: Extract the Exact Rules
+
+Most YouTube strategies are described in vague terms. Your first job is to remove ambiguity. Write down the rules as if you were explaining them to a computer:
+
+- What market and timeframe does it trade?
+- What is the entry condition?
+- What is the exit condition?
+- What position size does it use?
+- Are there stop losses or take profits?
+- Does it trade every signal or only the first of the day?
+
+If the creator cannot answer these questions clearly, the strategy is not ready to test. Vague rules let you accidentally overfit later because you can keep changing the definition until the backtest looks good. For a deeper look at starting from scratch, see [AI trading for beginners](./ai-trading-for-beginners).
+
+## Step 2: Get Clean Historical Data
+
+A backtest is only as good as the data behind it. Free sources like Yahoo Finance are fine for daily bars, but they may have splits, dividends, and delistings that distort results. For intraday work, consider a paid provider or Alpaca's historical API.
+
+| Data Source | Best For | Caveats |
+|-------------|----------|---------|
+| Yahoo Finance | Daily stocks and ETFs | Survivorship bias, adjustment errors |
+| Alpaca | US equities, paper and live | Limited history, good for recent testing |
+| CCXT | Crypto | Exchange-specific, watch for fees |
+| QuantConnect | Multi-asset research | Requires platform familiarity |
+
+Always align your data source with the market the video actually trades. A crypto strategy backtested on stock data is meaningless.
+
+## Step 3: Code the Strategy Without Shortcuts
+
+Here is a simple example of a moving-average-crossover strategy converted from a hypothetical YouTube video. The logic is deliberately simple so you can see the structure.
+
+```python
+import pandas as pd
+import yfinance as yf
+
+# Download data
+df = yf.download("AAPL", start="2020-01-01", end="2024-12-31")
+df = df[['Open', 'High', 'Low', 'Close', 'Volume']].copy()
+
+# Compute indicators using only past data
+df['fast'] = df['Close'].rolling(window=20).mean()
+df['slow'] = df['Close'].rolling(window=50).mean()
+
+# Generate signal: 1 for long, -1 for short, 0 for flat
+# Shift by 1 to avoid lookahead bias: trade at next open using today's close signal
+df['signal'] = 0
+df.loc[df['fast'] > df['slow'], 'signal'] = 1
+df.loc[df['fast'] < df['slow'], 'signal'] = -1
+df['position'] = df['signal'].shift(1)
+
+# Compute returns
+df['market_return'] = df['Close'].pct_change()
+df['strategy_return'] = df['position'] * df['market_return']
+
+# Drop NaN and show summary
+df = df.dropna()
+print(f"Total return: {df['strategy_return'].sum():.2%}")
+print(f"Sharpe ratio: {(df['strategy_return'].mean() / df['strategy_return'].std()) * (252**0.5):.2f}")
+```
+
+The key line is `df['position'] = df['signal'].shift(1)`. Without that shift, you would be trading on the same day's close, which you cannot do in real life. Many backtests fail this basic test.
+
+## Step 4: Check for Repainting
+
+Repainting happens when a strategy's historical signal changes after new data arrives. Common causes include:
+
+- Using the current bar's close as an entry price
+- Recalculating indicators on every tick inside a bar
+- Using highs or lows that were not known at the signal time
+
+To avoid repainting, define every signal using the previous bar's close or the current bar's open. If the video creator shows an indicator that flips color inside a live bar, assume it repaints.
+
+## Step 5: Add Realistic Costs
+
+A backtest without costs is a fantasy. Slippage and commissions turn small edges into losses. Add these assumptions conservatively:
+
+| Cost | Typical Retail Assumption | Notes |
+|------|---------------------------|-------|
+| Commission | $0 per share on US equities | Many brokers now offer zero commissions |
+| Slippage | 0.01% to 0.05% per trade | Higher for low-volume stocks or crypto |
+| Borrow cost | 2% to 20% annually for shorts | Often ignored in video backtests |
+| Spread | Varies by asset | Use realistic bid-ask for intraday |
+
+If the strategy's edge disappears after adding modest costs, it was never robust. Honest traders welcome this test.
+
+## Step 6: Validate Out of Sample
+
+Once the strategy looks decent on the training period, test it on data it has never seen. A simple split works for starters:
+
+- Train / optimize on 2018 to 2022
+- Validate on 2023 to 2024
+
+If performance collapses out of sample, the strategy is overfit. Do not tweak it and rerun on the same validation set. That just leaks information. Our guide on [how to backtest without overfitting](./how-to-backtest-without-overfitting) covers this in more detail.
+
+## Common Traps to Avoid
+
+| Trap | Why It Is Dangerous | How to Avoid |
+|------|---------------------|--------------|
+| Lookahead bias | Uses future data by accident | Shift signals and check timestamps |
+| Survivorship bias | Only tests stocks that still exist | Include delisted tickers or use survivorship-free data |
+| Overfitting | Too many parameters for the data | Use simple rules and out-of-sample tests |
+| Repainting | Signal changes after the fact | Only trade on confirmed bars |
+| Ignoring costs | Makes losers look profitable | Add slippage, spread, and commissions |
+
+These traps explain why so many YouTube strategies look brilliant in the video and fail in real trading. The creators are not always malicious; sometimes they simply do not know their own backtest is broken.
+
+## What to Do After the Backtest
+
+A good backtest is the beginning, not the end. Next steps include:
+
+1. Run a walk-forward analysis on multiple time periods.
+2. Paper trade the strategy for at least a month.
+3. Track every trade and compare live PnL to backtest PnL.
+4. Adjust risk rules before considering real capital.
+
+Our tutorial on [building your first AI trading bot with Alpaca paper trading](./first-ai-trading-bot-ema-cross-alpaca) gives you a concrete path from backtest to paper execution. For understanding why live results diverge from simulations, read [backtest vs live PnL gap](./backtest-vs-live-pnl-gap).
+
+## Bottom Line
+
+Turning a YouTube strategy into a Python backtest is the best way to separate education from entertainment. The process forces you to define rules, question assumptions, and face the reality of costs and bias. Most strategies will fail this test. The few that survive deserve closer attention.
+
+---
+
+**Related reading:** [Paper Trade a YouTube Strategy on Alpaca](./paper-trade-youtube-strategy-alpaca), [How to Backtest Without Overfitting](./how-to-backtest-without-overfitting), [AI Trading for Beginners](./ai-trading-for-beginners)

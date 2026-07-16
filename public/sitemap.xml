@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://vibetrading.fun/</loc>
     <lastmod>2026-07-16</lastmod>
@@ -65,163 +65,819 @@
     <lastmod>2026-07-16</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/ai-breakout-strategy-setup</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-breakout-strategy-setup"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-breakout-strategy-setup"/>
+    <lastmod>2026-07-21</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-breakout-strategy-setup</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-breakout-strategy-setup"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-breakout-strategy-setup"/>
+    <lastmod>2026-07-21</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-correlation-hedging</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-correlation-hedging"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-correlation-hedging"/>
+    <lastmod>2026-07-24</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-correlation-hedging</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-correlation-hedging"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-correlation-hedging"/>
+    <lastmod>2026-07-24</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/ai-day-trading-strategies</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-day-trading-strategies"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-day-trading-strategies"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/ai-day-trading-strategies</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-day-trading-strategies"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-day-trading-strategies"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/ai-earnings-volatility-strategy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-earnings-volatility-strategy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-earnings-volatility-strategy"/>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-earnings-volatility-strategy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-earnings-volatility-strategy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-earnings-volatility-strategy"/>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/ai-hedge-fund-multi-agent-walkthrough</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-hedge-fund-multi-agent-walkthrough"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-hedge-fund-multi-agent-walkthrough"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/ai-hedge-fund-multi-agent-walkthrough</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-hedge-fund-multi-agent-walkthrough"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-hedge-fund-multi-agent-walkthrough"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/ai-kelly-criterion-position-sizing</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-kelly-criterion-position-sizing"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-kelly-criterion-position-sizing"/>
+    <lastmod>2026-07-23</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-kelly-criterion-position-sizing</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-kelly-criterion-position-sizing"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-kelly-criterion-position-sizing"/>
+    <lastmod>2026-07-23</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-long-short-equity-strategy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-long-short-equity-strategy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-long-short-equity-strategy"/>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-long-short-equity-strategy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-long-short-equity-strategy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-long-short-equity-strategy"/>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-momentum-strategy-python</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-momentum-strategy-python"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-momentum-strategy-python"/>
+    <lastmod>2026-07-21</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-momentum-strategy-python</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-momentum-strategy-python"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-momentum-strategy-python"/>
+    <lastmod>2026-07-21</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-multi-factor-ranking</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-multi-factor-ranking"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-multi-factor-ranking"/>
+    <lastmod>2026-07-23</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-multi-factor-ranking</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-multi-factor-ranking"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-multi-factor-ranking"/>
+    <lastmod>2026-07-23</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-news-event-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-news-event-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-news-event-trading"/>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-news-event-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-news-event-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-news-event-trading"/>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-pairs-trading-cointegration</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-pairs-trading-cointegration"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-pairs-trading-cointegration"/>
+    <lastmod>2026-07-21</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-pairs-trading-cointegration</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-pairs-trading-cointegration"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-pairs-trading-cointegration"/>
+    <lastmod>2026-07-21</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-risk-parity-portfolio</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-risk-parity-portfolio"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-risk-parity-portfolio"/>
+    <lastmod>2026-07-23</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-risk-parity-portfolio</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-risk-parity-portfolio"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-risk-parity-portfolio"/>
+    <lastmod>2026-07-23</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-sector-rotation-strategy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-sector-rotation-strategy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-sector-rotation-strategy"/>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-sector-rotation-strategy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-sector-rotation-strategy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-sector-rotation-strategy"/>
+    <lastmod>2026-07-22</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-social-sentiment-strategy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-social-sentiment-strategy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-social-sentiment-strategy"/>
+    <lastmod>2026-07-23</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-social-sentiment-strategy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-social-sentiment-strategy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-social-sentiment-strategy"/>
+    <lastmod>2026-07-23</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-stop-loss-dynamic-atr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-stop-loss-dynamic-atr"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-stop-loss-dynamic-atr"/>
+    <lastmod>2026-07-24</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-stop-loss-dynamic-atr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-stop-loss-dynamic-atr"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-stop-loss-dynamic-atr"/>
+    <lastmod>2026-07-24</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-strategy-comparison-framework</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-strategy-comparison-framework"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-strategy-comparison-framework"/>
+    <lastmod>2026-07-24</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-strategy-comparison-framework</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-strategy-comparison-framework"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-strategy-comparison-framework"/>
+    <lastmod>2026-07-24</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-trader-agent-copy-trading-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trader-agent-copy-trading-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trader-agent-copy-trading-guide"/>
+    <lastmod>2026-07-20</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-trader-agent-copy-trading-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trader-agent-copy-trading-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trader-agent-copy-trading-guide"/>
+    <lastmod>2026-07-20</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-trading-data-pipeline-explained</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-data-pipeline-explained"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-data-pipeline-explained"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-trading-data-pipeline-explained</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-data-pipeline-explained"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-data-pipeline-explained"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/ai-trading-for-beginners</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-for-beginners"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-for-beginners"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/ai-trading-for-beginners</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-for-beginners"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-for-beginners"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/ai-trading-performance-metrics-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-performance-metrics-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-performance-metrics-guide"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-trading-performance-metrics-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-performance-metrics-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-performance-metrics-guide"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/ai-trading-platform</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-platform"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-platform"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/ai-trading-platform</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-platform"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-platform"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/ai-trading-risk-management-framework</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-risk-management-framework"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-risk-management-framework"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-trading-risk-management-framework</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-risk-management-framework"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-risk-management-framework"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-trading-scams-case-studies-2026</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-scams-case-studies-2026"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-scams-case-studies-2026"/>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-trading-scams-case-studies-2026</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-scams-case-studies-2026"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-scams-case-studies-2026"/>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/ai-trading-scams-red-flags</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-scams-red-flags"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-scams-red-flags"/>
     <lastmod>2026-07-03</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/ai-trading-scams-red-flags</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-scams-red-flags"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-scams-red-flags"/>
     <lastmod>2026-07-03</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/ai-trading-vs-algorithmic-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-vs-algorithmic-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-vs-algorithmic-trading"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-trading-vs-algorithmic-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trading-vs-algorithmic-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trading-vs-algorithmic-trading"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/ai-trend-following-vs-mean-reversion</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trend-following-vs-mean-reversion"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trend-following-vs-mean-reversion"/>
+    <lastmod>2026-07-21</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/ai-trend-following-vs-mean-reversion</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/ai-trend-following-vs-mean-reversion"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/ai-trend-following-vs-mean-reversion"/>
+    <lastmod>2026-07-21</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/backtest-vs-live-pnl-gap</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/backtest-vs-live-pnl-gap"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/backtest-vs-live-pnl-gap"/>
+    <lastmod>2026-07-25</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/backtest-vs-live-pnl-gap</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/backtest-vs-live-pnl-gap"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/backtest-vs-live-pnl-gap"/>
+    <lastmod>2026-07-25</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/backtrader-backtesting-basics</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/backtrader-backtesting-basics"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/backtrader-backtesting-basics"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/backtrader-backtesting-basics</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/backtrader-backtesting-basics"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/backtrader-backtesting-basics"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/backtrader-vs-vectorbt-python</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/backtrader-vs-vectorbt-python"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/backtrader-vs-vectorbt-python"/>
+    <lastmod>2026-07-17</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/backtrader-vs-vectorbt-python</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/backtrader-vs-vectorbt-python"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/backtrader-vs-vectorbt-python"/>
+    <lastmod>2026-07-17</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/best-ai-trading-bots-2026</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/best-ai-trading-bots-2026"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/best-ai-trading-bots-2026"/>
     <lastmod>2026-07-03</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/best-ai-trading-bots-2026</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/best-ai-trading-bots-2026"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/best-ai-trading-bots-2026"/>
     <lastmod>2026-07-03</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/best-ai-trading-youtube-channels-2026</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/best-ai-trading-youtube-channels-2026"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/best-ai-trading-youtube-channels-2026"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/best-ai-trading-youtube-channels-2026</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/best-ai-trading-youtube-channels-2026"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/best-ai-trading-youtube-channels-2026"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/claude-code-trading-agent-alpaca</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/claude-code-trading-agent-alpaca"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/claude-code-trading-agent-alpaca"/>
     <lastmod>2026-07-03</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/claude-code-trading-agent-alpaca</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/claude-code-trading-agent-alpaca"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/claude-code-trading-agent-alpaca"/>
     <lastmod>2026-07-03</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/convert-youtube-strategy-to-backtest</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/convert-youtube-strategy-to-backtest"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/convert-youtube-strategy-to-backtest"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/convert-youtube-strategy-to-backtest</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/convert-youtube-strategy-to-backtest"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/convert-youtube-strategy-to-backtest"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/does-ai-trading-really-work</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/does-ai-trading-really-work"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/does-ai-trading-really-work"/>
     <lastmod>2026-07-03</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/does-ai-trading-really-work</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/does-ai-trading-really-work"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/does-ai-trading-really-work"/>
     <lastmod>2026-07-03</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/blog/fingpt-news-sentiment-trading-signal</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/fingpt-news-sentiment-trading-signal"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/fingpt-news-sentiment-trading-signal"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/fingpt-news-sentiment-trading-signal</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/fingpt-news-sentiment-trading-signal"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/fingpt-news-sentiment-trading-signal"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/blog/finrl-reinforcement-learning-trading-bot</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/finrl-reinforcement-learning-trading-bot"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/finrl-reinforcement-learning-trading-bot"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/finrl-reinforcement-learning-trading-bot</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/finrl-reinforcement-learning-trading-bot"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/finrl-reinforcement-learning-trading-bot"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/finrl-vs-stable-baselines3-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/finrl-vs-stable-baselines3-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/finrl-vs-stable-baselines3-trading"/>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/finrl-vs-stable-baselines3-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/finrl-vs-stable-baselines3-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/finrl-vs-stable-baselines3-trading"/>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/first-ai-trading-bot-ema-cross-alpaca</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/first-ai-trading-bot-ema-cross-alpaca"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/first-ai-trading-bot-ema-cross-alpaca"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/first-ai-trading-bot-ema-cross-alpaca</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/first-ai-trading-bot-ema-cross-alpaca"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/first-ai-trading-bot-ema-cross-alpaca"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/first-bot-should-be-simple-ema-cross</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/first-bot-should-be-simple-ema-cross"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/first-bot-should-be-simple-ema-cross"/>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/first-bot-should-be-simple-ema-cross</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/first-bot-should-be-simple-ema-cross"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/first-bot-should-be-simple-ema-cross"/>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/free-vs-paid-market-data</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/free-vs-paid-market-data"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/free-vs-paid-market-data"/>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/free-vs-paid-market-data</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/free-vs-paid-market-data"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/free-vs-paid-market-data"/>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/freqtrade-beginner-guide-crypto-bot</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/freqtrade-beginner-guide-crypto-bot"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/freqtrade-beginner-guide-crypto-bot"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/freqtrade-beginner-guide-crypto-bot</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/freqtrade-beginner-guide-crypto-bot"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/freqtrade-beginner-guide-crypto-bot"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/freqtrade-ml-freqai-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/freqtrade-ml-freqai-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/freqtrade-ml-freqai-guide"/>
+    <lastmod>2026-07-20</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/freqtrade-ml-freqai-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/freqtrade-ml-freqai-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/freqtrade-ml-freqai-guide"/>
+    <lastmod>2026-07-20</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/freqtrade-vs-hummingbot-crypto</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/freqtrade-vs-hummingbot-crypto"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/freqtrade-vs-hummingbot-crypto"/>
+    <lastmod>2026-07-17</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/freqtrade-vs-hummingbot-crypto</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/freqtrade-vs-hummingbot-crypto"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/freqtrade-vs-hummingbot-crypto"/>
+    <lastmod>2026-07-17</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/how-to-backtest-without-overfitting</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/how-to-backtest-without-overfitting"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/how-to-backtest-without-overfitting"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/how-to-backtest-without-overfitting</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/how-to-backtest-without-overfitting"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/how-to-backtest-without-overfitting"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/how-to-spot-fake-ai-trading-youtube</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/how-to-spot-fake-ai-trading-youtube"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/how-to-spot-fake-ai-trading-youtube"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/how-to-spot-fake-ai-trading-youtube</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/how-to-spot-fake-ai-trading-youtube"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/how-to-spot-fake-ai-trading-youtube"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/hummingbot-avellaneda-market-making</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/hummingbot-avellaneda-market-making"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/hummingbot-avellaneda-market-making"/>
+    <lastmod>2026-07-19</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/hummingbot-avellaneda-market-making</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/hummingbot-avellaneda-market-making"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/hummingbot-avellaneda-market-making"/>
+    <lastmod>2026-07-19</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/jesse-ai-trading-framework-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/jesse-ai-trading-framework-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/jesse-ai-trading-framework-guide"/>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/jesse-ai-trading-framework-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/jesse-ai-trading-framework-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/jesse-ai-trading-framework-guide"/>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/lean-cli-python-factor-strategy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/lean-cli-python-factor-strategy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/lean-cli-python-factor-strategy"/>
+    <lastmod>2026-07-19</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/lean-cli-python-factor-strategy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/lean-cli-python-factor-strategy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/lean-cli-python-factor-strategy"/>
+    <lastmod>2026-07-19</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/lumibot-stocks-options-backtest</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/lumibot-stocks-options-backtest"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/lumibot-stocks-options-backtest"/>
+    <lastmod>2026-07-19</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/lumibot-stocks-options-backtest</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/lumibot-stocks-options-backtest"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/lumibot-stocks-options-backtest"/>
+    <lastmod>2026-07-19</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/machine-learning-trading-overview</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/machine-learning-trading-overview"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/machine-learning-trading-overview"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/machine-learning-trading-overview</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/machine-learning-trading-overview"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/machine-learning-trading-overview"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/minimum-viable-python-stack-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/minimum-viable-python-stack-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/minimum-viable-python-stack-trading"/>
+    <lastmod>2026-07-25</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/minimum-viable-python-stack-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/minimum-viable-python-stack-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/minimum-viable-python-stack-trading"/>
+    <lastmod>2026-07-25</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/nautilus-trader-beginner-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/nautilus-trader-beginner-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/nautilus-trader-beginner-guide"/>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/nautilus-trader-beginner-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/nautilus-trader-beginner-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/nautilus-trader-beginner-guide"/>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/openbb-alpaca-live-data-pipeline</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/openbb-alpaca-live-data-pipeline"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/openbb-alpaca-live-data-pipeline"/>
+    <lastmod>2026-07-20</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/openbb-alpaca-live-data-pipeline</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/openbb-alpaca-live-data-pipeline"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/openbb-alpaca-live-data-pipeline"/>
+    <lastmod>2026-07-20</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/openbb-python-quant-research-stack</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/openbb-python-quant-research-stack"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/openbb-python-quant-research-stack"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/openbb-python-quant-research-stack</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/openbb-python-quant-research-stack"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/openbb-python-quant-research-stack"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/openbb-vs-bloomberg-terminal-retail</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/openbb-vs-bloomberg-terminal-retail"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/openbb-vs-bloomberg-terminal-retail"/>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/openbb-vs-bloomberg-terminal-retail</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/openbb-vs-bloomberg-terminal-retail"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/openbb-vs-bloomberg-terminal-retail"/>
+    <lastmod>2026-07-18</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/overfitting-vs-robustness-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/overfitting-vs-robustness-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/overfitting-vs-robustness-trading"/>
+    <lastmod>2026-07-25</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/overfitting-vs-robustness-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/overfitting-vs-robustness-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/overfitting-vs-robustness-trading"/>
+    <lastmod>2026-07-25</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/paper-to-live-trading-checklist</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/paper-to-live-trading-checklist"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/paper-to-live-trading-checklist"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/paper-to-live-trading-checklist</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/paper-to-live-trading-checklist"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/paper-to-live-trading-checklist"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/paper-trade-youtube-strategy-alpaca</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/paper-trade-youtube-strategy-alpaca"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/paper-trade-youtube-strategy-alpaca"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/paper-trade-youtube-strategy-alpaca</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/paper-trade-youtube-strategy-alpaca"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/paper-trade-youtube-strategy-alpaca"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/quantconnect-lean-first-algo</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/quantconnect-lean-first-algo"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/quantconnect-lean-first-algo"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/quantconnect-lean-first-algo</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/quantconnect-lean-first-algo"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/quantconnect-lean-first-algo"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/blog/quantconnect-vs-backtrader-vs-alpaca-vs-mql5</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/quantconnect-vs-backtrader-vs-alpaca-vs-mql5"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/quantconnect-vs-backtrader-vs-alpaca-vs-mql5"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/quantconnect-vs-backtrader-vs-alpaca-vs-mql5</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/quantconnect-vs-backtrader-vs-alpaca-vs-mql5"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/quantconnect-vs-backtrader-vs-alpaca-vs-mql5"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/retail-vs-institutional-ai-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/retail-vs-institutional-ai-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/retail-vs-institutional-ai-trading"/>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/retail-vs-institutional-ai-trading</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/retail-vs-institutional-ai-trading"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/retail-vs-institutional-ai-trading"/>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/superalgos-crypto-automation-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/superalgos-crypto-automation-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/superalgos-crypto-automation-guide"/>
+    <lastmod>2026-07-19</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/superalgos-crypto-automation-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/superalgos-crypto-automation-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/superalgos-crypto-automation-guide"/>
+    <lastmod>2026-07-19</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/top-ai-trading-github-projects-2026</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/top-ai-trading-github-projects-2026"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/top-ai-trading-github-projects-2026"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/top-ai-trading-github-projects-2026</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/top-ai-trading-github-projects-2026"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/top-ai-trading-github-projects-2026"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
+    <loc>https://vibetrading.fun/blog/tradingagents-multi-agent-setup</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/tradingagents-multi-agent-setup"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/tradingagents-multi-agent-setup"/>
+    <lastmod>2026-07-17</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/tradingagents-multi-agent-setup</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/tradingagents-multi-agent-setup"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/tradingagents-multi-agent-setup"/>
+    <lastmod>2026-07-17</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/tradingagents-vs-ai-hedge-fund</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/tradingagents-vs-ai-hedge-fund"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/tradingagents-vs-ai-hedge-fund"/>
+    <lastmod>2026-07-20</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/tradingagents-vs-ai-hedge-fund</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/tradingagents-vs-ai-hedge-fund"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/tradingagents-vs-ai-hedge-fund"/>
+    <lastmod>2026-07-20</lastmod>
+  </url>
+  <url>
     <loc>https://vibetrading.fun/blog/what-retail-ai-trading-can-and-cannot-do</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/what-retail-ai-trading-can-and-cannot-do"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/what-retail-ai-trading-can-and-cannot-do"/>
     <lastmod>2026-07-13</lastmod>
   </url>
   <url>
     <loc>https://vibetrading.fun/zh/blog/what-retail-ai-trading-can-and-cannot-do</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/what-retail-ai-trading-can-and-cannot-do"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/what-retail-ai-trading-can-and-cannot-do"/>
     <lastmod>2026-07-13</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/win-rate-vs-expectancy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/win-rate-vs-expectancy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/win-rate-vs-expectancy"/>
+    <lastmod>2026-07-25</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/win-rate-vs-expectancy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/win-rate-vs-expectancy"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/win-rate-vs-expectancy"/>
+    <lastmod>2026-07-25</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/blog/youtube-ai-trading-playlist-curated</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/youtube-ai-trading-playlist-curated"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/youtube-ai-trading-playlist-curated"/>
+    <lastmod>2026-07-16</lastmod>
+  </url>
+  <url>
+    <loc>https://vibetrading.fun/zh/blog/youtube-ai-trading-playlist-curated</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://vibetrading.fun/blog/youtube-ai-trading-playlist-curated"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://vibetrading.fun/zh/blog/youtube-ai-trading-playlist-curated"/>
+    <lastmod>2026-07-16</lastmod>
   </url>
 </urlset>

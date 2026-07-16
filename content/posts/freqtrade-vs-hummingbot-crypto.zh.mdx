@@ -1,0 +1,187 @@
+---
+title: "freqtrade vs Hummingbot：哪款开源加密货币机器人更适合你？"
+description: "本文从策略类型、资产支持、易用性、风险画像、回测体验与机器学习支持角度对比 freqtrade 与 Hummingbot。帮你选出最符合自己交易目标、技术水平和风险偏好的开源加密货币交易机器人，是选型前的必读对比，并给出根据交易风格快速决策的简明流程图。"
+date: "2026-07-17"
+category: "Tools"
+tags: ["ai trading", "crypto", "freqtrade", "hummingbot", "open source", "bot"]
+readTime: "12 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "freqtrade 和 Hummingbot 哪个更好？"
+    answer: "取决于策略。方向性趋势/波段交易选 freqtrade；做市和套利选 Hummingbot。"
+  - question: "新手能用 Hummingbot 吗？"
+    answer: "Hummingbot 学习曲线比 freqtrade 更陡，因为它专注做市和套利。方向性策略新手通常从 freqtrade 开始更合适。"
+  - question: "freqtrade 能做市吗？"
+    answer: "freqtrade 不是为做市设计的，它围绕方向性策略的进场和出场信号构建。"
+  - question: "两者都免费吗？"
+    answer: "都是开源免费。但交易所需手续费、数据费用和服务器费用仍需自理。"
+  - question: "支持哪些交易所？"
+    answer: "freqtrade 通过 CCXT 支持币安、Bybit、Kraken、OKX 等数十家交易所。Hummingbot 同时支持中心化交易所和以太坊、Solana 等链上的 DEX。"
+---
+
+<Disclaimer />
+
+如果你想运行开源加密货币交易机器人，freqtrade 和 Hummingbot 是两个绕不开的名字。两者都免费、维护良好、具备生产环境能力，但它们面向的交易风格完全不同。
+
+本文从策略匹配、搭建复杂度、交易所支持和风险画像四个维度对比，帮你选出符合目标的工具。
+
+## 快速对比
+
+| 特性 | freqtrade | Hummingbot |
+|---|---|---|
+| **核心策略** | 方向性波段/趋势/剥头皮 | 做市/套利 |
+| **最佳市场** | 中心化现货和合约 | 中心化交易所 + DEX |
+| **是否需要编程** | 自定义策略需 Python | 脚本用 Python，配置用 YAML |
+| **Web UI** | 内置 | 可选面板 |
+| **模拟交易** | 支持 dry-run | 支持 paper trade |
+| **机器学习** | 内置 FreqAI | 无内置 |
+| **交易所支持** | CCXT 支持 100+ 家 | 支持 CEX 和 DEX |
+| **社区规模** | 很大 | 大，偏 DeFi |
+
+结论已经很明显：如果你的思维是"买入信号/卖出信号"，选 freqtrade；如果你的思维是"价差/订单簿/套利循环"，选 Hummingbot。
+
+## freqtrade 最擅长什么
+
+freqtrade 是用 Python 编写的方向性加密货币交易策略框架。你写一个定义进出场条件的策略类，freqtrade 负责数据获取、执行、日志和报告。
+
+### 优势
+
+- **成熟回测引擎**：考虑手续费、滑点、真实订单执行
+- **策略生态**：大量公开策略，但质量参差不齐
+- **FreqAI**：内置机器学习自适应策略模块
+- **Docker 支持**：便于部署到 VPS 或树莓派
+- **Dry-run 模式**：用真实行情、虚假资金测试
+
+### 典型场景
+
+- 4 小时图 EMA 交叉策略
+- 山寨币 RSI 均值回归
+- FreqAI 驱动的趋势跟踪
+- 多币种组合策略
+
+### 劣势
+
+- 只支持加密货币，不含股票或外汇
+- 大量公开策略存在过拟合
+- 自定义需 Python 基础
+- API key 安全由你自己负责
+
+## Hummingbot 最擅长什么
+
+Hummingbot 是做市和套利框架。它不预测方向，而是从买卖价差或不同场所的价格差中获利。
+
+### 优势
+
+- **开箱即用的做市策略**：纯做市、跨所做市、套利
+- **支持 DEX**：可直接在 Uniswap、PancakeSwap、Jupiter 等链上协议交易
+- **库存管理**：内置平衡基准币和报价币的逻辑
+- **策略模板**：预置策略降低首次交易门槛
+
+### 典型场景
+
+- 为小市值币提供流动性
+- 跨所比特币套利
+- 稳定币对赚取手续费
+- 在 DEX 上做市
+
+### 劣势
+
+- 对方向性交易者学习曲线更陡
+- 需要更多资金承担库存风险
+- DEX gas 费可能侵蚀利润
+- 做市竞争激烈、资金密集
+
+## 策略匹配决策树
+
+1. **你想预测价格方向？** → freqtrade
+2. **你想从价差或价格差异中获利？** → Hummingbot
+3. **你想用机器学习？** → freqtrade
+4. **你想在 DEX 交易？** → Hummingbot
+5. **你编程经验有限？** → freqtrade 的 Web UI 更友好
+6. **你资金量大、想低频被动收益？** → Hummingbot
+
+## 搭建复杂度
+
+### freqtrade 安装
+
+```bash
+git clone https://github.com/freqtrade/freqtrade.git
+cd freqtrade
+./setup.sh --install
+source .venv/bin/activate
+freqtrade create-userdir --userdir user_data
+freqtrade new-config --config config.json
+```
+
+然后编辑 `config.json` 添加交易所、dry-run 模式、Telegram 提醒等。策略文件放在 `user_data/strategies/`。
+
+### Hummingbot 安装
+
+```bash
+docker pull hummingbot/hummingbot:latest
+docker run -it --name hummingbot hummingbot/hummingbot:latest
+```
+
+进入容器后创建 API key、选择策略、配置价差、挂单量和刷新时间等参数。
+
+两者文档都很完善，但 freqtrade 更像传统 Python 项目，Hummingbot 更像基础设施软件。
+
+## 风险画像
+
+### freqtrade 风险
+
+- 方向性策略可能产生大回撤
+- 公开策略普遍存在过拟合
+- 合约杠杆会放大亏损
+- 交易所 API 故障可能让持仓暴露
+
+### Hummingbot 风险
+
+- 库存失衡可能让你持有一路下跌的币种
+- 逆向选择：你常在下跌前买入、上涨前卖出
+- DEX 智能合约风险
+- 以太坊 gas 费和失败交易
+
+<Alert type="warning">
+  两个机器人都能亏钱。务必先用模拟盘交易、小仓位测试，绝不用无法承受损失的资金。
+</Alert>
+
+## 回测差异
+
+freqtrade 有强大的内置回测器：
+
+```bash
+freqtrade backtesting --strategy MyStrategy --timerange 20230101-20240101
+```
+
+Hummingbot 回测能力相对有限，因为做市依赖订单簿动态，而历史 tick 数据很难完整捕捉。Hummingbot 用户更常用模拟交易验证。
+
+如果你重视历史验证，freqtrade 的工具链更强。
+
+## 机器学习
+
+freqtrade 内置 FreqAI，可在策略中训练自适应模型。Hummingbot 没有等价内置功能。如果你想在加密货币领域实验机器学习，freqtrade 是更自然的选择。
+
+## 社区与生态
+
+freqtrade 拥有更庞大的普通用户群体和新手教程。Hummingbot 社区更偏 DeFi 和专业做市。两者都有活跃的 Discord 和 GitHub 仓库。
+
+## 什么时候可以一起用
+
+一些高级交易者会同时运行两个机器人：
+
+- 用 freqtrade 做方向性头寸
+- 用 Hummingbot 对同一资产做bands做市赚价差
+
+这不是新手配置，但说明两者可以互补。
+
+## 总结
+
+**freqtrade** 适合想构建方向性加密货币策略、拥有强回测和机器学习支持的交易者。**Hummingbot** 适合想在中枢化和去中心化交易所运行做市或套利策略的交易者。
+
+没有 universally 最好的机器人。正确选择取决于你的策略、资金量和技术舒适度。
+
+---
+
+**相关阅读**: [Freqtrade 新手指南](./freqtrade-beginner-guide-crypto-bot) | [Top AI Trading GitHub 开源项目](./top-ai-trading-github-projects-2026) | [如何回测而不自欺欺人](./how-to-backtest-without-overfitting)

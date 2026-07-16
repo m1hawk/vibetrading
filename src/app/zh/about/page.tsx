@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "关于我们",
-  description:
-    "VibeTrading.fun 的存在原因、我们的构建与测试方式，以及我们永远不会销售什么。",
+  title: "关于我们 - VibeTrading.fun",
+  description: "了解 VibeTrading.fun 的创立原因、我们的测试方法，以及我们对散户交易者提供诚实、基于证据教育的长期承诺。本站不卖课、不推荐未验证工具，只分享可复现的方法。",
 
   alternates: {
     canonical: "/zh/about",

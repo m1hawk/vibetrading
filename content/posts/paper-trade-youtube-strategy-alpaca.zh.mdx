@@ -1,0 +1,213 @@
+---
+title: "在 Alpaca 模拟盘交易 YouTube 上的 AI 交易策略"
+description: "本文把 YouTube 上看到的 AI 交易策略放到 Alpaca 免费模拟交易环境中安全测试。包含环境搭建、数据获取、信号生成、下单逻辑、交易跟踪与 Python 代码片段，是实盘前不可或缺的桥梁步骤，帮助你在无风险条件下验证执行逻辑并发现隐藏 bug。"
+date: "2026-07-16"
+category: "Tutorials"
+tags: ["ai trading", "youtube", "alpaca", "paper trading", "tutorial"]
+readTime: "10 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "Alpaca 模拟交易免费吗？"
+    answer: "是的。Alpaca 提供免费模拟交易账户，API 与实盘相同，可以用虚拟资金测试策略。"
+  - question: "任何 YouTube 策略都能在 Alpaca 模拟交易吗？"
+    answer: "只有交易 Alpaca 支持的美股或 ETF 的策略才可以。加密货币、外汇和国际股票需要不同券商。"
+  - question: "模拟交易多久才能上实盘？"
+    answer: "至少要经历不同市场环境，通常一到三个月，并且只用能承受全部亏损的资金考虑实盘。"
+  - question: "模拟与实盘结果有什么差别？"
+    answer: "模拟交易忽略滑点、部分成交和情绪压力。实盘结果几乎总是更差，所以要加入保守假设。"
+---
+
+<Disclaimer />
+
+你在 YouTube 上看到一个 AI 交易策略，讲得还挺清楚。创作者解释了规则，展示了一些代码，没有承诺一夜暴富。下一步安全的做法不是直接实盘，而是模拟交易。本教程将展示如何把这个 YouTube 策略放到 Alpaca 的免费模拟交易环境中运行。
+
+模拟交易让你测试执行逻辑、抓 bug、并在接近真实市场的条件下观察策略表现，而不用承担资金风险。它不完美，但远好于相信回测或视频封面。如果你对这个工作流还不熟悉，可以先看 [AI 交易入门指南](./ai-trading-for-beginners)。
+
+## 你需要准备什么
+
+在写代码之前，先准备好基础工具：
+
+| 需求 | 推荐选项 | 原因 |
+|------|---------|------|
+| 券商账户 | Alpaca 模拟账户 | 免费、API 优先、美股 |
+| API 密钥 | 在 Alpaca 后台生成 | 自动化下单必需 |
+| Python 环境 | 3.10 或更新 | 支持新版 SDK |
+| 数据源 | Alpaca 行情数据 | 与执行场所一致 |
+| 交易日志 | 电子表格或笔记本 | 追踪决策的关键 |
+
+在虚拟环境中安装所需包：
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install alpaca-py pandas python-dotenv
+```
+
+创建 `.env` 文件存放密钥，并把 `.env` 加入 `.gitignore`：
+
+```
+ALPACA_API_KEY=your_key_here
+ALPACA_SECRET_KEY=your_secret_here
+```
+
+即使模拟交易的密钥也要谨慎对待，因为它们可能泄露账户信息。
+
+## 第一步：清晰定义策略
+
+假设 YouTube 策略是一个简单的 momentum 突破：
+
+- 观察开盘后 30 分钟。
+- 如果价格突破 30 分钟高点，开多。
+- 止损设在 30 分钟低点。
+- 收盘时平仓。
+
+这只是示例，你可以替换成视频实际描述规则。关键是每条规则都要精确到能写成代码。
+
+## 第二步：获取日内数据
+
+Alpaca 提供历史和实时 K 线。以下是获取最近 5 分钟 K 线的方法：
+
+```python
+import os
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+from alpaca.data.historical import StockHistoricalDataClient
+from alpaca.data.requests import StockBarsRequest
+from alpaca.data.timeframe import TimeFrame
+
+load_dotenv()
+
+client = StockHistoricalDataClient(
+    os.getenv("ALPACA_API_KEY"),
+    os.getenv("ALPACA_SECRET_KEY"),
+)
+
+request = StockBarsRequest(
+    symbol_or_symbols="AAPL",
+    timeframe=TimeFrame.Minute,
+    start=datetime.now() - timedelta(days=30),
+    end=datetime.now(),
+)
+
+bars = client.get_stock_bars(request)
+df = bars.df.reset_index()
+print(df.head())
+```
+
+运行这段代码并检查输出。确保时间戳、开盘、最高、最低、收盘和成交量都完整，再进入下单逻辑。
+
+## 第三步：构建信号生成器
+
+现在把策略规则转成函数。该函数返回每根 K 线的目标仓位：
+
+```python
+def generate_signals(df):
+    df = df.copy()
+    df['date'] = df['timestamp'].dt.date
+    
+    # 识别一天中前 6 根 K 线（5 分钟 -> 30 分钟）
+    df['bar_of_day'] = df.groupby('date').cumcount() + 1
+    morning = df[df['bar_of_day'] <= 6].copy()
+    
+    # 计算每天早盘高低点
+    morning_high = morning.groupby('date')['high'].max().rename('morning_high')
+    morning_low = morning.groupby('date')['low'].min().rename('morning_low')
+    df = df.merge(morning_high, on='date').merge(morning_low, on='date')
+    
+    # 信号：早盘突破后做多
+    df['signal'] = 0
+    df.loc[df['close'] > df['morning_high'], 'signal'] = 1
+    df.loc[df['close'] < df['morning_low'], 'signal'] = 0  # 出场占位
+    
+    return df
+```
+
+这段代码故意简化。真实系统需要加更多规则、处理止损和管理仓位。这里的目的是展示模式。
+
+## 第四步：提交模拟订单
+
+有了信号后，向 Alpaca 模拟账户提交订单：
+
+```python
+from alpaca.trading.client import TradingClient
+from alpaca.trading.requests import MarketOrderRequest
+from alpaca.trading.enums import OrderSide, TimeInForce
+
+trading_client = TradingClient(
+    os.getenv("ALPACA_API_KEY"),
+    os.getenv("ALPACA_SECRET_KEY"),
+    paper=True,
+)
+
+def submit_paper_order(symbol, qty, side):
+    order = trading_client.submit_order(
+        order_data=MarketOrderRequest(
+            symbol=symbol,
+            qty=qty,
+            side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
+            time_in_force=TimeInForce.DAY,
+        )
+    )
+    return order
+```
+
+只在目标仓位变化时调用这个函数。常见错误是每根 K 线都发单。机器人应该在仓位变化时交易，而不是每五分钟交易一次。
+
+## 第五步：记录每笔交易
+
+模拟交易日志必不可少。至少记录以下字段：
+
+| 字段 | 示例 | 重要性 |
+|------|------|--------|
+| 日期 | 2026-07-16 | 识别市场环境 |
+| 标的 | AAPL | 跟踪交易资产 |
+| 信号原因 | 早盘突破 | 保持策略诚实 |
+| 入场价 | 225.50 | 与回测假设比较 |
+| 出场价 | 227.10 | 计算真实盈亏 |
+| 数量 | 10 | 仓位数据 |
+| 滑点估计 | 0.02 | 后续调整回测 |
+| 备注 | 因跳空延迟入场 | 解释偏差 |
+
+每周结束时，把模拟日志与回测对比。如果模拟结果持续差于回测，说明回测假设过于乐观。原因可参考 [回测与实盘盈亏差距](./backtest-vs-live-pnl-gap)。
+
+## 第六步：实盘前加入风险规则
+
+模拟交易很安全，但容易产生虚假信心。在转实盘前，执行以下规则：
+
+- 单笔最大风险：本金的 1% 到 2%
+- 日亏损上限：单日亏损 3% 后停止交易
+- 最大持仓数：避免过度集中
+- 除非策略本身需要，否则不留隔夜仓
+- 每个亏损周后复核再加大仓位
+
+这些规则保护你不被自己伤害。自动化执行不能取代纪律。
+
+## 模拟交易常见错误
+
+| 错误 | 危害 | 修正 |
+|------|------|------|
+| 忽略滑点 | 模拟成交不现实 | 给结果加上滑点假设 |
+| 交易过频 | 手续费和噪音吞噬优势 | 只交易清晰信号 |
+| 中途改规则 | 破坏实验有效性 | 第一单前定义好规则 |
+| 仓位不真实 | 扭曲心理 | 模拟仓位与计划实盘仓位匹配 |
+| 过早放弃 | 一周不代表一种市场状态 | 经历多种环境后再评估 |
+
+## 从模拟到实盘
+
+如果模拟结果稳定且现实，你可以考虑用很小的实盘账户。逐步加仓：
+
+1. 先交易计划实盘规模的 10%，跑一个月。
+2. 每周比较实盘与模拟盈亏。
+3. 只有成本后的实盘优势仍在，才加仓。
+4. 保留资金应对回撤。
+
+完整机器人搭建可参考我们的 [第一个 AI 交易机器人：EMA 交叉 + Alpaca 模拟交易](./first-ai-trading-bot-ema-cross-alpaca) 教程。
+
+## 结语
+
+在 Alpaca 上模拟交易 YouTube 策略，是看完一个 promising 视频后的负责任下一步。它把模糊灵感变成可衡量的执行。大多数策略在模拟盘上的表现会比视频里差，而这本身就是有价值的信息。目标不是证明视频说得对，而是看这个想法能否经受现实检验。
+
+---
+
+**相关阅读：** [把 YouTube 策略转换成 Python 回测](./convert-youtube-strategy-to-backtest)、[回测与实盘盈亏差距](./backtest-vs-live-pnl-gap)、[第一个 AI 交易机器人](./first-ai-trading-bot-ema-cross-alpaca)

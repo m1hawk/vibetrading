@@ -1,0 +1,117 @@
+---
+title: "算法交易免费 vs 付费数据：你真正需要什么"
+description: "本文对比算法交易中免费与付费市场数据源的优劣、适用阶段、数据质量差异与隐藏成本，帮助交易者判断何时该升级数据，以及在各阶段应避免的前视偏差、幸存者偏差与数据窥探陷阱，是搭建可靠量化数据基础的重要参考，并给出从免费数据逐步升级到付费数据的具体决策树。"
+date: "2026-07-26"
+category: "Guides"
+tags: ["market data", "data providers", "algo trading", "free data", "paid data", "beginners"]
+readTime: "12 min read"
+featured: false
+lang: "zh"
+faq:
+  - question: "免费数据对算法交易够吗？"
+    answer: "学习和简单策略足够。严肃策略通常需要干净、完整的付费数据。"
+  - question: "什么时候该为数据付费？"
+    answer: "当你需要日内数据、期权链、国际市场或干净的回测历史数据时。"
+  - question: "什么是幸存者偏差？"
+    answer: "历史数据集只包含仍存在的公司，忽略了退市股票。这会夸大回测结果。"
+  - question: "哪家付费数据商最好？"
+    answer: "取决于需求。Polygon 适合股票和期权。Tiingo 和 Nasdaq Data Link 也是强替代。外汇可考虑 Dukascopy 或 OANDA。"
+---
+
+<Disclaimer />
+
+数据是每个交易系统的基础。免费数据能带你走很远，但有局限。知道何时升级、为什么付费，可帮你避免糟糕回测和资本损失。
+
+## 数据需求的阶段
+
+数据需求随交易成熟度演进：
+
+| 阶段 | 需求 | 最佳数据源 |
+|---|---|---|
+| 学习 | 日度价格、基础指标 | Yahoo Finance、yfinance |
+| 原型 | 日内、模拟交易 | Alpaca、OpenBB |
+| 严肃回测 | 干净历史数据、无幸存者偏差 | Polygon、Tiingo、Norgate |
+| 期权策略 | 期权链、希腊字母 | Polygon、Cboe、ORATS |
+| 国际市场 | 非美股 | Bloomberg、Refinitiv、本地交易所 |
+| 高频 | Tick 数据、订单簿 | 交易所、专业数据商 |
+
+## 免费数据源
+
+### Yahoo Finance
+
+适合股票和 ETF 日度历史价格。通过 `yfinance` 易于获取。
+
+优点：免费、简单、覆盖广
+缺点：准确性无保证、可能无通知变更、无日内数据
+
+### Alpaca
+
+为模拟和实盘账户提供免费美股实时和历史数据。
+
+优点：实时、API 友好
+缺点：仅美股、历史有限、期权数据有限
+
+### OpenBB
+
+通过统一界面聚合免费和付费来源。
+
+优点：统一访问、研究方便
+缺点：仍受底层免费来源限制
+
+## 付费数据源
+
+### Polygon
+
+股票、期权和加密的热门选择。干净历史数据和 API。
+
+费用：股票约 199 美元/月起，期权更贵
+
+### Tiingo
+
+价格实惠的日度和日内数据，基本面也不错。
+
+费用：基础计划约 10 美元/月起
+
+### Norgate
+
+专注干净历史股票数据，包含退市股票，有助于避免幸存者偏差。
+
+费用：按覆盖范围订阅
+
+### Dukascopy / OANDA
+
+外汇和 CFD 数据。
+
+## 何时升级
+
+考虑付费数据当：
+
+- 你部署真实资金
+- 策略使用日内信号
+- 需要期权链
+- 交易国际市场
+- 想要无幸存者偏差的准确回测
+- 免费数据延迟让你亏钱
+
+## 应避免什么
+
+- 日度交易却购买 tick 数据
+- 未验证就用免费数据跑实盘策略
+- 回测中忽视幸存者偏差
+- 假设贵数据一定带来更好结果
+
+## 免费 vs 付费决策树
+
+1. 你在学习？→ 免费数据足够
+2. 你用短线策略模拟交易？→ Alpaca 或 OpenBB
+3. 你回测多年股票策略？→ 考虑 Norgate 或 Polygon
+4. 你交易期权？→ Polygon 或 ORATS
+5. 你交易加密？→ 交易所 API 或 CoinMetrics
+
+## 总结
+
+免费数据是强大的学习工具。当策略优势依赖准确性、完整性或速度时，付费数据变得值得。让数据支出匹配实际需求，而非假设越贵越好。
+
+---
+
+**相关阅读**: [OpenBB + Alpaca 实时数据管道](./openbb-alpaca-live-data-pipeline) | [最小可用 Python 技术栈](./minimum-viable-python-stack-trading) | [OpenBB vs Bloomberg Terminal](./openbb-vs-bloomberg-terminal-retail)

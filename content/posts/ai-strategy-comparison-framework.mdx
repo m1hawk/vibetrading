@@ -1,0 +1,153 @@
+---
+title: "AI Strategy Comparison: Rank and Select Strategies"
+description: "Build a systematic framework for comparing AI trading strategies using risk-adjusted metrics, robustness tests, and real-world constraints."
+date: "2026-07-24"
+category: "Strategies"
+tags: ["ai trading", "strategy comparison", "backtesting", "risk metrics", "portfolio"]
+readTime: "12 min read"
+featured: false
+lang: "en"
+faq:
+  - question: "How do I compare two trading strategies?"
+    answer: "Use risk-adjusted metrics such as Sharpe ratio, Sortino ratio, Calmar ratio, and maximum drawdown, not just total return."
+  - question: "What is the most important metric?"
+    answer: "There is no single most important metric. Combine return, risk, robustness, and practical constraints such as turnover and capacity."
+  - question: "Should I compare strategies on backtests?"
+    answer: "Backtests are a starting point. Use out-of-sample data, walk-forward analysis, and paper trading before trusting comparisons."
+  - question: "How does AI fit into strategy comparison?"
+    answer: "AI can help rank strategies by predicted robustness, regime fit, and probability of future success."
+---
+
+<Disclaimer />
+
+Traders often fall in love with strategies that have the highest backtest return. That is a mistake. A strategy with a 50% annual return and a 60% drawdown is usually worse than one with 15% return and a 5% drawdown. A systematic comparison framework helps you choose strategies that are robust, not just impressive on paper.
+
+A good framework turns strategy selection from an emotional decision into a structured process. It also helps you avoid overfitting your own judgment to the most recent backtest.
+
+## Why You Need a Framework
+
+Without a framework, strategy selection becomes emotional. You pick the one with the prettiest equity curve or the most recent winning streak. A good framework forces you to compare strategies on dimensions that matter for live trading.
+
+## Core Metrics
+
+### Return Metrics
+
+- **Total return**: Simple but misleading alone
+- **Annualized return**: Allows comparison across different time periods
+- **CAGR**: Compound annual growth rate
+
+### Risk Metrics
+
+- **Maximum drawdown**: Peak-to-trough decline
+- **Volatility**: Standard deviation of returns
+- **Downside deviation**: Volatility of losing periods only
+
+### Risk-Adjusted Metrics
+
+- **Sharpe ratio**: Return per unit of total risk
+- **Sortino ratio**: Return per unit of downside risk
+- **Calmar ratio**: Return per unit of maximum drawdown
+- **Profit factor**: Gross profit divided by gross loss
+
+### Practical Metrics
+
+- **Win rate**: Percentage of winning trades
+- **Average win/loss ratio**: Payoff ratio
+- **Expectancy**: Expected value per trade
+- **Turnover**: How often the strategy trades
+- **Capacity**: How much capital the strategy can handle
+
+A complete comparison might look like this:
+
+| Metric | Strategy A | Strategy B |
+|---|---|---|
+| Annualized Return | 18% | 12% |
+| Max Drawdown | 25% | 8% |
+| Sharpe Ratio | 0.85 | 1.20 |
+| Sortino Ratio | 1.10 | 1.80 |
+| Profit Factor | 1.30 | 1.50 |
+| Max Drawdown | 25% | 8% |
+
+Strategy A has higher return but worse risk-adjusted metrics. Depending on your tolerance, Strategy B may be the better choice.
+
+## Robustness Tests
+
+A strategy can look great on one dataset and fail on another. Test robustness with:
+
+- **Out-of-sample testing**: Validate on data not used in training
+- **Walk-forward analysis**: Repeatedly train and test on rolling windows
+- **Monte Carlo simulation**: Randomize trade order to test sensitivity
+- **Parameter sensitivity**: Check if small parameter changes destroy results
+
+## Comparing AI vs Rule-Based Strategies
+
+AI strategies often have higher backtest returns but are harder to interpret and more prone to overfitting. Rule-based strategies are simpler but may miss complex patterns. A fair comparison should account for:
+
+- Interpretability
+- Implementation complexity
+- Data requirements
+- Overfitting risk
+- Maintenance effort
+
+## A Simple Scoring Framework
+
+Assign weights to metrics based on your goals:
+
+```python
+score = (
+    0.25 * sharpe +
+    0.20 * sortino +
+    0.20 * calmar +
+    0.15 * robustness_score +
+    0.10 * practicality_score +
+    0.10 * consistency_score
+)
+```
+
+This produces a single ranking that balances multiple dimensions.
+
+## Common Mistakes
+
+- Comparing strategies on different time periods
+- Ignoring transaction costs and slippage
+- Selecting based on total return alone
+- Overfitting the comparison metric itself
+- Not testing on out-of-sample data
+
+## When the Framework Helps Most
+
+Use a formal comparison framework when:
+
+- You have multiple strategies and limited capital
+- You need to justify a strategy choice to yourself or others
+- You want to avoid recency bias
+- You are combining strategies into a portfolio
+
+## Regime Fit Analysis
+
+A strategy that works in bull markets may fail in bear markets. Regime fit analysis measures how a strategy performs under different conditions:
+
+- High vs low volatility
+- Rising vs falling interest rates
+- Trending vs mean-reverting markets
+- Expanding vs contracting liquidity
+
+If you find that Strategy A performs well in high volatility and Strategy B performs well in low volatility, you can combine them rather than choosing one.
+
+## Building a Portfolio of Strategies
+
+The final goal is not to pick one strategy but to build a portfolio of uncorrelated strategies. A portfolio approach:
+
+- Reduces dependency on any single market regime
+- Smooths drawdowns
+- Allows you to scale capital more safely
+
+Use the framework to rank individual strategies, then optimize weights based on correlation and risk contribution. This is similar to risk parity applied to strategies instead of assets.
+
+## Bottom Line
+
+Strategy comparison is not about finding the highest return. It is about finding the strategy that best fits your risk tolerance, capital, time horizon, and ability to execute consistently. A disciplined framework protects you from chasing backtests and helps you build a robust portfolio of strategies.
+
+---
+
+**Related reading**: [AI Trend Following vs Mean Reversion](./ai-trend-following-vs-mean-reversion) | [How to Backtest Without Overfitting](./how-to-backtest-without-overfitting) | [AI Trading Performance Metrics Guide](./ai-trading-performance-metrics-guide)

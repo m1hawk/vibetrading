@@ -4,8 +4,7 @@ import { PostCard } from "@/components/PostCard";
 
 export const metadata: Metadata = {
   title: "Vibe Trading 实践指南",
-  description:
-    "关于理解、构建、验证和改进 AI 交易工作流的实践指南。",
+  description: "关于理解、构建、验证和改进 AI 交易工作流的实践指南。从入门概念、风险管理到开源项目教程，帮助散户交易者建立可重复、可回测、可持续改进的交易流程。",
 
   alternates: {
     canonical: "/zh/blog",

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { HubPage } from "@/components/HubPage";
 import { getPostsByCategory } from "@/lib/posts";
 
-export const metadata: Metadata = { title: "AI 交易工具", description: "按 Vibe Trading 工作流选择 AI 模型、交易平台、API 和自动化工具。" ,
+export const metadata: Metadata = { title: "AI 交易工具对比与选择指南", description: "按 Vibe Trading 工作流选择 AI 模型、交易平台、API 和自动化工具。独立对比每种工具的能力、局限和真实使用场景。" ,
   alternates: {
     canonical: "/zh/tools",
   }};
