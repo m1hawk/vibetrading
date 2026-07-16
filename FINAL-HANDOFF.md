@@ -1,13 +1,13 @@
-# VibeTrading 2 周内容冲刺 — 最终交接文档
+# VibeTrading 2 周内容冲刺 — 最终交接文档 v4
 
-> 生成日期：2026-07-16  
-> 项目路径：`/Users/yangzhen/Desktop/vibetrading`  
-> 目标域名：https://vibetrading.fun  
-> 冲刺目标：14 天内新增 100 篇 AI Trading 相关内容并推动 Google 索引。
+> 生成日期：2026-07-16
+> 项目路径：`/Users/yangzhen/Desktop/vibetrading`
+> 目标域名：https://vibetrading.fun
+> 冲刺目标：14 天内推动 ≥100 篇已上线的 AI Trading 内容被 Google 索引并产生搜索流量。
 
 ---
 
-## 一、当前状态：内容生产已完成，等待部署与 GSC 提交
+## 一、当前状态：内容已超额完成，重点转向索引与流量
 
 ### 核心完成标准核对
 
@@ -15,8 +15,8 @@
 |---|---|---|---|
 | ① | 英文 MDX 发布 | ≥50 | ✅ 68 |
 | ① | 中文 MDX 发布 | ≥50 | ✅ 68 |
-| ② | 英文新页面 GSC 已索引 | ≥40（80%） | ⏳ 待提交后验证 |
-| ③ | 覆盖核心长尾词 | ≥50 | ✅ 68/82 |
+| ② | 英文页面 GSC 已索引 | ≥50 | ⏳ 提交中 |
+| ③ | 覆盖核心长尾词 | ≥60 | ✅ 68/82 |
 | ④ | 英文单篇平均字数 | ≥800 | ✅ 1454（最低 800） |
 | ⑤ | 第 14 天英文日点击量 | ≥5 | ⏳ 待验证 |
 | ⑥ | Disclaimer + FAQ Schema + 内链 ≥3 | 100% | ✅ 136/136 |
@@ -30,7 +30,7 @@
   - 策略对比与实战：15 个主题
   - Reddit 痛点/避坑/问答：13 个主题
   - YouTube 内容转化：5 个主题
-  - 基础科普/概念：6 个主题
+  - 基础科普/概念：11 个主题
   - 其他高流量入口：4 个主题
 
 ---
@@ -39,7 +39,7 @@
 
 | 文件 | 用途 |
 |---|---|
-| `content-sprint-plan-v3.md` | 重新制定的 14 天冲刺计划 |
+| `content-sprint-plan-v4.md` | 重新制定的 14 天冲刺计划（v4：从数量转向索引+流量） |
 | `gsc-index-tracking.csv` | 68 个英文 URL 的 GSC 提交与索引追踪表 |
 | `gsc-submission-guide.md` | Google Search Console 提交操作指南 |
 | `deployment-checklist.md` | 部署与提交核对清单 |
@@ -47,6 +47,9 @@
 | `keyword-coverage-mapping.md` | 82 个关键词覆盖映射表 |
 | `scripts/seo-health-check.mjs` | 自动化 SEO 健康检查脚本 |
 | `seo-health-report.json` | 最新 SEO 健康检查详细报告 |
+| `research/github-ai-trading-projects.md` | GitHub 开源项目研究报告 |
+| `research/reddit-ai-trading-needs.md` | Reddit 痛点与话题研究报告 |
+| `research/_AI Trading_ 关键词研究报告（v2 · DataForSEO 真实数据校准版）.md` | 第三方关键词数据报告 |
 
 ---
 
@@ -78,39 +81,36 @@
 
 ---
 
-## 四、你必须执行的下一步
+## 四、GSC 提交状态（2026-07-16）
 
-### 1. 部署到生产环境
+### 已完成
+1. ✅ 代码已 push 到 `main` 并自动部署到 GitHub Pages：`https://vibetrading.fun/`。
+2. ✅ `https://vibetrading.fun/sitemap.xml` 已重新提交到 GSC，状态为 "Couldn't fetch"（Google 会周期性重新抓取）。
+3. ⏳ P0 支柱页（5 个英文 URL）正在通过 WebBridge 手动请求索引中。
 
-```bash
-cd /Users/yangzhen/Desktop/vibetrading
-# 确保构建成功
-npm run build
+### 待执行
+1. **Day 1 剩余**：确认 P0 URL 索引请求结果，记录到 `gsc-index-tracking.csv`。
+2. **Day 2-7**：按 `gsc-index-tracking.csv` 优先级分批手动提交 P1/P2/P3 URL。
+   - 每日提交 10-15 个，避免触发 GSC 限额。
+3. **Day 8-9**：加固 5 篇核心英文支柱页，优化内链网络。
+4. **Day 10**：重新部署 + 重新提交 sitemap + 社交/外链信号。
+5. **Day 11-13**：索引排查 + 再次请求未索引的重要 URL。
+6. **Day 14**：数据复盘：统计已索引数、点击量、曝光、平均排名。
 
-# 将 out/ 目录内容上传到 vibetrading.fun 根目录
-# 具体命令取决于你的托管方式（Vercel/Cloudflare Pages/GitHub Pages/自有服务器）
-```
+详细操作步骤见 `gsc-submission-guide.md` 和 `content-sprint-plan-v4.md`。
 
-部署后验证：
-- `https://vibetrading.fun/` 可访问
-- `https://vibetrading.fun/sitemap.xml` 可访问并返回 152 个 URL
-- 任意 blog 页面可访问，例如 `https://vibetrading.fun/blog/ai-trading-for-beginners`
+---
 
-### 2. Google Search Console 提交
+## 五、内容方向约束
 
-1. 登录 [Google Search Console](https://search.google.com/search-console/)。
-2. 选择 `vibetrading.fun` 资源。
-3. 提交 sitemap：`sitemap.xml`。
-4. 按 `gsc-index-tracking.csv` 中的优先级分批手动请求索引：
-   - **Day 10**：P0 支柱页 5 个
-   - **Day 11**：P1 GitHub 项目 + 基础概念 16 个
-   - **Day 12**：P2 策略 + Reddit 痛点 28 个
-   - **Day 13**：P3 YouTube 转化 + 其他长尾 19 个
-5. 在 CSV 中记录 `date_submitted`。
+- ✅ **允许**：开源 GitHub 项目对比、策略对比、Reddit 痛点转化、YouTube 策略转化、基础概念科普。
+- ❌ **不允许**：付费 app/产品对比（如 TrendSpider、3Commas、Kavout、eToro 等商业工具深度评测）。
+- ❌ **不允许**：保证收益、夸大效果的表述。
+- ❌ **不允许**：直接搬运 YouTube 视频，只转化策略为可回测代码 + 风险分析。
 
-详细操作步骤见 `gsc-submission-guide.md`。
+---
 
-### 3. 获取外链信号
+## 六、获取外链信号
 
 使用 `social-sharing-templates.md` 中的模板：
 - 在 Reddit r/algotrading 发布 1-2 篇高质量帖子。
@@ -118,29 +118,35 @@ npm run build
 - 在 GitHub Discussions 的相关项目下留下有价值的评论。
 - 在中文社区（知乎、雪球、V2EX、即刻等）分享对应中文内容。
 
-### 4. 每日追踪
+---
 
-- 更新 `gsc-index-tracking.csv`。
+## 七、每日追踪
+
+- 更新 `gsc-index-tracking.csv` 中的 `date_submitted` 和状态列。
 - 观察 Coverage 报告中的 "Crawled - currently not indexed" 页面。
 - 对未索引页面做小幅更新（加一段 FAQ、调整内链）后重新提交。
 
 ---
 
-## 五、14 天目标检查表
+## 八、14 天目标检查表
 
 | 日期 | 任务 |
 |---|---|
-| Day 10 | 部署 + 提交 sitemap + P0 URL 手动提交 |
-| Day 11 | P1 URL 手动提交 + 开始社交分享 |
-| Day 12 | P2 URL 手动提交 + 继续社交分享 |
-| Day 13 | P3 URL 手动提交 + 索引异常排查 |
+| Day 1 | 部署 + 重新提交 sitemap + P0 URL 手动提交 |
+| Day 2 | P1 首批 URL 手动提交 + 开始社交分享 |
+| Day 3 | P1 剩余 + P2 首批 URL 手动提交 |
+| Day 4-6 | P2/P3 URL 分批手动提交 |
+| Day 7 | 第一周数据复盘 |
+| Day 8-9 | 加固 5 篇核心英文支柱页 + 内链网络优化 |
+| Day 10 | 重新部署 + 重新提交 sitemap + 社交/外链信号 |
+| Day 11-13 | 索引异常排查 + 再次请求未索引 URL |
 | Day 14 | GSC 数据复盘：统计已索引数、点击量、曝光、平均排名 |
 
 ---
 
-## 六、注意事项
+## 九、注意事项
 
-1. **不要一次性提交所有 URL**：GSC 手动请求索引有每日限额，建议每批不超过 20 个。
+1. **不要一次性提交所有 URL**：GSC 手动请求索引有每日限额，建议每批不超过 15 个。
 2. **索引需要耐心**：即使立即请求，Google 也可能需要 2-7 天才会显示索引状态。
 3. **中文页面 html lang**：当前根 layout 固定为 `lang="en"`，中文页面通过 `hreflang` 区分。如要完全正确，可考虑后续将根 layout 改为根据路径动态设置 lang。
 4. **内容新鲜度**：建议每月更新核心支柱页（`ai-trading-for-beginners`、`best-ai-trading-bots-2026`、`top-ai-trading-github-projects-2026`）的 `dateModified`。
@@ -148,18 +154,17 @@ npm run build
 
 ---
 
-## 七、我这边无法继续的工作
+## 十、我这边无法继续的工作
 
-- 实际部署到 `vibetrading.fun`（需要你的服务器/托管权限）。
-- 登录你的 GSC 账号提交 URL 和查看索引状态。
-- 直接获取 GSC 点击/曝光数据。
+- 直接获取 GSC 点击/曝光数据（需要登录你的 GSC 账号）。
+- 实际在社交平台上发布内容（需要你操作账号）。
 
-完成部署和 GSC 提交后，你可以把 GSC 数据截图或 CSV 发给我，我可以继续帮你：
+完成 GSC 提交后，你可以把 GSC 数据截图或 CSV 发给我，我可以继续帮你：
 - 分析哪些页面未索引及原因
 - 优化低排名页面
 - 制定第 15-30 天的内容维护计划
 
 ---
 
-*文档版本：v1*  
+*文档版本：v4*
 *最后更新：2026-07-16*
