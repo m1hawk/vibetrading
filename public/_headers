@@ -1,0 +1,8 @@
+/sitemap.xml
+  Cache-Control: public, must-revalidate, max-age=0
+
+/sitemap-probe.xml
+  Cache-Control: public, must-revalidate, max-age=0
+
+/robots.txt
+  Cache-Control: public, must-revalidate, max-age=0
