@@ -77,9 +77,13 @@ export function Header() {
           className="flex items-center gap-2.5 text-foreground"
           onClick={() => setOpen(false)}
         >
-          <span className="flex h-7 w-7 items-center justify-center bg-ink font-mono text-[11px] font-semibold text-accent">
-            V
-          </span>
+          <img
+            src="/logo-icon.png"
+            alt="VibeTrading"
+            className="h-7 w-7 object-contain"
+            width={28}
+            height={28}
+          />
           <span className="font-serif text-[1.15rem] font-bold tracking-tight">
             VibeTrading
           </span>

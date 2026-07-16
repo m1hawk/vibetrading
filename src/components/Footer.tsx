@@ -57,9 +57,13 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-[1.5fr_0.75fr_0.75fr]">
           <div>
             <Link href={homeHref} className="flex items-center gap-2.5 text-foreground">
-              <span className="flex h-7 w-7 items-center justify-center bg-ink font-mono text-[11px] font-semibold text-accent">
-                V
-              </span>
+              <img
+                src="/logo-icon.png"
+                alt="VibeTrading"
+                className="h-7 w-7 object-contain"
+                width={28}
+                height={28}
+              />
               <span className="font-serif text-lg font-bold tracking-tight">VibeTrading</span>
             </Link>
             <p className="mt-5 max-w-md text-sm leading-7 text-muted">{t.description}</p>

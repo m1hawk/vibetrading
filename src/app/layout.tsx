@@ -35,6 +35,13 @@ export const metadata: Metadata = {
       "Turn market ideas into testable trading workflows with AI. No quant background required.",
   },
   metadataBase: new URL("https://vibetrading.fun"),
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
+  },
   robots: {
     index: true,
     follow: true,
