@@ -12,6 +12,7 @@ const footerCopy = {
     links: [
       ["Start Here", "/vibe-trading"],
       ["Guides", "/blog"],
+      ["Tutorials", "/tutorials"],
       ["Tools", "/tools"],
       ["Build", "/build"],
       ["Lab", "/lab"],

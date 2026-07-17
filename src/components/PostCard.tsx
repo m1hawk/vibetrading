@@ -9,18 +9,34 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, featured = false }: PostCardProps) {
-  const postHref = post.lang === "zh" ? `/zh/blog/${post.slug}` : `/blog/${post.slug}`;
-  const ctaText = post.lang === "zh" ? "阅读文章" : "Read article";
+  const isZh = post.lang === "zh";
+  const postHref = isZh ? `/zh/blog/${post.slug}` : `/blog/${post.slug}`;
+  const ctaText = isZh ? "阅读文章" : "Read article";
+  const imageSrc = isZh ? `/og/zh/blog/${post.slug}.png` : `/og/blog/${post.slug}.png`;
 
   return (
     <article
-      className={`nx-card group relative flex flex-col p-6 ${
+      className={`nx-card group relative flex flex-col overflow-hidden p-6 ${
         featured ? "lg:col-span-2 lg:grid lg:grid-cols-2 lg:gap-8" : ""
       }`}
     >
-      <div className="flex flex-1 flex-col">
+      <div
+        className={`-mx-6 -mt-6 mb-4 overflow-hidden ${
+          featured ? "lg:col-span-2 lg:mb-6" : ""
+        }`}
+      >
+        <img
+          src={imageSrc}
+          alt={post.title}
+          width={1200}
+          height={630}
+          loading="lazy"
+          className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+        />
+      </div>
+      <div className={`flex flex-1 flex-col ${featured ? "lg:col-span-2" : ""}`}>
         <div className="mb-3 flex flex-wrap items-center gap-2 font-mono text-[11px] text-muted-foreground">
-          <span className="border border-accent/25 bg-accent/10 px-2.5 py-1 text-accent">
+          <span className="border border-accent/25 bg-accent/10 px-2.5 py-1 text-accent-hover">
             {post.category}
           </span>
           {post.tags.slice(0, 2).map((tag) => (
@@ -30,7 +46,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
           ))}
           <span className="flex items-center gap-1">
             <Calendar className="h-3.5 w-3.5" />
-            {formatDate(post.date)}
+            {formatDate(post.date, isZh ? "zh-CN" : "en-US")}
           </span>
         </div>
 
@@ -49,7 +65,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
           {post.description}
         </p>
 
-        <div className="mt-5 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent">
+        <div className="mt-5 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent-hover">
           {ctaText}
           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
         </div>

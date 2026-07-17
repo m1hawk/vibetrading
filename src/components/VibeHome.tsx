@@ -53,9 +53,9 @@ const copy = {
       },
       {
         title: "Choose the right tools",
-        description: "Compare AI models, trading platforms, APIs, and automation tools.",
+        description: "Assemble an open-source stack by workflow, limits, and real retail use cases.",
         href: "/tools",
-        cta: "Compare tools",
+        cta: "Explore the stack",
         icon: Bot,
         fig: "04",
       },
@@ -129,9 +129,9 @@ const copy = {
       },
       {
         title: "选择正确的工具",
-        description: "比较 AI 模型、交易平台、API 和自动化工具。",
+        description: "按工作流、局限和真实使用场景，搭建自己的开源工具栈。",
         href: "/zh/tools",
-        cta: "比较工具",
+        cta: "了解工具栈",
         icon: Bot,
         fig: "04",
       },
@@ -250,7 +250,7 @@ export function VibeHome({ lang }: { lang: Lang }) {
                   <Link key={path.title} href={path.href} className="nx-card group p-7">
                     <div className="flex items-start justify-between gap-6">
                       <div className="flex items-center gap-3">
-                        <span className="font-mono text-[11px] tracking-[0.14em] text-accent">
+                        <span className="font-mono text-[11px] tracking-[0.14em] text-accent-hover">
                           FIG. {path.fig}
                         </span>
                         <span className="flex h-10 w-10 items-center justify-center border border-border bg-[var(--page)] text-accent">
@@ -263,7 +263,7 @@ export function VibeHome({ lang }: { lang: Lang }) {
                       {path.title}
                     </h3>
                     <p className="mt-3 max-w-md leading-7 text-muted">{path.description}</p>
-                    <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.12em] text-accent">
+                    <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.12em] text-accent-hover">
                       {path.cta} →
                     </p>
                   </Link>
@@ -317,7 +317,7 @@ export function VibeHome({ lang }: { lang: Lang }) {
                   <p className="mt-3 min-h-14 leading-7 text-muted">{description}</p>
                   <Link
                     href={`${prefix}/build`}
-                    className="mt-7 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent"
+                    className="mt-7 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent-hover"
                   >
                     {cta}
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -355,7 +355,7 @@ export function VibeHome({ lang }: { lang: Lang }) {
               <h2 className="nx-display text-3xl sm:text-4xl">{t.guidesTitle}</h2>
               <Link
                 href={`${prefix}/blog`}
-                className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent sm:inline-flex"
+                className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent-hover sm:inline-flex"
               >
                 {t.guidesCta}
                 <ArrowRight className="h-3.5 w-3.5" />

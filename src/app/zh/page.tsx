@@ -2,12 +2,24 @@ import type { Metadata } from "next";
 import { VibeHome } from "@/components/VibeHome";
 
 export const metadata: Metadata = {
-  title: "人人都能开始的 Vibe Trading",
+  title: "VibeTrading.fun — 人人都能开始的 Vibe Trading",
   description:
     "用自然语言和 AI，把市场想法变成研究、策略、回测和自动化交易工作流。不需要量化背景，VibeTrading.fun 让每个人都能系统学习 AI 交易。",
 
   alternates: {
     canonical: "/zh",
+  },
+  openGraph: {
+    title: "人人都能开始的 Vibe Trading",
+    description:
+      "用自然语言和 AI，把市场想法变成研究、策略、回测和自动化交易工作流。不需要量化背景，VibeTrading.fun 让每个人都能系统学习 AI 交易。",
+    type: "website",
+    locale: "zh_CN",
+    images: [{ url: "/og/zh/home.png", width: 1200, height: 630, alt: "人人都能开始的 Vibe Trading" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og/zh/home.png"],
   }};
 
 export default function ZhHome() {

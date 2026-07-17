@@ -5,6 +5,17 @@ import { getPostsByCategory } from "@/lib/posts";
 export const metadata: Metadata = { title: "AI 交易工具对比与选择指南", description: "按 Vibe Trading 工作流选择 AI 模型、交易平台、API 和自动化工具。独立对比每种工具的能力、局限和真实使用场景。" ,
   alternates: {
     canonical: "/zh/tools",
+  },
+  openGraph: {
+    title: "AI 交易工具对比与选择指南",
+    description: "按 Vibe Trading 工作流选择 AI 模型、交易平台、API 和自动化工具。独立对比每种工具的能力、局限和真实使用场景。",
+    type: "website",
+    locale: "zh_CN",
+    images: [{ url: "/og/zh/tools.png", width: 1200, height: 630, alt: "AI 交易工具对比与选择指南" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og/zh/tools.png"],
   }};
 
 export default function ZhToolsPage() {
