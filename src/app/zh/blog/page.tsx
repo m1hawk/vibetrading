@@ -8,6 +8,17 @@ export const metadata: Metadata = {
 
   alternates: {
     canonical: "/zh/blog",
+  },
+  openGraph: {
+    title: "Vibe Trading 实践指南",
+    description: "关于理解、构建、验证和改进 AI 交易工作流的实践指南。从入门概念、风险管理到开源项目教程，帮助散户交易者建立可重复、可回测、可持续改进的交易流程。",
+    type: "website",
+    locale: "zh_CN",
+    images: [{ url: "/og/zh/blog.png", width: 1200, height: 630, alt: "Vibe Trading 实践指南" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og/zh/blog.png"],
   }};
 
 export default function ZhBlogPage() {
@@ -24,7 +35,7 @@ export default function ZhBlogPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="mb-12">
-        <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent">指南</p>
+        <p className="font-mono text-xs uppercase tracking-[0.22em] text-accent-hover">指南</p>
         <h1 className="mt-5 text-5xl font-semibold tracking-[-0.045em] text-foreground sm:text-6xl">
           Vibe Trading 实践指南
         </h1>
@@ -37,7 +48,7 @@ export default function ZhBlogPage() {
             <a
               key={category}
               href={`#${category.toLowerCase()}`}
-              className="rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-muted transition-colors hover:border-accent hover:text-accent"
+              className="rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-muted transition-colors hover:border-accent hover:text-accent-hover"
             >
               {category}
             </a>

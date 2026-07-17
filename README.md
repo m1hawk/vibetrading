@@ -33,7 +33,7 @@ Live site: [https://vibetrading.fun](https://vibetrading.fun)
 title: "Your Post Title"
 description: "A short description for SEO and cards."
 date: "2026-07-03"
-category: "Guides" # Guides | Reviews | Tutorials | Challenges
+category: "Guides" # Guides | Tutorials | Strategies | Tools
 tags: ["ai trading", "beginners"]
 readTime: "8 min read"
 featured: false

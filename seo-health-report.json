@@ -1,10 +1,10 @@
 {
   "summary": {
-    "total": 162,
+    "total": 159,
     "blogPages": 136,
     "withIssues": 2,
     "duplicateTitles": 1,
-    "duplicateDescriptions": 1,
+    "duplicateDescriptions": 0,
     "withFaqSchema": 136,
     "withArticleSchema": 136
   },
@@ -14,16 +14,12 @@
       2
     ]
   ],
-  "duplicateDescriptions": [
-    [
-      "Turn market ideas into research, strategies, backtests, and automated workflows with AI. No quant background required.",
-      3
-    ]
-  ],
+  "duplicateDescriptions": [],
   "pagesWithIssues": [
     {
       "url": "https://vibetrading.fun/404",
       "issues": [
+        "description length 0",
         "missing canonical",
         "has noindex"
       ]
@@ -31,6 +27,7 @@
     {
       "url": "https://vibetrading.fun/_not-found",
       "issues": [
+        "description length 0",
         "missing canonical",
         "has noindex"
       ]
@@ -40,13 +37,14 @@
     {
       "url": "https://vibetrading.fun/404",
       "title": "404: This page could not be found.",
-      "description": "Turn market ideas into research, strategies, backtests, and automated workflows with AI. No quant background required.",
+      "description": "",
       "canonical": null,
-      "hreflangCount": 1,
+      "hreflangCount": 0,
       "h1": "404",
       "hasFaqSchema": false,
       "hasArticleSchema": false,
       "issues": [
+        "description length 0",
         "missing canonical",
         "has noindex"
       ]
@@ -54,13 +52,14 @@
     {
       "url": "https://vibetrading.fun/_not-found",
       "title": "404: This page could not be found.",
-      "description": "Turn market ideas into research, strategies, backtests, and automated workflows with AI. No quant background required.",
+      "description": "",
       "canonical": null,
-      "hreflangCount": 1,
+      "hreflangCount": 0,
       "h1": "404",
       "hasFaqSchema": false,
       "hasArticleSchema": false,
       "issues": [
+        "description length 0",
         "missing canonical",
         "has noindex"
       ]
@@ -738,11 +737,11 @@
     },
     {
       "url": "https://vibetrading.fun/blog/quantconnect-vs-backtrader-vs-alpaca-vs-mql5",
-      "title": "QuantConnect vs Backtrader vs Alpaca vs MQL5: Pick | VibeTrading.fun",
+      "title": "QuantConnect vs Backtrader vs Alpaca vs MQL5 | VibeTrading.fun",
       "description": "A hands-on comparison of four popular algorithmic trading stacks. Learn which platform fits your skill level, budget, asset classes, and migration path.",
       "canonical": "https://vibetrading.fun/blog/quantconnect-vs-backtrader-vs-alpaca-vs-mql5",
       "hreflangCount": 2,
-      "h1": "QuantConnect vs Backtrader vs Alpaca vs MQL5: Pick",
+      "h1": "QuantConnect vs Backtrader vs Alpaca vs MQL5",
       "hasFaqSchema": true,
       "hasArticleSchema": true,
       "issues": []
@@ -858,17 +857,6 @@
       "issues": []
     },
     {
-      "url": "https://vibetrading.fun/challenges",
-      "title": "AI Trading Challenges | VibeTrading.fun",
-      "description": "Join 30-day AI trading challenges with fixed rules, transparent capital tracking, and honest results. Learn by building, testing, and reviewing strategies in public.",
-      "canonical": "https://vibetrading.fun/challenges",
-      "hreflangCount": 0,
-      "h1": "Challenges",
-      "hasFaqSchema": false,
-      "hasArticleSchema": false,
-      "issues": []
-    },
-    {
       "url": "https://vibetrading.fun/disclaimer",
       "title": "Risk Disclaimer | VibeTrading.fun",
       "description": "Important risk disclaimer for VibeTrading.fun. Trading and AI trading bots involve substantial risk of loss. Nothing on this site is financial advice.",
@@ -908,28 +896,6 @@
       "canonical": "https://vibetrading.fun/privacy",
       "hreflangCount": 0,
       "h1": "Privacy Policy",
-      "hasFaqSchema": false,
-      "hasArticleSchema": false,
-      "issues": []
-    },
-    {
-      "url": "https://vibetrading.fun/reviews",
-      "title": "AI Trading Reviews | VibeTrading.fun",
-      "description": "Honest, hands-on reviews of AI trading bots, platforms, and software. We test each tool and publish real results, limits, and who it is best for.",
-      "canonical": "https://vibetrading.fun/reviews",
-      "hreflangCount": 0,
-      "h1": "Reviews",
-      "hasFaqSchema": false,
-      "hasArticleSchema": false,
-      "issues": []
-    },
-    {
-      "url": "https://vibetrading.fun/starter-kit",
-      "title": "Learn AI Trading | VibeTrading.fun",
-      "description": "Free, evidence-based AI trading learning resources for retail traders: guides, checklists, tool comparisons, and a structured path from idea to paper trading.",
-      "canonical": "https://vibetrading.fun/starter-kit",
-      "hreflangCount": 0,
-      "h1": "Learn Vibe Trading",
       "hasFaqSchema": false,
       "hasArticleSchema": false,
       "issues": []
@@ -1816,7 +1782,7 @@
     },
     {
       "url": "https://vibetrading.fun/zh",
-      "title": "人人都能开始的 Vibe Trading | VibeTrading.fun",
+      "title": "VibeTrading.fun — 人人都能开始的 Vibe Trading",
       "description": "用自然语言和 AI，把市场想法变成研究、策略、回测和自动化交易工作流。不需要量化背景，VibeTrading.fun 让每个人都能系统学习 AI 交易。",
       "canonical": "https://vibetrading.fun/zh",
       "hreflangCount": 0,

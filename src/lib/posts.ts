@@ -19,10 +19,13 @@ export interface Post {
   tags: string[];
   readTime: string;
   featured?: boolean;
+  author?: string;
   content: string;
   lang: Lang;
   faq?: FaqItem[];
 }
+
+export const DEFAULT_AUTHOR = "VibeTrading Editorial Team";
 
 const postsDirectory = path.join(process.cwd(), "content", "posts");
 
@@ -57,6 +60,7 @@ export function getAllPosts(lang: Lang = "en"): Post[] {
         tags: data.tags || [],
         readTime: data.readTime || "5 min read",
         featured: data.featured || false,
+        author: data.author || undefined,
         content,
         lang: fileLang,
         faq: data.faq || [],
@@ -96,8 +100,7 @@ export function getAllTags(lang: Lang = "en"): string[] {
   return Array.from(tags).sort();
 }
 
-export function getAvailableLanguages(slug: string): Lang[] {
-  if (!fs.existsSync(postsDirectory)) {
+export function getAvailableLanguages(slug: string): Lang[] {  if (!fs.existsSync(postsDirectory)) {
     return [];
   }
 
@@ -113,4 +116,41 @@ export function getAvailableLanguages(slug: string): Lang[] {
   }
 
   return languages.sort();
+}
+
+/**
+ * Related posts ranked by same-category bonus + tag overlap.
+ * Returns up to `count` posts, excluding the given slug.
+ */
+export function getRelatedPosts(post: Post, lang: Lang = "en", count = 3): Post[] {
+  const tagSet = new Set(post.tags.map((t) => t.toLowerCase()));
+  return getAllPosts(lang)
+    .filter((p) => p.slug !== post.slug)
+    .map((p) => {
+      const overlap = p.tags.filter((t) => tagSet.has(t.toLowerCase())).length;
+      const sameCategory = p.category.toLowerCase() === post.category.toLowerCase() ? 1 : 0;
+      return { post: p, score: sameCategory * 2 + overlap };
+    })
+    .filter((r) => r.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, count)
+    .map((r) => r.post);
+}
+
+/**
+ * Previous / next posts within the same category, ordered by date ascending
+ * (prev = older, next = newer). Returns nulls at the boundaries.
+ */
+export function getAdjacentPosts(
+  post: Post,
+  lang: Lang = "en"
+): { prev: Post | null; next: Post | null } {
+  const siblings = getPostsByCategory(post.category, lang).sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  const index = siblings.findIndex((p) => p.slug === post.slug);
+  return {
+    prev: index > 0 ? siblings[index - 1] : null,
+    next: index >= 0 && index < siblings.length - 1 ? siblings[index + 1] : null,
+  };
 }

@@ -1,12 +1,14 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { getAllPosts, getPostBySlug, getAvailableLanguages } from "@/lib/posts";
+import { getAllPosts, getPostBySlug, getAvailableLanguages, DEFAULT_AUTHOR } from "@/lib/posts";
 import { MDXContent } from "@/components/MDXContent";
 import { formatDate } from "@/lib/date";
 import { Calendar, Clock, Tag, ArrowLeft, Globe } from "lucide-react";
 import Link from "next/link";
 import { TableOfContents } from "@/components/TableOfContents";
 import { JsonLd } from "@/components/JsonLd";
+import { ReadingProgress } from "@/components/ReadingProgress";
+import { ArticleFooter } from "@/components/ArticleFooter";
 
 interface ZhBlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -58,6 +60,20 @@ export async function generateMetadata({
       modifiedTime: post.updated,
       tags: post.tags,
       locale: "zh_CN",
+      images: [
+        {
+          url: `/og/zh/blog/${post.slug}.png`,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: [`/og/zh/blog/${post.slug}.png`],
     },
   };
 }
@@ -72,15 +88,17 @@ export default async function ZhBlogPostPage({ params }: ZhBlogPostPageProps) {
 
   const availableLanguages = getAvailableLanguages(slug);
   const hasEn = availableLanguages.includes("en");
+  const byline = post.author || DEFAULT_AUTHOR;
 
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
     headline: post.title,
     description: post.description,
+    image: `https://vibetrading.fun/og/zh/blog/${post.slug}.png`,
     author: {
       "@type": "Organization",
-      name: "vibetrading.fun",
+      name: byline,
       url: "https://vibetrading.fun",
     },
     publisher: {
@@ -117,6 +135,7 @@ export default async function ZhBlogPostPage({ params }: ZhBlogPostPageProps) {
 
   return (
     <>
+      <ReadingProgress />
       <JsonLd data={articleSchema} />
       {faqSchema && <JsonLd data={faqSchema} />}
       <article className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -136,7 +155,7 @@ export default async function ZhBlogPostPage({ params }: ZhBlogPostPageProps) {
                 <span>Also available in</span>
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="font-medium text-accent hover:text-accent-hover"
+                  className="font-medium text-accent-hover hover:underline"
                 >
                   English
                 </Link>
@@ -145,12 +164,12 @@ export default async function ZhBlogPostPage({ params }: ZhBlogPostPageProps) {
 
             <header className="mb-10">
               <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-muted">
-                <span className="rounded-full bg-accent/10 px-3 py-1 text-accent">
+                <span className="rounded-full bg-accent/10 px-3 py-1 text-accent-hover">
                   {post.category}
                 </span>
                 <span className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  {formatDate(post.date)}
+                  {formatDate(post.date, "zh-CN")}
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
@@ -163,6 +182,19 @@ export default async function ZhBlogPostPage({ params }: ZhBlogPostPageProps) {
               </h1>
 
               <p className="mt-4 text-lg text-muted">{post.description}</p>
+
+              <div className="mt-6 flex items-center gap-3 border-t border-border pt-5 text-sm">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/15 font-serif text-xs font-bold text-accent-hover">
+                  VT
+                </span>
+                <div>
+                  <p className="font-medium text-foreground">{byline}</p>
+                  <p className="text-xs text-muted-foreground">
+                    发布于 {formatDate(post.date, "zh-CN")}
+                    {post.updated && ` · 最后更新于 ${formatDate(post.updated, "zh-CN")}`}
+                  </p>
+                </div>
+              </div>
 
               {post.tags.length > 0 && (
                 <div className="mt-6 flex flex-wrap items-center gap-2">
@@ -182,6 +214,8 @@ export default async function ZhBlogPostPage({ params }: ZhBlogPostPageProps) {
             <div className="prose prose-invert max-w-none">
               <MDXContent source={post.content} />
             </div>
+
+            <ArticleFooter post={post} lang="zh" />
           </div>
 
           <aside className="hidden lg:block">

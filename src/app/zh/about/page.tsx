@@ -7,6 +7,17 @@ export const metadata: Metadata = {
 
   alternates: {
     canonical: "/zh/about",
+  },
+  openGraph: {
+    title: "关于我们 - VibeTrading.fun",
+    description: "了解 VibeTrading.fun 的创立原因、我们的测试方法，以及我们对散户交易者提供诚实、基于证据教育的长期承诺。本站不卖课、不推荐未验证工具，只分享可复现的方法。",
+    type: "website",
+    locale: "zh_CN",
+    images: [{ url: "/og/zh/about.png", width: 1200, height: 630, alt: "关于我们 - VibeTrading.fun" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og/zh/about.png"],
   }};
 
 export default function AboutPageZh() {

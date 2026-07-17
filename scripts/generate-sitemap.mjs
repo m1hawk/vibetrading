@@ -14,6 +14,7 @@ const staticRoutes = [
   "/",
   "/vibe-trading",
   "/blog",
+  "/tutorials",
   "/tools",
   "/build",
   "/lab",

@@ -60,7 +60,7 @@ export function HubPage({
           {cards.map((card, index) => {
             const content = (
               <>
-                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-accent">
+                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-accent-hover">
                   FIG. {String(index + 1).padStart(2, "0")} · {card.eyebrow}
                 </p>
                 <h2 className="mt-4 font-serif text-2xl font-semibold tracking-tight">
@@ -68,7 +68,7 @@ export function HubPage({
                 </h2>
                 <p className="mt-3 leading-7 text-muted">{card.description}</p>
                 {card.href && (
-                  <span className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent">
+                  <span className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent-hover">
                     Open guide
                     <ArrowRight className="h-3.5 w-3.5" />
                   </span>
@@ -94,7 +94,7 @@ export function HubPage({
             <h2 className="nx-display text-3xl sm:text-4xl">{postsTitle}</h2>
             <Link
               href={ctaHref}
-              className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent sm:inline-flex"
+              className="hidden items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent-hover sm:inline-flex"
             >
               {ctaLabel}
               <ArrowRight className="h-3.5 w-3.5" />
