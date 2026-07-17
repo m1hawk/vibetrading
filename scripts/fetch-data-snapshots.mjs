@@ -9,8 +9,10 @@
  *     (the winning bracket of a resolved event = the actual weekly count range)
  *
  * Output: data/btc-daily.json, data/musk-tweets.json
- * The script is idempotent: it rebuilds the full series from public history
- * and merges with whatever is already on disk, so no history is ever lost.
+ * Default mode is incremental: only new days / newly resolved or newly
+ * appearing Polymarket events are fetched and merged into the on-disk
+ * series. Run with `--full` to rebuild the entire history from scratch
+ * (useful for first runs or data repairs).
  */
 import fs from "fs";
 import path from "path";
@@ -18,6 +20,8 @@ import path from "path";
 const root = process.cwd();
 const dataDir = path.join(root, "data");
 fs.mkdirSync(dataDir, { recursive: true });
+
+const FULL = process.argv.includes("--full");
 
 const UA = { "User-Agent": "vibetrading.fun data-snapshot/1.0" };
 
@@ -27,6 +31,14 @@ async function getJson(url) {
   return res.json();
 }
 
+function readData(file, fallback) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(dataDir, file), "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+
 function dayKey(ms) {
   return new Date(ms).toISOString().slice(0, 10);
 }
@@ -34,30 +46,47 @@ function dayKey(ms) {
 /* ── BTC daily up/down ─────────────────────────────────────────────── */
 
 async function fetchBtc() {
-  const days = 365;
+  const existing = readData("btc-daily.json", { days: [] });
+  const incremental = !FULL && existing.days.length > 0;
+  // Incremental: refetch only a recent window (covers the latest candle and
+  // corrects the previous day if it was still partial). Full: 365 days.
+  const days = incremental ? 7 : 365;
   const url = `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}&interval=daily`;
   const json = await getJson(url);
   const points = (json.prices || []).map(([ms, price]) => ({ date: dayKey(ms), close: Math.round(price * 100) / 100 }));
 
-  // Dedupe by date, drop today's partial candle
+  // Merge: on-disk history wins except where fresh points exist
   const byDate = new Map();
+  for (const p of existing.days) byDate.set(p.date, { date: p.date, close: p.close });
   for (const p of points) byDate.set(p.date, p);
   const today = dayKey(Date.now());
-  byDate.delete(today);
+  byDate.delete(today); // drop today's partial candle
 
-  const sorted = [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+  const sorted = [...byDate.values()]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-365); // rolling year
+
   const out = sorted.map((p, i) => {
     const prev = i > 0 ? sorted[i - 1].close : null;
     const changePct = prev ? Math.round(((p.close - prev) / prev) * 10000) / 100 : null;
     return { date: p.date, close: p.close, changePct, up: prev ? p.close >= prev : null };
   });
 
+  const added = out.length - existing.days.length;
+  // Skip the write when nothing changed, so `updated` stays truthful and
+  // the daily cron produces no empty commits.
+  if (existing.days.length === out.length && JSON.stringify(existing.days) === JSON.stringify(out)) {
+    console.log(`btc-daily.json: no changes (${out.length} days)`);
+    return;
+  }
   const file = path.join(dataDir, "btc-daily.json");
   fs.writeFileSync(
     file,
     JSON.stringify({ updated: new Date().toISOString(), source: "coingecko", days: out }, null, 2)
   );
-  console.log(`btc-daily.json: ${out.length} days (${out[0]?.date} -> ${out[out.length - 1]?.date})`);
+  console.log(
+    `btc-daily.json: ${out.length} days (${out[0]?.date} -> ${out[out.length - 1]?.date}) [${incremental ? `incremental, +${Math.max(0, added)} new` : "full rebuild"}]`
+  );
 }
 
 /* ── Elon Musk weekly tweet counts (via resolved Polymarket brackets) ── */
@@ -130,12 +159,21 @@ async function fetchEventDetail(meta) {
 }
 
 async function fetchMusk() {
+  const existing = readData("musk-tweets.json", { weeks: [], live: [] });
+  const knownResolved = new Set(existing.weeks.map((w) => w.slug));
+
   const metas = await fetchMuskEvents();
-  console.log(`musk: ${metas.length} candidate events`);
+  // Incremental: skip events already resolved on disk. Always refetch
+  // previously-live events (they may have settled) and anything new.
+  const incremental = !FULL && existing.weeks.length > 0;
+  const toFetch = incremental ? metas.filter((m) => !knownResolved.has(m.slug)) : metas;
+  console.log(
+    `musk: ${metas.length} candidate events, fetching ${toFetch.length} [${incremental ? "incremental" : "full rebuild"}]`
+  );
 
   // Limited concurrency
   const details = [];
-  const queue = [...metas];
+  const queue = [...toFetch];
   const workers = Array.from({ length: 5 }, async () => {
     while (queue.length) {
       const meta = queue.shift();
@@ -149,12 +187,15 @@ async function fetchMusk() {
   });
   await Promise.all(workers);
 
-  const weeks = [];
+  // Start from the on-disk resolved weeks; merge anything newly resolved
+  const weeksBySlug = new Map(existing.weeks.map((w) => [w.slug, w]));
   const live = [];
+  let newlyResolved = 0;
   for (const d of details) {
     const winner = d.brackets.find((b) => b.resolvedYes);
     if (winner) {
-      weeks.push({
+      if (!weeksBySlug.has(d.slug)) newlyResolved++;
+      weeksBySlug.set(d.slug, {
         weekStart: d.weekStart,
         weekEnd: d.weekEnd,
         low: winner.low,
@@ -175,8 +216,8 @@ async function fetchMusk() {
     }
   }
 
-  weeks.sort((a, b) => a.weekStart.localeCompare(b.weekStart));
-  // Dedupe overlapping windows: keep the longest window per shared start date
+  const weeks = [...weeksBySlug.values()].sort((a, b) => a.weekStart.localeCompare(b.weekStart));
+  // Dedupe identical windows
   const seen = new Set();
   const deduped = weeks.filter((w) => {
     const key = `${w.weekStart}_${w.weekEnd}`;
@@ -185,6 +226,14 @@ async function fetchMusk() {
     return true;
   });
 
+  const payloadChanged =
+    existing.weeks.length !== deduped.length ||
+    JSON.stringify(existing.weeks) !== JSON.stringify(deduped) ||
+    JSON.stringify(existing.live) !== JSON.stringify(live);
+  if (!payloadChanged) {
+    console.log(`musk-tweets.json: no changes (${deduped.length} weeks, ${live.length} live)`);
+    return;
+  }
   const file = path.join(dataDir, "musk-tweets.json");
   fs.writeFileSync(
     file,
@@ -200,11 +249,12 @@ async function fetchMusk() {
       2
     )
   );
-  console.log(`musk-tweets.json: ${deduped.length} resolved weeks, ${live.length} live events`);
+  console.log(`musk-tweets.json: ${deduped.length} resolved weeks (+${newlyResolved} new), ${live.length} live events`);
 }
 
 /* ── main ── */
 
-const target = process.argv[2];
+const args = process.argv.slice(2).filter((a) => !a.startsWith("--"));
+const target = args[0];
 if (!target || target === "btc") await fetchBtc();
 if (!target || target === "musk") await fetchMusk();
