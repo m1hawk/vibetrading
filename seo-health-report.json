@@ -1,6 +1,6 @@
 {
   "summary": {
-    "total": 159,
+    "total": 163,
     "blogPages": 136,
     "withIssues": 2,
     "duplicateTitles": 1,
@@ -901,6 +901,28 @@
       "issues": []
     },
     {
+      "url": "https://vibetrading.fun/tools/bitcoin-up-or-down",
+      "title": "Bitcoin Up or Down: Historical Daily Data | VibeTrading.fun",
+      "description": "Free historical dataset: how often does Bitcoin actually go up in a day? One year of daily up/down results, streaks, and monthly stats—updated daily.",
+      "canonical": "https://vibetrading.fun/tools/bitcoin-up-or-down",
+      "hreflangCount": 0,
+      "h1": "Bitcoin up or down: the historical record",
+      "hasFaqSchema": false,
+      "hasArticleSchema": false,
+      "issues": []
+    },
+    {
+      "url": "https://vibetrading.fun/tools/elon-musk-tweets",
+      "title": "Elon Musk Tweet Count: Weekly Historical Data | VibeTrading.fun",
+      "description": "Free historical dataset of Elon Musk&#x27;s weekly tweet counts from settled Polymarket bracket markets. Ranges, trends, and live bracket odds, updated weekly.",
+      "canonical": "https://vibetrading.fun/tools/elon-musk-tweets",
+      "hreflangCount": 0,
+      "h1": "Elon Musk&#x27;s tweet count: the weekly record",
+      "hasFaqSchema": false,
+      "hasArticleSchema": false,
+      "issues": []
+    },
+    {
       "url": "https://vibetrading.fun/tools",
       "title": "AI Trading Tools | VibeTrading.fun",
       "description": "Independent guides to AI trading tools, models, platforms, APIs, and automation workflows. Compare options by workflow, limits, and real retail use cases.",
@@ -1754,6 +1776,28 @@
       "canonical": "https://vibetrading.fun/zh/privacy",
       "hreflangCount": 0,
       "h1": "隐私政策",
+      "hasFaqSchema": false,
+      "hasArticleSchema": false,
+      "issues": []
+    },
+    {
+      "url": "https://vibetrading.fun/zh/tools/bitcoin-up-or-down",
+      "title": "比特币猜涨跌：每日历史数据 | VibeTrading.fun",
+      "description": "免费历史数据集：比特币一天之内到底涨多还是跌多？过去一年的每日涨跌记录、连涨连跌和逐月统计，每天更新。",
+      "canonical": "https://vibetrading.fun/zh/tools/bitcoin-up-or-down",
+      "hreflangCount": 0,
+      "h1": "比特币猜涨跌：历史数据记录",
+      "hasFaqSchema": false,
+      "hasArticleSchema": false,
+      "issues": []
+    },
+    {
+      "url": "https://vibetrading.fun/zh/tools/elon-musk-tweets",
+      "title": "Elon Musk 每周发帖数：历史数据 | VibeTrading.fun",
+      "description": "免费历史数据集：从 Polymarket 已结算区间市场还原的 Elon Musk 每周发帖数量。区间、趋势和当前市场赔率，每周更新。",
+      "canonical": "https://vibetrading.fun/zh/tools/elon-musk-tweets",
+      "hreflangCount": 0,
+      "h1": "Elon Musk 每周发帖数：历史记录",
       "hasFaqSchema": false,
       "hasArticleSchema": false,
       "issues": []

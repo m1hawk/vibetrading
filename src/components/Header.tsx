@@ -26,6 +26,8 @@ const translatedRoutes = new Set([
   "/",
   "/vibe-trading",
   "/tools",
+  "/tools/bitcoin-up-or-down",
+  "/tools/elon-musk-tweets",
   "/build",
   "/lab",
   "/about",

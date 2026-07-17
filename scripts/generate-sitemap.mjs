@@ -16,6 +16,8 @@ const staticRoutes = [
   "/blog",
   "/tutorials",
   "/tools",
+  "/tools/bitcoin-up-or-down",
+  "/tools/elon-musk-tweets",
   "/build",
   "/lab",
   "/about",
@@ -26,6 +28,8 @@ const staticRoutes = [
   "/zh/vibe-trading",
   "/zh/blog",
   "/zh/tools",
+  "/zh/tools/bitcoin-up-or-down",
+  "/zh/tools/elon-musk-tweets",
   "/zh/build",
   "/zh/lab",
 ];

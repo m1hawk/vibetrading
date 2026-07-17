@@ -1,0 +1,37 @@
+name: Daily data snapshots
+
+on:
+  schedule:
+    # 09:23 UTC daily — after Polymarket weekly settlements and CoinGecko UTC close
+    - cron: "23 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch snapshots
+        run: node scripts/fetch-data-snapshots.mjs
+
+      - name: Commit updated data
+        run: |
+          git config user.name "vibetrading-bot"
+          git config user.email "bot@vibetrading.fun"
+          git add data/*.json
+          if git diff --cached --quiet; then
+            echo "No data changes"
+          else
+            git commit -m "data: daily snapshot update"
+            git push
+          fi
