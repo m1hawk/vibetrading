@@ -2,6 +2,7 @@ import { TrendingDown, TrendingUp, Activity, CalendarDays } from "lucide-react";
 import type { Lang } from "@/lib/posts";
 import { getBtcDaily, type BtcDay } from "@/lib/dataSnapshots";
 import { formatDate } from "@/lib/date";
+import { BtcStreakAndBetTool } from "@/components/BtcStreakAndBetTool";
 
 const copy = {
   en: {
@@ -219,6 +220,8 @@ export function BtcUpDownTool({ lang }: { lang: Lang }) {
           )}
         </div>
       </section>
+
+      <BtcStreakAndBetTool days={days} lang={lang} />
 
       <section className="nx-section px-4 pt-0 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">

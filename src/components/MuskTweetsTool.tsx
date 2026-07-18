@@ -2,6 +2,7 @@ import { BarChart3, MessageSquare, TrendingUp, Info } from "lucide-react";
 import type { Lang } from "@/lib/posts";
 import { getMuskTweets } from "@/lib/dataSnapshots";
 import { formatDate } from "@/lib/date";
+import { MuskSeasonalityTool } from "@/components/MuskSeasonalityTool";
 
 const copy = {
   en: {
@@ -136,6 +137,8 @@ export function MuskTweetsTool({ lang }: { lang: Lang }) {
           </div>
         </div>
       </section>
+
+      <MuskSeasonalityTool weeks={weeks} lang={lang} />
 
       <section className="nx-section px-4 pt-0 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
