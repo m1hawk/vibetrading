@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-17T07:12:14.086Z",
+  "updated": "2026-07-18T10:43:26.164Z",
   "source": "coingecko",
   "days": [
     {
@@ -2184,6 +2184,12 @@
       "date": "2026-07-16",
       "close": 64722.06,
       "changePct": -0.39,
+      "up": false
+    },
+    {
+      "date": "2026-07-17",
+      "close": 63788.93,
+      "changePct": -1.44,
       "up": false
     }
   ]
