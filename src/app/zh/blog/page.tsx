@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { Suspense } from "react";
 import { getAllPosts, getAllCategories, toPostMeta } from "@/lib/posts";
 import { BlogBrowser } from "@/components/BlogBrowser";
 
@@ -61,9 +60,7 @@ export default function ZhBlogPage() {
         </div>
       </div>
 
-      <Suspense fallback={null}>
-        <BlogBrowser posts={posts.map(toPostMeta)} categories={categories} tags={topTags} lang="zh" />
-      </Suspense>
+      <BlogBrowser posts={posts.map(toPostMeta)} categories={categories} tags={topTags} lang="zh" />
     </div>
   );
 }

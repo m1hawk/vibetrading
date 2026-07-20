@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 import type { Lang, PostMeta } from "@/lib/posts";
 import { PostCard } from "@/components/PostCard";
@@ -34,9 +33,17 @@ interface BlogBrowserProps {
 
 export function BlogBrowser({ posts, categories, tags, lang }: BlogBrowserProps) {
   const t = labels[lang];
-  const searchParams = useSearchParams();
-  const [query, setQuery] = useState(() => searchParams.get("q") || "");
-  const [activeTag, setActiveTag] = useState<string | null>(() => searchParams.get("tag"));
+  // Initial state is read from the URL on mount (not via useSearchParams)
+  // so the full article list stays in the statically exported HTML.
+  const [query, setQuery] = useState("");
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setQuery(params.get("q") || "");
+    setActiveTag(params.get("tag"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Keep the URL shareable: ?tag=x&q=y reflects current filter state
   useEffect(() => {
