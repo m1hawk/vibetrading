@@ -1,0 +1,119 @@
+---
+title: "Elon Musk Tweet Counts: 64 Weeks of Data, Archived"
+description: "We collected 64 settled weeks of Polymarket's Elon Musk tweet-count markets. Distribution, seasonality, and what the numbers mean for bracket bettors."
+date: "2026-07-20"
+category: "Guides"
+tags: ["prediction market", "polymarket", "elon musk tweets", "data analysis", "market data"]
+readTime: "10 min read"
+featured: true
+lang: "en"
+faq:
+  - question: "Where does the Elon Musk tweet count data come from?"
+    answer: "From resolved Polymarket bracket markets. Each week, Polymarket settles a market on how many times @elonmusk posts. The bracket that resolves to YES is the official count range, which we archive weekly."
+  - question: "How accurate is the weekly tweet count?"
+    answer: "The counts are ranges, not exact numbers. Most brackets span 20-50 posts, so the midpoint of the winning bracket can be off by up to ±25 from the true count."
+  - question: "What is the average number of Elon Musk tweets per week?"
+    answer: "Across 64 tracked weeks from January 2024 to July 2026, the average is about 350 posts per week, with a median of 337. The spread is huge: a standard deviation of roughly 190."
+  - question: "Which month does Elon Musk post the most?"
+    answer: "February, averaging about 593 posts per week across the tracked years—likely amplified by his intense political activity in early 2025. April through July are historically his quietest stretch."
+  - question: "Can I download the dataset?"
+    answer: "Yes. The full weekly series is public in our GitHub repository and on our free tool page, updated after each weekly settlement."
+---
+
+<Disclaimer />
+
+Every week, thousands of dollars change hands on a strangely specific question: **how many times will Elon Musk post on X this week?** Polymarket runs a bracket market on it, the week settles, and the result disappears into the feed.
+
+We thought that was a waste of a perfectly good dataset. So we started archiving every settled week.
+
+This is what 64 weeks of Elon Musk's posting behavior actually looks like—from January 2024 through July 2026—with the numbers that matter if you ever plan to touch one of these markets.
+
+## Where This Data Comes From
+
+Polymarket's weekly "Elon Musk # of tweets" market offers brackets like "300-349" or "400 or more." When the week ends, exactly one bracket resolves to YES. That winning bracket is the official count range, settled against an X post tracker (with X itself as the fallback source).
+
+Our pipeline checks every settled market and stores the winning bracket: week start, week end, and the count range. The full series lives on our [free Musk tweet count tool](/tools/elon-musk-tweets), updated automatically after each settlement.
+
+One honesty note before the numbers: **these are ranges, not exact counts.** A "300-349" bracket tells you the truth within ±25. We use bracket midpoints for averages, which is fine for distribution analysis but too coarse for anything daily.
+
+## The Headline Numbers
+
+| Metric | Value |
+|---|---|
+| Weeks tracked | 64 |
+| Average posts per week | ~350 |
+| Median | 337 |
+| Standard deviation | ~190 |
+| Quietest week | 27 (week of May 24, 2024) |
+| Busiest week | 862 (week of Feb 12, 2025) |
+
+Read that standard deviation again. The spread is more than half the mean. Anyone pricing this market as "around 350, give or take a little" is pricing it wrong—the distribution has a fat right tail and long quiet stretches.
+
+## The 2025 Spike and the 2026 Cooldown
+
+Break the series by year and a clear story appears:
+
+| Year | Weeks | Avg posts/week |
+|---|---|---|
+| 2024 (partial, from May) | 11 | ~240 |
+| 2025 | 41 | ~399 |
+| 2026 (through July) | 12 | ~285 |
+
+Early 2025 was Musk's hyperactive period. The single busiest week in the dataset—**862 posts** in the week of February 12, 2025—came right after the US presidential inauguration, when his political posting went into overdrive. That wasn't one lucky week: the data shows a **10-week consecutive streak of 400+ posts**, a run the market would have paid out on every single time if you'd backed the top bracket.
+
+Since then, the account has cooled. The 2026 average of ~285 is nearly 30% below 2025's pace, and the last 12 weeks average just 285—close to the 2024 baseline.
+
+The lesson for bettors: **year-over-year averages lie.** This series has a regime, and it changed at least twice in 64 weeks. Recency matters more than the all-time average.
+
+## February Is the Anomaly Month
+
+Grouping all tracked weeks by calendar month:
+
+| Month | Avg posts/week | Month | Avg posts/week |
+|---|---|---|---|
+| January | 442 | July | 111* |
+| February | **593** | August | 312 |
+| March | 358 | September | 215 |
+| April | 155 | October | 290 |
+| May | 141 | November | 278 |
+| June | — | December | 401 |
+
+*Small sample warnings apply: several months have only 1-2 observed years, and June has none yet.
+
+February's 593 average is heavily amplified by the 2025 spike, so don't read it as "every February is busy." The more robust pattern is on the other side: **April through July is consistently his quietest stretch**, with averages of 111-155 across multiple years. If you're pricing a quiet-season week with an all-year average, you're systematically off.
+
+## What This Means If You Bet the Brackets
+
+The settled outcomes give you the empirical base rate for each bracket range:
+
+| Range | Weeks landed | Hit rate | Break-even price |
+|---|---|---|---|
+| Under 200 | 14 | 21.9% | 0.22 |
+| 200-249 | 3 | 4.7% | 0.05 |
+| 250-299 | 12 | 18.8% | 0.19 |
+| 300-349 | 5 | 7.8% | 0.08 |
+| 350-399 | 5 | 7.8% | 0.08 |
+| 400+ | 25 | **39.1%** | 0.39 |
+
+The break-even price is the hit rate itself. If you could consistently buy "400+" below $0.39, the last 64 weeks would have paid you. If you paid $0.50 for it because "he posts a lot," the same history would have slowly drained you.
+
+Two caveats that matter more than the table:
+
+1. **The regime moved.** The 400+ hit rate is ~39% across all 64 weeks, but it's far lower inside the 2026 cooldown. Compute base rates on the regime you're in, not the whole series.
+2. **Ranges are coarse.** "400+" contains both 401 and 862. Midpoints hide that.
+
+You can run this analysis yourself on the live version of the data—our [bracket backtester](/tools/elon-musk-tweets) recomputes hit rates and break-even prices every week, and lets you test any assumed entry price against the full history. If you're new to evaluating bets this way, start with [win rate vs expectancy](/blog/win-rate-vs-expectancy) first; the math here is the same, just with brackets instead of trades.
+
+## How to Use the Dataset Yourself
+
+- **Interactive tool**: charts, live bracket odds, and the backtester at [/tools/elon-musk-tweets](/tools/elon-musk-tweets)
+- **Raw JSON**: the full series is public in our [GitHub repo](https://github.com/m1hawk/vibetrading) under `data/musk-tweets.json`, refreshed by a daily cron
+- **Build your own**: the fetcher is open source (`scripts/fetch-data-snapshots.mjs`)—it reads Polymarket's public Gamma API, no key required
+
+## What We're Watching Next
+
+The interesting question for the second half of 2026 is whether the cooldown holds. The 2026 average sits near the 2024 baseline now, but this account has a history of regime changes around political events. The dataset updates weekly; the story will keep writing itself.
+
+---
+
+*Data notes: counts are bracket midpoints from resolved Polymarket markets, not exact figures. Some months have small samples (June 2024-2026 is not yet covered). This article is for research and education, not betting advice.*

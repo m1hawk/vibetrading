@@ -1,12 +1,12 @@
 {
   "summary": {
-    "total": 163,
-    "blogPages": 136,
+    "total": 165,
+    "blogPages": 138,
     "withIssues": 2,
     "duplicateTitles": 1,
     "duplicateDescriptions": 0,
-    "withFaqSchema": 136,
-    "withArticleSchema": 136
+    "withFaqSchema": 138,
+    "withArticleSchema": 138
   },
   "duplicateTitles": [
     [
@@ -456,6 +456,17 @@
       "canonical": "https://vibetrading.fun/blog/does-ai-trading-really-work",
       "hreflangCount": 2,
       "h1": "Does AI Trading Really Work? A 2026 Guide",
+      "hasFaqSchema": true,
+      "hasArticleSchema": true,
+      "issues": []
+    },
+    {
+      "url": "https://vibetrading.fun/blog/elon-musk-tweet-count-64-weeks-data",
+      "title": "Elon Musk Tweet Counts: 64 Weeks of Data, Archived | VibeTrading.fun",
+      "description": "We collected 64 settled weeks of Polymarket&#x27;s Elon Musk tweet-count markets. Distribution, seasonality, and what the numbers mean for bracket bettors.",
+      "canonical": "https://vibetrading.fun/blog/elon-musk-tweet-count-64-weeks-data",
+      "hreflangCount": 2,
+      "h1": "Elon Musk Tweet Counts: 64 Weeks of Data, Archived",
       "hasFaqSchema": true,
       "hasArticleSchema": true,
       "issues": []
@@ -1347,6 +1358,17 @@
       "canonical": "https://vibetrading.fun/zh/blog/does-ai-trading-really-work",
       "hreflangCount": 2,
       "h1": "AI 交易真的有效吗？2026 年散户交易者指南",
+      "hasFaqSchema": true,
+      "hasArticleSchema": true,
+      "issues": []
+    },
+    {
+      "url": "https://vibetrading.fun/zh/blog/elon-musk-tweet-count-64-weeks-data",
+      "title": "我们存档了 64 周的 Elon Musk 发帖数，数据长这样 | VibeTrading.fun",
+      "description": "每周都有一个真金市场就 Musk 发帖数量结算。我们收集了 64 个已结算周，拆解分布、季节性规律，以及这些数据对区间下注者的意义。",
+      "canonical": "https://vibetrading.fun/zh/blog/elon-musk-tweet-count-64-weeks-data",
+      "hreflangCount": 2,
+      "h1": "我们存档了 64 周的 Elon Musk 发帖数，数据长这样",
       "hasFaqSchema": true,
       "hasArticleSchema": true,
       "issues": []
