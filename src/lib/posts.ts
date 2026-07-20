@@ -27,6 +27,14 @@ export interface Post {
 
 export const DEFAULT_AUTHOR = "VibeTrading Editorial Team";
 
+/** Post without body payload — safe to serialize into client components. */
+export type PostMeta = Omit<Post, "content" | "faq">;
+
+export function toPostMeta(post: Post): PostMeta {
+  const { content: _content, faq: _faq, ...meta } = post;
+  return meta;
+}
+
 const postsDirectory = path.join(process.cwd(), "content", "posts");
 
 function parseLang(fileName: string): { slug: string; lang: Lang } {

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { ArrowRight, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/date";
-import type { Post } from "@/lib/posts";
+import type { PostMeta } from "@/lib/posts";
 
 interface PostCardProps {
-  post: Post;
+  post: PostMeta;
   featured?: boolean;
 }
 

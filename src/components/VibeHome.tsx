@@ -9,7 +9,7 @@ import {
   Search,
   ShieldCheck,
 } from "lucide-react";
-import { getAllPosts, getFeaturedPosts, type Lang } from "@/lib/posts";
+import { getAllPosts, getAllCategories, getFeaturedPosts, type Lang } from "@/lib/posts";
 import { JsonLd } from "@/components/JsonLd";
 import { PostCard } from "@/components/PostCard";
 
@@ -21,7 +21,7 @@ const copy = {
     intro:
       "Turn a market idea into research, a strategy, a backtest, or an automated workflow by talking to AI. Start with no-code. Go as deep as you want.",
     primaryCta: "Start vibe trading",
-    secondaryCta: "See what we build",
+    secondaryCta: "Read the field guides",
     proof: ["No quant background required", "Paper first", "No signals for sale"],
     pathEyebrow: "Choose a starting point",
     pathTitle: "What do you want to make with AI?",
@@ -65,11 +65,11 @@ const copy = {
     methodIntro:
       "AI makes building faster. The edge still comes from asking a clear question, testing honestly, and knowing when not to trade.",
     steps: [
-      ["01", "Describe", "Explain the market idea and constraints in plain language."],
-      ["02", "Build", "Use AI to turn the idea into research, rules, code, or a tool."],
-      ["03", "Backtest", "Check the idea against data, fees, slippage, and bad regimes."],
-      ["04", "Paper trade", "Run it without capital and record every decision."],
-      ["05", "Iterate", "Keep, change, or kill the idea based on evidence."],
+      ["01", "Describe", "Explain the market idea and constraints in plain language.", "/blog/does-ai-trading-really-work"],
+      ["02", "Build", "Use AI to turn the idea into research, rules, code, or a tool.", "/blog/first-ai-trading-bot-ema-cross-alpaca"],
+      ["03", "Backtest", "Check the idea against data, fees, slippage, and bad regimes.", "/blog/how-to-backtest-without-overfitting"],
+      ["04", "Paper trade", "Run it without capital and record every decision.", "/blog/paper-to-live-trading-checklist"],
+      ["05", "Iterate", "Keep, change, or kill the idea based on evidence.", "/blog/win-rate-vs-expectancy"],
     ],
     levelsEyebrow: "Built for every starting level",
     levelsTitle: "Start with conversation.",
@@ -97,7 +97,7 @@ const copy = {
     intro:
       "用自然语言告诉 AI 你的市场想法，把它变成研究、策略、回测或自动化工作流。从无代码开始，按自己的节奏深入。",
     primaryCta: "开始 Vibe Trading",
-    secondaryCta: "看看我们做了什么",
+    secondaryCta: "浏览全部指南",
     proof: ["不需要量化背景", "先模拟，再实盘", "不出售交易信号"],
     pathEyebrow: "选择你的起点",
     pathTitle: "你想用 AI 做什么？",
@@ -141,11 +141,11 @@ const copy = {
     methodIntro:
       "AI 让构建更快，优势仍然来自清晰的问题、诚实的验证，以及知道什么时候不应该交易。",
     steps: [
-      ["01", "描述", "用自然语言说明市场想法、规则和约束。"],
-      ["02", "构建", "让 AI 把想法变成研究、规则、代码或工具。"],
-      ["03", "回测", "把手续费、滑点和不同市场环境纳入验证。"],
-      ["04", "模拟盘", "先不投入真实资金，并记录每一次决策。"],
-      ["05", "迭代", "根据证据保留、修改或者放弃想法。"],
+      ["01", "描述", "用自然语言说明市场想法、规则和约束。", "/zh/blog/does-ai-trading-really-work"],
+      ["02", "构建", "让 AI 把想法变成研究、规则、代码或工具。", "/zh/blog/first-ai-trading-bot-ema-cross-alpaca"],
+      ["03", "回测", "把手续费、滑点和不同市场环境纳入验证。", "/zh/blog/how-to-backtest-without-overfitting"],
+      ["04", "模拟盘", "先不投入真实资金，并记录每一次决策。", "/zh/blog/paper-to-live-trading-checklist"],
+      ["05", "迭代", "根据证据保留、修改或者放弃想法。", "/zh/blog/win-rate-vs-expectancy"],
     ],
     levelsEyebrow: "适合每一种起点",
     levelsTitle: "从对话开始。",
@@ -202,7 +202,7 @@ export function VibeHome({ lang }: { lang: Lang }) {
                   {t.primaryCta}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link href={`${prefix}/build`} className="nx-btn nx-btn-outline">
+                <Link href={`${prefix}/blog`} className="nx-btn nx-btn-outline">
                   {t.secondaryCta}
                 </Link>
               </div>
@@ -226,11 +226,11 @@ export function VibeHome({ lang }: { lang: Lang }) {
                 <span className="text-accent">Describe → Build → Test</span>
               </div>
               <div className="grid gap-px bg-white/10 sm:grid-cols-5">
-                {t.steps.map(([number, title]) => (
-                  <div key={number} className="bg-ink px-4 py-4">
+                {t.steps.map(([number, title, , href]) => (
+                  <Link key={number} href={href} className="group bg-ink px-4 py-4 transition-colors hover:bg-white/5">
                     <div className="font-mono text-[10px] tracking-[0.14em] text-accent">{number}</div>
-                    <div className="mt-2 font-serif text-base font-semibold">{title}</div>
-                  </div>
+                    <div className="mt-2 font-serif text-base font-semibold group-hover:underline">{title}</div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -282,14 +282,16 @@ export function VibeHome({ lang }: { lang: Lang }) {
               <p className="mt-5 leading-7 text-on-ink-muted">{t.methodIntro}</p>
             </div>
             <ol className="space-y-3">
-              {t.steps.map(([number, title, description]) => (
-                <li
-                  key={number}
-                  className="nx-card-ink grid gap-2 px-5 py-5 sm:grid-cols-[3rem_8.5rem_1fr] sm:items-start sm:gap-4"
-                >
-                  <span className="font-mono text-sm text-accent">{number}</span>
-                  <span className="font-serif text-lg font-semibold text-on-ink">{title}</span>
-                  <span className="leading-7 text-on-ink-muted">{description}</span>
+              {t.steps.map(([number, title, description, href]) => (
+                <li key={number}>
+                  <Link
+                    href={href}
+                    className="nx-card-ink group grid gap-2 px-5 py-5 sm:grid-cols-[3rem_8.5rem_1fr] sm:items-start sm:gap-4"
+                  >
+                    <span className="font-mono text-sm text-accent">{number}</span>
+                    <span className="font-serif text-lg font-semibold text-on-ink group-hover:underline">{title}</span>
+                    <span className="leading-7 text-on-ink-muted">{description}</span>
+                  </Link>
                 </li>
               ))}
             </ol>
@@ -360,6 +362,17 @@ export function VibeHome({ lang }: { lang: Lang }) {
                 {t.guidesCta}
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {getAllCategories(lang).map((category) => (
+                <Link
+                  key={category}
+                  href={`${prefix}/blog#${category.toLowerCase()}`}
+                  className="border border-border bg-surface px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-muted transition-colors hover:border-accent hover:text-accent-hover"
+                >
+                  {category}
+                </Link>
+              ))}
             </div>
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               {recentPosts.map((post) => (

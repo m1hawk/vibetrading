@@ -1,6 +1,7 @@
 import { Metadata } from "next";
-import { getAllPosts, getAllCategories } from "@/lib/posts";
-import { PostCard } from "@/components/PostCard";
+import { Suspense } from "react";
+import { getAllPosts, getAllCategories, toPostMeta } from "@/lib/posts";
+import { BlogBrowser } from "@/components/BlogBrowser";
 
 export const metadata: Metadata = {
   title: "Vibe Trading Guides",
@@ -27,12 +28,16 @@ export default function BlogPage() {
   const posts = getAllPosts("en");
   const categories = getAllCategories("en");
 
-  const postsByCategory = categories.map((category) => ({
-    category,
-    posts: posts.filter(
-      (post) => post.category.toLowerCase() === category.toLowerCase()
-    ),
-  }));
+  const tagCounts = new Map<string, number>();
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+    }
+  }
+  const topTags = [...tagCounts.entries()]
+    .filter(([, count]) => count >= 4)
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag]) => tag);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
@@ -59,33 +64,9 @@ export default function BlogPage() {
         </div>
       </div>
 
-      <div className="space-y-16">
-        {postsByCategory.map(
-          ({ category, posts: categoryPosts }) =>
-            categoryPosts.length > 0 && (
-              <section
-                key={category}
-                id={category.toLowerCase()}
-                className="scroll-mt-24"
-              >
-                <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
-                  <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                    {category}
-                  </h2>
-                  <span className="text-sm text-muted">
-                    {categoryPosts.length}{" "}
-                    {categoryPosts.length === 1 ? "article" : "articles"}
-                  </span>
-                </div>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {categoryPosts.map((post) => (
-                    <PostCard key={post.slug} post={post} />
-                  ))}
-                </div>
-              </section>
-            )
-        )}
-      </div>
+      <Suspense fallback={null}>
+        <BlogBrowser posts={posts.map(toPostMeta)} categories={categories} tags={topTags} lang="en" />
+      </Suspense>
     </div>
   );
 }
