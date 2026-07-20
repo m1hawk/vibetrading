@@ -17,7 +17,7 @@ const copy = {
   en: {
     eyebrow: "The practical field guide to AI-powered trading",
     title: "Vibe Trading for Everyone",
-    titleEm: "No quant degree required.",
+    titleEm: "Skip the 100 “I made $1M with AI” posts. Build a bot that loses $10 first.",
     intro:
       "Turn a market idea into research, a strategy, a backtest, or an automated workflow by talking to AI. Start with no-code. Go as deep as you want.",
     primaryCta: "Start vibe trading",
@@ -93,7 +93,7 @@ const copy = {
   zh: {
     eyebrow: "AI 驱动交易的实践指南",
     title: "人人都能开始的 Vibe Trading",
-    titleEm: "不需要量化学位。",
+    titleEm: "看了 100 个“AI 帮我赚百万”的帖子，不如亲手搭一个亏 10 刀的机器人。",
     intro:
       "用自然语言告诉 AI 你的市场想法，把它变成研究、策略、回测或自动化工作流。从无代码开始，按自己的节奏深入。",
     primaryCta: "开始 Vibe Trading",
