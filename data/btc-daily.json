@@ -1,18 +1,12 @@
 {
-  "updated": "2026-07-22T11:22:12.292Z",
+  "updated": "2026-07-23T11:21:55.635Z",
   "source": "coingecko",
   "days": [
     {
-      "date": "2025-07-22",
-      "close": 117482.47,
-      "changePct": null,
-      "up": null
-    },
-    {
       "date": "2025-07-23",
       "close": 119955.8,
-      "changePct": 2.11,
-      "up": true
+      "changePct": null,
+      "up": null
     },
     {
       "date": "2025-07-24",
@@ -2164,32 +2158,38 @@
     },
     {
       "date": "2026-07-17",
-      "close": 63788.93,
-      "changePct": -1.44,
+      "close": 63757.31,
+      "changePct": -1.49,
       "up": false
     },
     {
       "date": "2026-07-18",
-      "close": 63925.51,
-      "changePct": 0.21,
+      "close": 63918.38,
+      "changePct": 0.25,
       "up": true
     },
     {
       "date": "2026-07-19",
-      "close": 64793.26,
-      "changePct": 1.36,
+      "close": 64815.18,
+      "changePct": 1.4,
       "up": true
     },
     {
       "date": "2026-07-20",
-      "close": 64679.77,
-      "changePct": -0.18,
+      "close": 64568.58,
+      "changePct": -0.38,
       "up": false
     },
     {
       "date": "2026-07-21",
-      "close": 65199.44,
-      "changePct": 0.8,
+      "close": 65143.63,
+      "changePct": 0.89,
+      "up": true
+    },
+    {
+      "date": "2026-07-22",
+      "close": 66538.78,
+      "changePct": 2.14,
       "up": true
     }
   ]
