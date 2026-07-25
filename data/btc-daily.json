@@ -1,18 +1,12 @@
 {
-  "updated": "2026-07-24T11:14:26.479Z",
+  "updated": "2026-07-25T10:47:36.058Z",
   "source": "coingecko",
   "days": [
     {
-      "date": "2025-07-24",
-      "close": 118629.06,
-      "changePct": null,
-      "up": null
-    },
-    {
       "date": "2025-07-25",
       "close": 118354.44,
-      "changePct": -0.23,
-      "up": false
+      "changePct": null,
+      "up": null
     },
     {
       "date": "2025-07-26",
@@ -2190,6 +2184,12 @@
       "date": "2026-07-23",
       "close": 66077.06,
       "changePct": -0.67,
+      "up": false
+    },
+    {
+      "date": "2026-07-24",
+      "close": 65033.02,
+      "changePct": -1.58,
       "up": false
     }
   ]
