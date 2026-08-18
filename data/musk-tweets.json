@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-17T10:00:36.037Z",
+  "updated": "2026-08-18T09:52:20.104Z",
   "source": "polymarket-resolved-events",
   "note": "Actual weekly tweet counts reconstructed from resolved Polymarket bracket markets (resolution source: X tracker / X).",
   "weeks": [
@@ -713,37 +713,37 @@
         {
           "low": 140,
           "high": 159,
-          "prob": 0.1005
+          "prob": 0.449
         },
         {
           "low": 160,
           "high": 179,
-          "prob": 0.575
+          "prob": 0.535
         },
         {
           "low": 180,
           "high": 199,
-          "prob": 0.295
+          "prob": 0.0105
         },
         {
           "low": 200,
           "high": 219,
-          "prob": 0.035
+          "prob": 0.0015
         },
         {
           "low": 220,
           "high": 239,
-          "prob": 0.007
+          "prob": 0.0005
         },
         {
           "low": 240,
           "high": 259,
-          "prob": 0.0025
+          "prob": 0.0005
         },
         {
           "low": 260,
           "high": 279,
-          "prob": 0.0015
+          "prob": 0.0005
         },
         {
           "low": 280,
@@ -826,52 +826,52 @@
         {
           "low": 60,
           "high": 79,
-          "prob": 0.0005
+          "prob": 0.003
         },
         {
           "low": 80,
           "high": 99,
-          "prob": 0.0025
+          "prob": 0.0295
         },
         {
           "low": 100,
           "high": 119,
-          "prob": 0.0695
+          "prob": 0.1815
         },
         {
           "low": 120,
           "high": 139,
-          "prob": 0.2055
+          "prob": 0.297
         },
         {
           "low": 140,
           "high": 159,
-          "prob": 0.255
+          "prob": 0.265
         },
         {
           "low": 160,
           "high": 179,
-          "prob": 0.235
+          "prob": 0.145
         },
         {
           "low": 180,
           "high": 199,
-          "prob": 0.155
+          "prob": 0.055
         },
         {
           "low": 200,
           "high": 219,
-          "prob": 0.065
+          "prob": 0.0195
         },
         {
           "low": 220,
           "high": 239,
-          "prob": 0.022
+          "prob": 0.005
         },
         {
           "low": 240,
           "high": 259,
-          "prob": 0.007
+          "prob": 0.0025
         },
         {
           "low": 260,
@@ -881,12 +881,12 @@
         {
           "low": 280,
           "high": 299,
-          "prob": 0.0015
+          "prob": 0.0005
         },
         {
           "low": 300,
           "high": 319,
-          "prob": 0.001
+          "prob": 0.0005
         },
         {
           "low": 320,
@@ -936,30 +936,163 @@
       ]
     },
     {
-      "slug": "elon-musk-of-tweets-august-15-august-17",
-      "title": "Elon Musk # tweets August 15 - August 17, 2026?",
-      "weekStart": "2026-08-13",
-      "weekEnd": "2026-08-17",
+      "slug": "elon-musk-of-tweets-august-18-august-25",
+      "title": "Elon Musk # tweets August 18 - August 25, 2026?",
+      "weekStart": "2026-08-15",
+      "weekEnd": "2026-08-25",
+      "brackets": [
+        {
+          "low": 0,
+          "high": 19,
+          "prob": 0.0005
+        },
+        {
+          "low": 20,
+          "high": 39,
+          "prob": 0.0005
+        },
+        {
+          "low": 40,
+          "high": 59,
+          "prob": 0.0025
+        },
+        {
+          "low": 60,
+          "high": 79,
+          "prob": 0.007
+        },
+        {
+          "low": 80,
+          "high": 99,
+          "prob": 0.0265
+        },
+        {
+          "low": 100,
+          "high": 119,
+          "prob": 0.0585
+        },
+        {
+          "low": 120,
+          "high": 139,
+          "prob": 0.0995
+        },
+        {
+          "low": 140,
+          "high": 159,
+          "prob": 0.19
+        },
+        {
+          "low": 160,
+          "high": 179,
+          "prob": 0.195
+        },
+        {
+          "low": 180,
+          "high": 199,
+          "prob": 0.165
+        },
+        {
+          "low": 200,
+          "high": 219,
+          "prob": 0.105
+        },
+        {
+          "low": 220,
+          "high": 239,
+          "prob": 0.065
+        },
+        {
+          "low": 240,
+          "high": 259,
+          "prob": 0.0335
+        },
+        {
+          "low": 260,
+          "high": 279,
+          "prob": 0.0205
+        },
+        {
+          "low": 280,
+          "high": 299,
+          "prob": 0.0135
+        },
+        {
+          "low": 300,
+          "high": 319,
+          "prob": 0.0085
+        },
+        {
+          "low": 320,
+          "high": 339,
+          "prob": 0.0045
+        },
+        {
+          "low": 340,
+          "high": 359,
+          "prob": 0.0045
+        },
+        {
+          "low": 360,
+          "high": 379,
+          "prob": 0.0025
+        },
+        {
+          "low": 380,
+          "high": 399,
+          "prob": 0.0015
+        },
+        {
+          "low": 400,
+          "high": 419,
+          "prob": 0.0005
+        },
+        {
+          "low": 420,
+          "high": 439,
+          "prob": 0.0005
+        },
+        {
+          "low": 440,
+          "high": 459,
+          "prob": 0.0005
+        },
+        {
+          "low": 460,
+          "high": 479,
+          "prob": 0.0005
+        },
+        {
+          "low": 480,
+          "high": 499,
+          "prob": 0.0005
+        }
+      ]
+    },
+    {
+      "slug": "elon-musk-of-tweets-august-17-august-19",
+      "title": "Elon Musk # tweets August 17 - August 19, 2026?",
+      "weekStart": "2026-08-15",
+      "weekEnd": "2026-08-19",
       "brackets": [
         {
           "low": 40,
           "high": 64,
-          "prob": 0.365
+          "prob": 0.38
         },
         {
           "low": 65,
           "high": 89,
-          "prob": 0.0025
+          "prob": 0.0345
         },
         {
           "low": 90,
           "high": 114,
-          "prob": 0.0005
+          "prob": 0.0055
         },
         {
           "low": 115,
           "high": 139,
-          "prob": 0.0005
+          "prob": 0.0025
         },
         {
           "low": 140,
@@ -1067,7 +1200,7 @@
         {
           "low": 300,
           "high": 319,
-          "prob": 0.0005
+          "prob": 0
         },
         {
           "low": 320,
@@ -1112,7 +1245,7 @@
         {
           "low": 480,
           "high": 499,
-          "prob": 0.001
+          "prob": 0.0005
         },
         {
           "low": 500,
@@ -1127,57 +1260,57 @@
         {
           "low": 540,
           "high": 559,
-          "prob": 0.003
+          "prob": 0.005
         },
         {
           "low": 560,
           "high": 579,
-          "prob": 0.0045
+          "prob": 0.006
         },
         {
           "low": 580,
           "high": 599,
-          "prob": 0.0075
+          "prob": 0.011
         },
         {
           "low": 600,
           "high": 619,
-          "prob": 0.0135
+          "prob": 0.025
         },
         {
           "low": 620,
           "high": 639,
-          "prob": 0.0175
+          "prob": 0.0185
         },
         {
           "low": 640,
           "high": 659,
-          "prob": 0.0205
+          "prob": 0.027
         },
         {
           "low": 660,
           "high": 679,
-          "prob": 0.0265
+          "prob": 0.0385
         },
         {
           "low": 680,
           "high": 699,
-          "prob": 0.05
+          "prob": 0.0715
         },
         {
           "low": 700,
           "high": 719,
-          "prob": 0.0555
+          "prob": 0.0705
         },
         {
           "low": 720,
           "high": 739,
-          "prob": 0.083
+          "prob": 0.091
         },
         {
           "low": 740,
           "high": 759,
-          "prob": 0.1055
+          "prob": 0.0995
         },
         {
           "low": 760,
@@ -1187,12 +1320,12 @@
         {
           "low": 780,
           "high": 799,
-          "prob": 0.1395
+          "prob": 0.093
         },
         {
           "low": 800,
           "high": 839,
-          "prob": 0.15
+          "prob": 0.1615
         },
         {
           "low": 840,
@@ -1207,20 +1340,68 @@
         {
           "low": 920,
           "high": 959,
-          "prob": 0.0455
+          "prob": 0.045
         },
         {
           "low": 960,
           "high": 999,
-          "prob": 0.0205
+          "prob": 0.018
         }
       ]
     },
     {
-      "slug": "elon-musk-of-tweets-august-18-august-25",
-      "title": "Elon Musk # tweets August 18 - August 25, 2026?",
-      "weekStart": "2026-08-15",
-      "weekEnd": "2026-08-25",
+      "slug": "elon-musk-of-tweets-august-20-august-22",
+      "title": "Elon Musk # tweets August 20 - August 22, 2026?",
+      "weekStart": "2026-08-17",
+      "weekEnd": "2026-08-22",
+      "brackets": [
+        {
+          "low": 40,
+          "high": 64,
+          "prob": 0.465
+        },
+        {
+          "low": 65,
+          "high": 89,
+          "prob": 0.175
+        },
+        {
+          "low": 90,
+          "high": 114,
+          "prob": 0.042
+        },
+        {
+          "low": 115,
+          "high": 139,
+          "prob": 0.0045
+        },
+        {
+          "low": 140,
+          "high": 164,
+          "prob": 0.0015
+        },
+        {
+          "low": 165,
+          "high": 189,
+          "prob": 0.002
+        },
+        {
+          "low": 190,
+          "high": 214,
+          "prob": 0.0005
+        },
+        {
+          "low": 215,
+          "high": 239,
+          "prob": 0.0005
+        }
+      ]
+    },
+    {
+      "slug": "elon-musk-of-tweets-august-21-august-28-2026",
+      "title": "Elon Musk # tweets August 21 - August 28, 2026?",
+      "weekStart": "2026-08-18",
+      "weekEnd": "2026-08-28",
       "brackets": [
         {
           "low": 0,
@@ -1235,37 +1416,37 @@
         {
           "low": 40,
           "high": 59,
-          "prob": 0.0005
+          "prob": 0.0015
         },
         {
           "low": 60,
           "high": 79,
-          "prob": 0.0015
+          "prob": 0.006
         },
         {
           "low": 80,
           "high": 99,
-          "prob": 0.0035
+          "prob": 0.031
         },
         {
           "low": 100,
           "high": 119,
-          "prob": 0.019
+          "prob": 0.075
         },
         {
           "low": 120,
           "high": 139,
-          "prob": 0.066
+          "prob": 0.175
         },
         {
           "low": 140,
           "high": 159,
-          "prob": 0.155
+          "prob": 0.225
         },
         {
           "low": 160,
           "high": 179,
-          "prob": 0.195
+          "prob": 0.21
         },
         {
           "low": 180,
@@ -1275,7 +1456,7 @@
         {
           "low": 200,
           "high": 219,
-          "prob": 0.175
+          "prob": 0.135
         },
         {
           "low": 220,
@@ -1285,52 +1466,52 @@
         {
           "low": 240,
           "high": 259,
-          "prob": 0.055
+          "prob": 0.085
         },
         {
           "low": 260,
           "high": 279,
-          "prob": 0.0265
+          "prob": 0.075
         },
         {
           "low": 280,
           "high": 299,
-          "prob": 0.0135
+          "prob": 0.065
         },
         {
           "low": 300,
           "high": 319,
-          "prob": 0.0105
+          "prob": 0.025
         },
         {
           "low": 320,
           "high": 339,
-          "prob": 0.005
+          "prob": 0.025
         },
         {
           "low": 340,
           "high": 359,
-          "prob": 0.0035
+          "prob": 0.017
         },
         {
           "low": 360,
           "high": 379,
-          "prob": 0.0025
+          "prob": 0.0145
         },
         {
           "low": 380,
           "high": 399,
-          "prob": 0.0015
+          "prob": 0.0095
         },
         {
           "low": 400,
           "high": 419,
-          "prob": 0.0015
+          "prob": 0.008
         },
         {
           "low": 420,
           "high": 439,
-          "prob": 0.0005
+          "prob": 0.0015
         },
         {
           "low": 440,
@@ -1350,50 +1531,50 @@
       ]
     },
     {
-      "slug": "elon-musk-of-tweets-august-17-august-19",
-      "title": "Elon Musk # tweets August 17 - August 19, 2026?",
-      "weekStart": "2026-08-15",
-      "weekEnd": "2026-08-19",
+      "slug": "elon-musk-of-tweets-august-20-august-22-2026",
+      "title": "Elon Musk # tweets August 20 - August 22, 2026?",
+      "weekStart": "2026-08-17",
+      "weekEnd": "2026-08-22",
       "brackets": [
         {
           "low": 40,
           "high": 64,
-          "prob": 0.475
+          "prob": 0.44
         },
         {
           "low": 65,
           "high": 89,
-          "prob": 0.175
+          "prob": 0.24
         },
         {
           "low": 90,
           "high": 114,
-          "prob": 0.0265
+          "prob": 0.14
         },
         {
           "low": 115,
           "high": 139,
-          "prob": 0.0065
+          "prob": 0.13
         },
         {
           "low": 140,
           "high": 164,
-          "prob": 0.0015
+          "prob": 0.125
         },
         {
           "low": 165,
           "high": 189,
-          "prob": 0.0005
+          "prob": 0.0055
         },
         {
           "low": 190,
           "high": 214,
-          "prob": 0.0005
+          "prob": 0.0055
         },
         {
           "low": 215,
           "high": 239,
-          "prob": 0.0005
+          "prob": 0.005
         }
       ]
     }
