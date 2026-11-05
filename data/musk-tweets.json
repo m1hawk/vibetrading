@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-04T17:20:55.475Z",
+  "updated": "2026-11-05T17:28:22.025Z",
   "source": "polymarket-resolved-events",
   "note": "Actual weekly tweet counts reconstructed from resolved Polymarket bracket markets (resolution source: X tracker / X).",
   "weeks": [
@@ -1122,57 +1122,17 @@
       "high": 114,
       "midpoint": 102,
       "slug": "elon-musk-of-tweets-october-31-november-2-2026"
+    },
+    {
+      "weekStart": "2026-10-31",
+      "weekEnd": "2026-11-04",
+      "low": 65,
+      "high": 89,
+      "midpoint": 77,
+      "slug": "elon-musk-of-tweets-november-2-november-4-2026"
     }
   ],
   "live": [
-    {
-      "slug": "elon-musk-of-tweets-november-2-november-4-2026",
-      "title": "Elon Musk # tweets November 2 - November 4, 2026?",
-      "weekStart": "2026-10-31",
-      "weekEnd": "2026-11-04",
-      "brackets": [
-        {
-          "low": 40,
-          "high": 64,
-          "prob": 0
-        },
-        {
-          "low": 65,
-          "high": 89,
-          "prob": 0.9995
-        },
-        {
-          "low": 90,
-          "high": 114,
-          "prob": 0.0005
-        },
-        {
-          "low": 115,
-          "high": 139,
-          "prob": 0.0005
-        },
-        {
-          "low": 140,
-          "high": 164,
-          "prob": 0.0005
-        },
-        {
-          "low": 165,
-          "high": 189,
-          "prob": 0.0005
-        },
-        {
-          "low": 190,
-          "high": 214,
-          "prob": 0.0005
-        },
-        {
-          "low": 215,
-          "high": 239,
-          "prob": 0.0005
-        }
-      ]
-    },
     {
       "slug": "elon-musk-of-tweets-october-30-november-6-2026",
       "title": "Elon Musk # tweets October 30 - November 6, 2026?",
@@ -1237,72 +1197,72 @@
         {
           "low": 220,
           "high": 239,
-          "prob": 0.0005
+          "prob": 0
         },
         {
           "low": 240,
           "high": 259,
-          "prob": 0.0015
+          "prob": 0.0005
         },
         {
           "low": 260,
           "high": 279,
-          "prob": 0.025
+          "prob": 0.0705
         },
         {
           "low": 280,
           "high": 299,
-          "prob": 0.116
+          "prob": 0.4865
         },
         {
           "low": 300,
           "high": 319,
-          "prob": 0.25
+          "prob": 0.335
         },
         {
           "low": 320,
           "high": 339,
-          "prob": 0.285
+          "prob": 0.09
         },
         {
           "low": 340,
           "high": 359,
-          "prob": 0.195
+          "prob": 0.026
         },
         {
           "low": 360,
           "high": 379,
-          "prob": 0.1
+          "prob": 0.0075
         },
         {
           "low": 380,
           "high": 399,
-          "prob": 0.0425
+          "prob": 0.0025
         },
         {
           "low": 400,
           "high": 419,
-          "prob": 0.0175
+          "prob": 0.0005
         },
         {
           "low": 420,
           "high": 439,
-          "prob": 0.0065
+          "prob": 0.0005
         },
         {
           "low": 440,
           "high": 459,
-          "prob": 0.0035
+          "prob": 0.0005
         },
         {
           "low": 460,
           "high": 479,
-          "prob": 0.002
+          "prob": 0.0005
         },
         {
           "low": 480,
           "high": 499,
-          "prob": 0.0015
+          "prob": 0.0005
         },
         {
           "low": 500,
@@ -1340,7 +1300,7 @@
         {
           "low": 20,
           "high": 39,
-          "prob": 0.0005
+          "prob": 0
         },
         {
           "low": 40,
@@ -1355,127 +1315,127 @@
         {
           "low": 80,
           "high": 99,
-          "prob": 0.002
+          "prob": 0.0005
         },
         {
           "low": 100,
           "high": 119,
-          "prob": 0.0025
+          "prob": 0.002
         },
         {
           "low": 120,
           "high": 139,
-          "prob": 0.0035
+          "prob": 0.0115
         },
         {
           "low": 140,
           "high": 159,
-          "prob": 0.01
+          "prob": 0.014
         },
         {
           "low": 160,
           "high": 179,
-          "prob": 0.0165
+          "prob": 0.037
         },
         {
           "low": 180,
           "high": 199,
-          "prob": 0.03
+          "prob": 0.0765
         },
         {
           "low": 200,
           "high": 219,
-          "prob": 0.049
+          "prob": 0.1095
         },
         {
           "low": 220,
           "high": 239,
-          "prob": 0.0675
+          "prob": 0.1505
         },
         {
           "low": 240,
           "high": 259,
-          "prob": 0.0895
+          "prob": 0.158
         },
         {
           "low": 260,
           "high": 279,
-          "prob": 0.107
+          "prob": 0.121
         },
         {
           "low": 280,
           "high": 299,
-          "prob": 0.115
+          "prob": 0.095
         },
         {
           "low": 300,
           "high": 319,
-          "prob": 0.1325
+          "prob": 0.076
         },
         {
           "low": 320,
           "high": 339,
-          "prob": 0.115
+          "prob": 0.055
         },
         {
           "low": 340,
           "high": 359,
-          "prob": 0.085
+          "prob": 0.0315
         },
         {
           "low": 360,
           "high": 379,
-          "prob": 0.075
+          "prob": 0.0175
         },
         {
           "low": 380,
           "high": 399,
-          "prob": 0.045
+          "prob": 0.012
         },
         {
           "low": 400,
           "high": 419,
-          "prob": 0.0315
+          "prob": 0.0065
         },
         {
           "low": 420,
           "high": 439,
-          "prob": 0.0225
+          "prob": 0.0045
         },
         {
           "low": 440,
           "high": 459,
-          "prob": 0.012
+          "prob": 0.0035
         },
         {
           "low": 460,
           "high": 479,
-          "prob": 0.0075
+          "prob": 0.0035
         },
         {
           "low": 480,
           "high": 499,
-          "prob": 0.0065
+          "prob": 0.0035
         },
         {
           "low": 500,
           "high": 519,
-          "prob": 0.004
+          "prob": 0.0015
         },
         {
           "low": 520,
           "high": 539,
-          "prob": 0.003
+          "prob": 0.0015
         },
         {
           "low": 540,
           "high": 559,
-          "prob": 0.0025
+          "prob": 0.0005
         },
         {
           "low": 560,
           "high": 579,
-          "prob": 0.0015
+          "prob": 0.0005
         }
       ]
     },
@@ -1488,42 +1448,42 @@
         {
           "low": 40,
           "high": 64,
-          "prob": 0.23
+          "prob": 0.19
         },
         {
           "low": 65,
           "high": 89,
-          "prob": 0.375
+          "prob": 0.4
         },
         {
           "low": 90,
           "high": 114,
-          "prob": 0.205
+          "prob": 0.255
         },
         {
           "low": 115,
           "high": 139,
-          "prob": 0.102
+          "prob": 0.1035
         },
         {
           "low": 140,
           "high": 164,
-          "prob": 0.0625
+          "prob": 0.043
         },
         {
           "low": 165,
           "high": 189,
-          "prob": 0.0145
+          "prob": 0.0065
         },
         {
           "low": 190,
           "high": 214,
-          "prob": 0.011
+          "prob": 0.004
         },
         {
           "low": 215,
           "high": 239,
-          "prob": 0.0025
+          "prob": 0.002
         }
       ]
     },
@@ -1536,22 +1496,22 @@
         {
           "low": 0,
           "high": 19,
-          "prob": 0.001
+          "prob": 0.0005
         },
         {
           "low": 20,
           "high": 39,
-          "prob": 0.0035
+          "prob": 0.0005
         },
         {
           "low": 40,
           "high": 59,
-          "prob": 0.0035
+          "prob": 0.0005
         },
         {
           "low": 60,
           "high": 79,
-          "prob": 0.0035
+          "prob": 0.0015
         },
         {
           "low": 80,
@@ -1566,42 +1526,42 @@
         {
           "low": 120,
           "high": 139,
-          "prob": 0.0065
+          "prob": 0.0115
         },
         {
           "low": 140,
           "high": 159,
-          "prob": 0.0105
+          "prob": 0.0235
         },
         {
           "low": 160,
           "high": 179,
-          "prob": 0.015
+          "prob": 0.0455
         },
         {
           "low": 180,
           "high": 199,
-          "prob": 0.0295
+          "prob": 0.066
         },
         {
           "low": 200,
           "high": 219,
-          "prob": 0.046
+          "prob": 0.081
         },
         {
           "low": 220,
           "high": 239,
-          "prob": 0.055
+          "prob": 0.095
         },
         {
           "low": 240,
           "high": 259,
-          "prob": 0.085
+          "prob": 0.095
         },
         {
           "low": 260,
           "high": 279,
-          "prob": 0.095
+          "prob": 0.115
         },
         {
           "low": 280,
@@ -1611,72 +1571,72 @@
         {
           "low": 300,
           "high": 319,
-          "prob": 0.105
+          "prob": 0.095
         },
         {
           "low": 320,
           "high": 339,
-          "prob": 0.115
+          "prob": 0.07
         },
         {
           "low": 340,
           "high": 359,
-          "prob": 0.095
+          "prob": 0.055
         },
         {
           "low": 360,
           "high": 379,
-          "prob": 0.075
+          "prob": 0.0395
         },
         {
           "low": 380,
           "high": 399,
-          "prob": 0.0545
+          "prob": 0.0285
         },
         {
           "low": 400,
           "high": 419,
-          "prob": 0.0455
+          "prob": 0.0165
         },
         {
           "low": 420,
           "high": 439,
-          "prob": 0.0325
+          "prob": 0.0125
         },
         {
           "low": 440,
           "high": 459,
-          "prob": 0.0215
+          "prob": 0.008
         },
         {
           "low": 460,
           "high": 479,
-          "prob": 0.015
+          "prob": 0.006
         },
         {
           "low": 480,
           "high": 499,
-          "prob": 0.014
+          "prob": 0.0055
         },
         {
           "low": 500,
           "high": 519,
-          "prob": 0.009
+          "prob": 0.004
         },
         {
           "low": 520,
           "high": 539,
-          "prob": 0.009
+          "prob": 0.0035
         },
         {
           "low": 540,
           "high": 559,
-          "prob": 0.006
+          "prob": 0.002
         },
         {
           "low": 560,
           "high": 579,
-          "prob": 0.004
+          "prob": 0.002
         }
       ]
     },
@@ -1719,7 +1679,7 @@
         {
           "low": 120,
           "high": 139,
-          "prob": 0.0005
+          "prob": 0
         },
         {
           "low": 140,
@@ -1789,7 +1749,7 @@
         {
           "low": 400,
           "high": 419,
-          "prob": 0.0025
+          "prob": 0.001
         },
         {
           "low": 420,
@@ -1814,37 +1774,37 @@
         {
           "low": 500,
           "high": 519,
-          "prob": 0.0005
+          "prob": 0.0015
         },
         {
           "low": 520,
           "high": 539,
-          "prob": 0.0005
+          "prob": 0.0015
         },
         {
           "low": 540,
           "high": 559,
-          "prob": 0.0005
+          "prob": 0.0015
         },
         {
           "low": 560,
           "high": 579,
-          "prob": 0.0005
+          "prob": 0.0015
         },
         {
           "low": 580,
           "high": 599,
-          "prob": 0.004
+          "prob": 0.0025
         },
         {
           "low": 600,
           "high": 619,
-          "prob": 0.0005
+          "prob": 0.0015
         },
         {
           "low": 620,
           "high": 639,
-          "prob": 0.002
+          "prob": 0.0025
         },
         {
           "low": 640,
@@ -1854,22 +1814,22 @@
         {
           "low": 660,
           "high": 679,
-          "prob": 0.002
+          "prob": 0.0015
         },
         {
           "low": 680,
           "high": 699,
-          "prob": 0.0035
+          "prob": 0.003
         },
         {
           "low": 700,
           "high": 719,
-          "prob": 0.0035
+          "prob": 0.0055
         },
         {
           "low": 720,
           "high": 739,
-          "prob": 0.007
+          "prob": 0.0085
         },
         {
           "low": 740,
@@ -1879,37 +1839,85 @@
         {
           "low": 760,
           "high": 779,
-          "prob": 0.005
+          "prob": 0.0075
         },
         {
           "low": 780,
           "high": 799,
-          "prob": 0.0165
+          "prob": 0.0095
         },
         {
           "low": 800,
           "high": 839,
-          "prob": 0.0395
+          "prob": 0.0195
         },
         {
           "low": 840,
           "high": 879,
-          "prob": 0.047
+          "prob": 0.0315
         },
         {
           "low": 880,
           "high": 919,
-          "prob": 0.0425
+          "prob": 0.065
         },
         {
           "low": 920,
           "high": 959,
-          "prob": 0.0445
+          "prob": 0.059
         },
         {
           "low": 960,
           "high": 999,
-          "prob": 0.0445
+          "prob": 0.091
+        }
+      ]
+    },
+    {
+      "slug": "elon-musk-of-tweets-november-7-november-9-2026",
+      "title": "Elon Musk # tweets November 7 - November 9, 2026?",
+      "weekStart": "2026-11-05",
+      "weekEnd": "2026-11-09",
+      "brackets": [
+        {
+          "low": 40,
+          "high": 64,
+          "prob": 0.58
+        },
+        {
+          "low": 65,
+          "high": 89,
+          "prob": 0.395
+        },
+        {
+          "low": 90,
+          "high": 114,
+          "prob": 0.575
+        },
+        {
+          "low": 115,
+          "high": 139,
+          "prob": 0.465
+        },
+        {
+          "low": 140,
+          "high": 164,
+          "prob": 0.485
+        },
+        {
+          "low": 165,
+          "high": 189,
+          "prob": 0.0055
+        },
+        {
+          "low": 190,
+          "high": 214,
+          "prob": 0.02
+        },
+        {
+          "low": 215,
+          "high": 239,
+          "prob": 0.02
         }
       ]
     }
